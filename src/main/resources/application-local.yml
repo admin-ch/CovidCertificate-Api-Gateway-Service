@@ -1,0 +1,28 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          cc-api-gateway-service:
+            client-id: "cc-api-gateway-service"
+            client-secret: "secret"
+            authorization-grant-type: "client_credentials"
+            provider: "default-provider"
+        provider:
+          default-provider:
+            issuer-uri: "http://localhost:8180"
+
+
+ha-authcode-generation-service:
+  uri: http://localhost:8120
+
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: "{noop}secret"
+
+allowed-common-names: vmsoajenkins10p01.bfi.admin.ch,ZH-spital-A-t.bit.admin.ch,TEST
+
+cc-api-gateway-service:
+  jwt:
+    publicKey: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm7g5sfd8MtTfUh29hlW6q+pZCZPY8McM0JbF1ZwXZ80Zx2gNDAiUTQrY1cuH9KpgB0JOITMyR6y+e7N4QFlaiHejwULPe+CUJOlgiTd/wqT64JDWXon8OjqZqpXE3es7ubtDG1LOjIeNo9UZcqzvzRcqi+RIPYQ+WHB7fexn1fp7FSb0YEuMDHLuqLmiFKw7elmf6OwguL9J2XhEJXl9oLYDKjkkH1lmoLtWcDUOR4OEDT+SMrDGQu8c7M73Ze1vyzD3wLrmVDoNACTLAMJmU4b8ZP/aONUpyZenneKpWeLjhGXwXmeXtIhJMKwBcEp7MkB9CFt1q/1LJAawIP8fawIDAQAB"

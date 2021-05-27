@@ -1,0 +1,49 @@
+info:
+  build:
+    artifact: '@project.artifactId@'
+    description: '@project.description@'
+    name: '@project.name@'
+    version: '@project.version@'
+logging:
+  level:
+    ch.admin.bit.jeap: DEBUG
+    ch.admin.bag: DEBUG
+    org:
+      springframework:
+        security: INFO
+    io:
+      swagger:
+        models:
+          parameters:
+            AbstractSerializableParameter: ERROR
+  pattern:
+    level: '[%X{correlationId}] %5p'
+  config: classpath:logback-spring.xml
+  file:
+    name: log.log
+server:
+  port: 8121
+  servlet:
+    context-path: /
+spring:
+  application:
+    name: cc-api-gateway-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'info,health,prometheus,loggers'
+  endpoint:
+    health:
+      show-details: always
+
+cc-api-gateway-service:
+  rest:
+    connectTimeoutSeconds: 5
+    readTimeoutSeconds: 5
+  allowed-origin: "*"
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: "{noop}secret"

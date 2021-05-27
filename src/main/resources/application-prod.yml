@@ -1,0 +1,29 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          cc-api-gateway-service:
+            client-id: "cc-api-gateway-service"
+            client-secret: ${vcap.services.cc-api-gateway-service-keycloak-client.credentials.client-secret}
+            authorization-grant-type: "client_credentials"
+            provider: "default-provider"
+            scope: "openid"
+        provider:
+          default-provider:
+            issuer-uri: "https://identity.bit.admin.ch/realms/BAG-CovidCertificate"
+
+
+ha-authcode-generation-service:
+  uri: "https://cc-management-service.app.cfap02.atlantica.admin.ch/"
+
+  monitor:
+    prometheus:
+      user: "prometheus"
+      password: ${vcap.services.cc_prometheus.credentials.password}
+
+allowed-common-names: vmsoajenkins10p01.bfi.admin.ch,ZH-spital-A-t.bit.admin.ch
+
+cc-api-gateway-service:
+  jwt:
+    publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
