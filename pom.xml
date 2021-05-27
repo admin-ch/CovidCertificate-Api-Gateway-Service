@@ -30,6 +30,10 @@
         <sonar.coverage.exclusions>
             **/*Dto.java,**/config/*,**/*Exception.java,**/*Constants.java,**/*Registry.java,**/*Config.java,**/*Mock*,**/*Application.java,**/*HttpResponseHeaderFilter.java,**/*ActuatorSecurity.java
         </sonar.coverage.exclusions>
+
+        <sonar.projectKey>admin-ch_CovidCertificate-Api-Gateway-Service</sonar.projectKey>
+        <sonar.organization>admin-ch</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
