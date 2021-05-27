@@ -2,4 +2,7 @@
 TODO
 
 ## Lombok
- Project uses Lombok. Configure your IDE with lombok plugin.
+Project uses Lombok. Configure your IDE with lombok plugin.
+ 
+## Local development
+TODO
