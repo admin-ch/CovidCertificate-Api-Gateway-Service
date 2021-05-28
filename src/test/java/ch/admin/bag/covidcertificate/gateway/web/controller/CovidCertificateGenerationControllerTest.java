@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 @ExtendWith(SpringExtension.class)
 @Slf4j
 @Disabled
-class CovidCertificationGenerationControllerTest {
+class CovidCertificateGenerationControllerTest {
 
     private static final String URL = "/api/code/v1";
 
@@ -35,7 +35,7 @@ class CovidCertificationGenerationControllerTest {
     private CovidCertificateGenerationService service;
 
     @InjectMocks
-    private CovidCertificationGenerationController controller;
+    private CovidCertificateGenerationController controller;
 
     private MockMvc mockMvc;
 

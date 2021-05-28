@@ -14,6 +14,7 @@ public class Constants {
     public static final String KPI_CERT_KEY = "cert";
     public static final ZoneId SWISS_TIMEZONE = ZoneId.of("Europe/Zurich");
     public static final String KPI_CREATE_CERTIFICATE_SYSTEM_KEY = "cc";
+    public static final String KPI_REVOKE_CERTIFICATE_SYSTEM_KEY = "re";
     public static final String KPI_SYSTEM_API = "api";
     public static final DateTimeFormatter LOG_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     public static final String KPI_TYPE_VACCINATION = "v";
