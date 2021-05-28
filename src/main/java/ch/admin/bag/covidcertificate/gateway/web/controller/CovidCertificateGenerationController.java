@@ -33,7 +33,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RestController
 @RequestMapping(value = "api/v1/covidcertificate")
 @RequiredArgsConstructor
-public class CovidCertificationGenerationController {
+public class CovidCertificateGenerationController {
 
     private final CovidCertificateGenerationService service;
 
