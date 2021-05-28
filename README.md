@@ -5,4 +5,4 @@ TODO
 Project uses Lombok. Configure your IDE with lombok plugin.
  
 ## Local development
-TODO
+TODO 
