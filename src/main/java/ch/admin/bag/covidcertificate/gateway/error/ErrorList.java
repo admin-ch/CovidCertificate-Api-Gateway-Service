@@ -49,6 +49,8 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Country short form can not be mapped}";
     public static final String INVALID_LANGUAGE = ERROR_CODE_KEY + 469 + ","
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
+    public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
+            + ERROR_MESSAGE_KEY + "Invalid UVCI format.}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
@@ -74,4 +76,8 @@ public class ErrorList {
     public static final RestError PAYLOAD_TOO_LARGE = new RestError(PAYLOAD_TOO_LARGE_CODE, PAYLOAD_TOO_LARGE_MESSAGE, HttpStatus.PAYLOAD_TOO_LARGE);
     public static final String PAYLOAD_TOO_LARGE_JSON = ERROR_CODE_KEY + PAYLOAD_TOO_LARGE_CODE + ","
             + ERROR_MESSAGE_KEY + PAYLOAD_TOO_LARGE_MESSAGE + "}";
+
+    // Conflict
+    public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
+            + ERROR_MESSAGE_KEY + "Duplicate UVCI.}";
 }

@@ -4,6 +4,7 @@ import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.filters.PayloadLimitException;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
+import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,6 +40,11 @@ public class ResponseStatusExceptionHandler {
 
     @ExceptionHandler(value = {CreateCertificateException.class})
     protected ResponseEntity<RestError> createCertificateConflict(CreateCertificateException ex) {
+        return handleError(ex.getError());
+    }
+
+    @ExceptionHandler(value = {RevokeCertificateException.class})
+    protected ResponseEntity<RestError> createCertificateConflict(RevokeCertificateException ex) {
         return handleError(ex.getError());
     }
 
