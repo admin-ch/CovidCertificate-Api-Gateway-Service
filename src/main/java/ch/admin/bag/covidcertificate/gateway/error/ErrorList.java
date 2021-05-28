@@ -50,20 +50,6 @@ public class ErrorList {
     public static final String INVALID_LANGUAGE = ERROR_CODE_KEY + 469 + ","
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
 
-    // Internal server error
-    public static final String CREATE_COSE_PROTECTED_HEADER_FAILED = ERROR_CODE_KEY + 550 + ","
-            + ERROR_MESSAGE_KEY + "Creating COSE protected header failed.}";
-    public static final String CREATE_COSE_PAYLOAD_FAILED = ERROR_CODE_KEY + 551 + ","
-            + ERROR_MESSAGE_KEY + "Creating COSE payload failed.}";
-    public static final String CREATE_COSE_SIGNATURE_DATA_FAILED = ERROR_CODE_KEY + 552 + ","
-            + ERROR_MESSAGE_KEY + "Creating COSE signature data failed.}";
-    public static final String CREATE_SIGNATURE_FAILED = ERROR_CODE_KEY + 553 + ","
-            + ERROR_MESSAGE_KEY + "Creating signature failed.}";
-    public static final String CREATE_COSE_SIGN1_FAILED = ERROR_CODE_KEY + 554 + ","
-            + ERROR_MESSAGE_KEY + "Creating COSE_Sign1 failed.}";
-    public static final String CREATE_BARCODE_FAILED = ERROR_CODE_KEY + 555 + ","
-            + ERROR_MESSAGE_KEY + "Creating barcode failed.}";
-
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
     private static final String INVALID_SIGNATURE_MESSAGE = "Integrity check failed, the body hash does not match the hash in the header";
