@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -22,8 +21,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomHeaderAuthenticationFilter extends OncePerRequestFilter {
-
-    private final List<String> allowedCommonNames;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,13 +38,6 @@ public class CustomHeaderAuthenticationFilter extends OncePerRequestFilter {
         String commonName = CNExtractor.extract(authorizationHeader);
 
         log.info("Found '{}' from '{}'", kv("commonName", commonName), authorizationHeader);
-
-        //TODO: Reactivate Check when the list is updated
-//        if (!allowedCommonNames.contains(commonName)) {
-//            response.setStatus(HttpStatus.FORBIDDEN.value());
-//            log.error("Common-Name '{}' not allowed. Please register your certificate.", commonName);
-//            return;
-//        }
 
         String clientCert = request.getHeader("X-Client-Cert");
 
