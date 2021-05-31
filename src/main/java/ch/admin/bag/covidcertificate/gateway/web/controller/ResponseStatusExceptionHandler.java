@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
 @ControllerAdvice()
@@ -63,6 +66,21 @@ public class ResponseStatusExceptionHandler {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = {HttpMessageNotReadableException.class})
+    protected ResponseEntity<RestError> notReadableRequestPayload(HttpMessageNotReadableException ex) {
+        var errorMessage = getRootCauseMessage(ex);
+        var error = new RestError(HttpStatus.BAD_REQUEST.value(), errorMessage, HttpStatus.BAD_REQUEST);
+        return handleError(error);
+    }
+
+    private String getRootCauseMessage(NestedRuntimeException ex){
+        return Stream.of(ex.getRootCause(), ex.getCause(), ex)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .map(Throwable::getMessage)
+                .orElse("");
+    }
+    
     private ResponseEntity<RestError> handleError(RestError restError) {
         return new ResponseEntity<>(restError, restError.getHttpStatus());
     }
