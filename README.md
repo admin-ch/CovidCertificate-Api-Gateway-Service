@@ -1,4 +1,4 @@
-# CC-API-Gateway-Service
+# CovidCertificate-API-Gateway-Service
 
 ## Lombok
 Project uses Lombok. Configure your IDE with lombok plugin.
