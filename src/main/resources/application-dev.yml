@@ -22,8 +22,6 @@ ha-authcode-generation-service:
       user: "prometheus"
       password: ${vcap.services.cc_prometheus.credentials.password}
 
-allowed-common-names: vmsoajenkins10p01.bfi.admin.ch,ZH-spital-A-t.bit.admin.ch
-
 cc-api-gateway-service:
   jwt:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}

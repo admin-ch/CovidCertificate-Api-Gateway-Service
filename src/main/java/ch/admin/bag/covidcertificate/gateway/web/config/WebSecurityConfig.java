@@ -21,9 +21,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${cc-api-gateway-service.allowed-origin}")
     private String allowedOrigin;
 
-    @Value("#{'${allowed-common-names}'.split(',')}")
-    private List<String> allowedCommonNames;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -36,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new CustomHeaderAuthenticationFilter(allowedCommonNames), BasicAuthenticationFilter.class)
+                .and().addFilterBefore(new CustomHeaderAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .authorizeRequests().anyRequest().fullyAuthenticated();
     }
 

@@ -46,4 +46,3 @@ cc-api-gateway-service:
   monitor:
     prometheus:
       user: "prometheus"
-      password: "{noop}secret"
