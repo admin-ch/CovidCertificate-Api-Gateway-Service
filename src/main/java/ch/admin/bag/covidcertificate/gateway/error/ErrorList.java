@@ -51,6 +51,21 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
             + ERROR_MESSAGE_KEY + "Invalid UVCI format.}";
+    public static final int INVALID_VACCINATION_INFO_CODE = 471;
+    public static final String INVALID_VACCINATION_INFO_MESSAGE = "Invalid vaccination info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_VACCINATION_INFO = new RestError(INVALID_VACCINATION_INFO_CODE, INVALID_VACCINATION_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String INVALID_VACCINATION_INFO_JSON = ERROR_CODE_KEY + INVALID_VACCINATION_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_VACCINATION_INFO_MESSAGE + "}";
+    public static final int INVALID_TEST_INFO_CODE = 472;
+    public static final String INVALID_TEST_INFO_MESSAGE = "Invalid test info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_TEST_INFO = new RestError(INVALID_TEST_INFO_CODE, "Invalid test info! Exactly one element is expected in the array.", HttpStatus.BAD_REQUEST);
+    public static final String INVALID_TEST_INFO_JSON = ERROR_CODE_KEY + INVALID_TEST_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_TEST_INFO_MESSAGE + "}";
+    public static final int INVALID_RECOVERY_INFO_CODE = 473;
+    public static final String INVALID_RECOVERY_INFO_MESSAGE = "Invalid recovery info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_RECOVERY_INFO = new RestError(INVALID_RECOVERY_INFO_CODE, INVALID_RECOVERY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String INVALID_RECOVERY_INFO_JSON = ERROR_CODE_KEY + INVALID_RECOVERY_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_RECOVERY_INFO_MESSAGE + "}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
