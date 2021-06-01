@@ -34,14 +34,6 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
                         @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON)
                 })
 )
-@ApiResponse(responseCode = "413",
-        content = @Content(
-                schema = @Schema(implementation = RestError.class),
-                mediaType = "application/json",
-                examples = {
-                        @ExampleObject(name = "PAYLOAD_TOO_LARGE", value = PAYLOAD_TOO_LARGE_JSON)
-                }
-        ))
 @Slf4j
 public class ResponseStatusExceptionHandler {
 

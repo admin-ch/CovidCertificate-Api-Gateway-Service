@@ -86,7 +86,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testSignatureValid() throws Exception {
+    void testSignatureValid() throws Exception {
         byte[] signature = getSignature();
 
         when(request.getHeader(keyHeaderName)).thenReturn(certificateString);
@@ -100,7 +100,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testSignatureValidWindowsWithNewLine() throws Exception {
+    void testSignatureValidWindowsWithNewLine() throws Exception {
         String json = "\r" + testJson + "\r";
         byte[] signature = getSignature(json, privateKey);
 
@@ -115,7 +115,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testSignatureValidWithTab() throws Exception {
+    void testSignatureValidWithTab() throws Exception {
         String json = "\t" + testJson + "\t";
         byte[] signature = getSignature(json, privateKey);
 
@@ -130,7 +130,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testWithOtherBody() throws Exception {
+    void testWithOtherBody() throws Exception {
         byte[] signature = getSignature();
 
         when(request.getHeader(keyHeaderName)).thenReturn(certificateString);
@@ -147,7 +147,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testEncryptedWithWrongPrivateKey() throws Exception {
+    void testEncryptedWithWrongPrivateKey() throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(4096);
         KeyPair otherKeyPair = keyGen.generateKeyPair();
@@ -165,7 +165,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testWrongPublicKey() throws Exception {
+    void testWrongPublicKey() throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(4096);
         KeyPair otherKeyPair = keyGen.generateKeyPair();
@@ -182,7 +182,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testWithOtherHash() throws Exception {
+    void testWithOtherHash() throws Exception {
         byte[] signature = getSignature("other json", privateKey);
 
         when(request.getHeader(keyHeaderName)).thenReturn(certificateString);
@@ -195,7 +195,7 @@ class IntegrityFilterTest {
     }
 
     @Test
-    public void testWithoutHeaders() throws Exception {
+    void testWithoutHeaders() throws Exception {
         byte[] signature = getSignature();
 
         when(request.getHeader(keyHeaderName)).thenReturn(null);
