@@ -5,6 +5,7 @@ import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.BearerTokenValidationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
+import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CovidCertificateCreateResponseDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryCertificateCreateDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.TestCertificateCreateDto;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
@@ -35,9 +36,11 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class CovidCertificateGenerationController {
 
-    private final CovidCertificateGenerationService service;
+    private final CovidCertificateGenerationService generationService;
 
     private final BearerTokenValidationService bearerTokenValidationService;
+
+    private final KpiDataService kpiDataService;
 
     @PostMapping("/vaccination")
     @Operation(operationId = "createVaccinationCertificate",
@@ -76,7 +79,7 @@ public class CovidCertificateGenerationController {
         log.info("Call of Create for vaccination certificate");
         String userExtId = bearerTokenValidationService.validate(createDto.getOtp());
 
-        CovidCertificateCreateResponseDto covidCertificate = service.createCovidCertificate(createDto);
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_VACCINATION, userExtId);
         return covidCertificate;
 
@@ -119,7 +122,7 @@ public class CovidCertificateGenerationController {
         log.info("Call of Create for test certificate");
         String userExtId = bearerTokenValidationService.validate(createDto.getOtp());
 
-        CovidCertificateCreateResponseDto covidCertificate = service.createCovidCertificate(createDto);
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_TEST, userExtId);
         return covidCertificate;
     }
@@ -158,12 +161,14 @@ public class CovidCertificateGenerationController {
         log.info("Call of Create for recovery certificate");
         String userExtId = bearerTokenValidationService.validate(createDto.getOtp());
 
-        CovidCertificateCreateResponseDto covidCertificate = service.createCovidCertificate(createDto);
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_RECOVERY, userExtId);
         return covidCertificate;
     }
 
     private void logKpi(String type, String userExtId) {
-        log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, ZonedDateTime.now(SWISS_TIMEZONE).format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_SYSTEM_KEY, KPI_SYSTEM_API), kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
+        LocalDateTime kpiTimestamp = LocalDateTime.now();
+        log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, kpiTimestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
+        kpiDataService.saveKpiData(kpiTimestamp, type, userExtId);
     }
 }
