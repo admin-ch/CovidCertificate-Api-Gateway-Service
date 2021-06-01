@@ -1,14 +1,17 @@
 package ch.admin.bag.covidcertificate.gateway.filters;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 public class CachedBodyServletInputStream extends ServletInputStream {
 
-    private InputStream cachedBodyInputStream;
+    private final InputStream cachedBodyInputStream;
 
     public CachedBodyServletInputStream(byte[] cachedBody) {
         this.cachedBodyInputStream = new ByteArrayInputStream(cachedBody);
@@ -24,7 +27,7 @@ public class CachedBodyServletInputStream extends ServletInputStream {
         try {
             return cachedBodyInputStream.available() == 0;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception during reading", e);
             throw new IllegalStateException(e);
         }
     }
@@ -36,6 +39,6 @@ public class CachedBodyServletInputStream extends ServletInputStream {
 
     @Override
     public void setReadListener(ReadListener readListener) {
-
+        //Method not used
     }
 }
