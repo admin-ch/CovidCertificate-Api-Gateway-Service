@@ -15,12 +15,12 @@ public class KpiData {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     UUID id;
-    LocalDateTime kpiTimestamp;
+    LocalDateTime timestamp;
     String type;
     String value;
 
-    public KpiData(LocalDateTime kpiTimestamp, String type, String value) {
-        this.kpiTimestamp = kpiTimestamp;
+    public KpiData(LocalDateTime timestamp, String type, String value) {
+        this.timestamp = timestamp;
         this.type = type;
         this.value = value;
     }

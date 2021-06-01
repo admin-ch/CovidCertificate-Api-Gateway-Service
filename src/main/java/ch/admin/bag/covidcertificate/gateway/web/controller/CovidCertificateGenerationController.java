@@ -167,8 +167,8 @@ public class CovidCertificateGenerationController {
     }
 
     private void logKpi(String type, String userExtId) {
-        LocalDateTime kpiTimestamp = LocalDateTime.now();
-        log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, kpiTimestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
-        kpiDataService.saveKpiData(kpiTimestamp, type, userExtId);
+        LocalDateTime timestamp = LocalDateTime.now();
+        log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
+        kpiDataService.saveKpiData(timestamp, type, userExtId);
     }
 }

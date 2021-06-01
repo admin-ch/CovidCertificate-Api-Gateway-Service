@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Service
 @Slf4j
@@ -16,9 +15,9 @@ public class KpiDataService {
 
     private final KpiDataRepository logRepository;
 
-    public void saveKpiData(LocalDateTime kpiTimestamp, String type, String value) {
+    public void saveKpiData(LocalDateTime timestamp, String type, String value) {
         KpiData kpiData = new KpiData(
-                kpiTimestamp,
+                timestamp,
                 type,
                 value
         );
