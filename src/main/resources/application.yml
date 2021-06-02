@@ -28,6 +28,49 @@ server:
 spring:
   application:
     name: cc-api-gateway-service
+  datasource:
+    url: jdbc:postgresql://localhost:3121/cc-api-gateway
+    # Only for local development
+    username: cc-api-gateway
+    password: secret
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      pool-name: hikari-cp-${spring.application.name}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    clean-on-validation-error: false
+    locations: classpath:db/migration/common, classpath:db/migration/postgresql
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+  messages:
+    basename: mail-messages,validation-messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  session:
+    store-type: none
+  data:
+    rest:
+      base-path: /api
+      max-page-size: 100
+      default-page-size: 20
+  main:
+    banner-mode: off
 
 management:
   endpoints:
