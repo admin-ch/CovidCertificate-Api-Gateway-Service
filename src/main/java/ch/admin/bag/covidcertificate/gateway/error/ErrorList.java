@@ -44,8 +44,6 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Invalid date of first positive test result}";
     public static final String INVALID_COUNTRY_OF_TEST = ERROR_CODE_KEY + 467 + ","
             + ERROR_MESSAGE_KEY + "Invalid country of test}";
-    public static final String INVALID_COUNTRY_SHORT_FORM = ERROR_CODE_KEY + 468 + ","
-            + ERROR_MESSAGE_KEY + "Country short form can not be mapped}";
     public static final String INVALID_LANGUAGE = ERROR_CODE_KEY + 469 + ","
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
@@ -65,10 +63,16 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + SIGNATURE_PARSE_MESSAGE + "}";
 
     public static final int INVALID_BEARER_CODE = 492;
-    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing bearer token";
+    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing OTP";
     public static final RestError INVALID_BEARER = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_BEARER_JSON = ERROR_CODE_KEY + INVALID_BEARER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_BEARER_MESSAGE + "}";
+
+    public static final int INVALID_AUTHORIZATION_COMBINATION_CODE = 493;
+    public static final String INVALID_AUTHORIZATION_COMBINATION_MESSAGE = "Invalid authorization combination of OTP and identity";
+    public static final RestError INVALID_AUTHORIZATION_COMBINATION = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_AUTHORIZATION_COMBINATION_JSON = ERROR_CODE_KEY + INVALID_AUTHORIZATION_COMBINATION_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_AUTHORIZATION_COMBINATION_MESSAGE + "}";
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","

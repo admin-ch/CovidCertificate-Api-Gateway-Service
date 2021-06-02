@@ -8,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RevocationDto {
-    @Schema(example= "urn:uvci:01:CH:97DAB5E31B589AF3CAE2F53F", description = "UVCI of certificate to be revoked.")
+    @Schema(example = "urn:uvci:01:CH:97DAB5E31B589AF3CAE2F53F", description = "UVCI of certificate to be revoked.")
     private String uvci;
     private String otp;
+    private IdentityDto identity;
 }
