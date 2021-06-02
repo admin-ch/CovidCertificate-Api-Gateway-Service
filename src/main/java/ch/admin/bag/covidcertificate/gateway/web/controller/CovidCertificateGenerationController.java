@@ -72,6 +72,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_COUNTRY_SHORT_FORM", value = INVALID_COUNTRY_SHORT_FORM),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                     }
             )
     )
@@ -115,6 +116,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_COUNTRY_SHORT_FORM", value = INVALID_COUNTRY_SHORT_FORM),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                     }
             )
     )
@@ -154,6 +156,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_COUNTRY_OF_TEST", value = INVALID_COUNTRY_OF_TEST),
                             @ExampleObject(name = "INVALID_COUNTRY_SHORT_FORM", value = INVALID_COUNTRY_SHORT_FORM),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                     }
             )
     )

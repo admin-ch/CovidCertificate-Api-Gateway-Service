@@ -50,6 +50,8 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
             + ERROR_MESSAGE_KEY + "Invalid UVCI format.}";
+    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 471 + ","
+            + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;

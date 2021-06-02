@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.service.dto.incoming;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -13,4 +14,5 @@ public class CovidCertificateCreateResponseDto {
     @Schema(type = "string", format = "byte")
     private byte[] qrCode;
     private String uvci;
+    private boolean printJobSent;
 }
