@@ -1,0 +1,10 @@
+version: '3'
+services:
+  db-api-gateway:
+    image: postgres
+    ports:
+      - "3121:5432"
+    environment:
+      - POSTGRES_USER=cc-api-gateway
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=cc-api-gateway

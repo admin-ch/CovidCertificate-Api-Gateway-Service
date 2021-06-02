@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.web.config;
 
+import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final KpiDataService kpiDataService;
+
     @Value("${cc-api-gateway-service.allowed-origin}")
     private String allowedOrigin;
 
@@ -33,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new CustomHeaderAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .and().addFilterBefore(new CustomHeaderAuthenticationFilter(kpiDataService), BasicAuthenticationFilter.class)
                 .authorizeRequests().anyRequest().fullyAuthenticated();
     }
 
