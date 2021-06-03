@@ -44,8 +44,6 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Invalid date of first positive test result}";
     public static final String INVALID_COUNTRY_OF_TEST = ERROR_CODE_KEY + 467 + ","
             + ERROR_MESSAGE_KEY + "Invalid country of test}";
-    public static final String INVALID_COUNTRY_SHORT_FORM = ERROR_CODE_KEY + 468 + ","
-            + ERROR_MESSAGE_KEY + "Country short form can not be mapped}";
     public static final String INVALID_LANGUAGE = ERROR_CODE_KEY + 469 + ","
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","

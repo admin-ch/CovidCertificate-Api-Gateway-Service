@@ -16,7 +16,7 @@ public class VaccinationCertificateDataDto {
     private Integer numberOfDoses;
     @Schema(example= "2", description = "total series of doses.")
     private Integer totalNumberOfDoses;
-    @Schema(example= "2021-05-14", description = "date of vaccination. Format: ISO 8601 date without time. Range: can be between 1900-01-01 and 2099-12-31.")
+    @Schema(example= "2021-05-14", description = "date of vaccination. Format: ISO 8601 date without time.")
     private LocalDate vaccinationDate;
     @Schema(example= "CH", description = "the country in which the covid certificate owner has been vaccinated. Format: string (2 chars according to ISO 3166 Country Codes).")
     private String countryOfVaccination;
