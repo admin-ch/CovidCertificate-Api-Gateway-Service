@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.web.config;
 
+import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -21,6 +22,8 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomHeaderAuthenticationFilter extends OncePerRequestFilter {
+
+    private final KpiDataService kpiDataService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -58,6 +61,8 @@ public class CustomHeaderAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void logKpi(String commonName) {
-        log.info("kpi: {} {}", kv(KPI_TIMESTAMP_KEY, ZonedDateTime.now(SWISS_TIMEZONE).format(LOG_FORMAT)), kv(KPI_CERT_KEY, commonName));
+        LocalDateTime timestamp = LocalDateTime.now();
+        log.info("kpi: {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CERT_KEY, commonName));
+        kpiDataService.saveKpiData(timestamp, KPI_COMMON_NAME_TYPE, commonName);
     }
 }

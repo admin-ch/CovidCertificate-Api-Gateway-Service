@@ -1,6 +1,5 @@
 package ch.admin.bag.covidcertificate.gateway.error;
 
-import ch.admin.bag.covidcertificate.gateway.filters.CustomHttpRequestWrapper;
 import org.springframework.http.HttpStatus;
 
 public class ErrorList {
@@ -85,12 +84,6 @@ public class ErrorList {
     public static final RestError INVALID_BEARER = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_BEARER_JSON = ERROR_CODE_KEY + INVALID_BEARER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_BEARER_MESSAGE + "}";
-
-    private static final int PAYLOAD_TOO_LARGE_CODE = 493;
-    private static final String PAYLOAD_TOO_LARGE_MESSAGE = "Request payload too large, the maximum payload size is: " + CustomHttpRequestWrapper.MAX_BODY_SIZE + " bytes";
-    public static final RestError PAYLOAD_TOO_LARGE = new RestError(PAYLOAD_TOO_LARGE_CODE, PAYLOAD_TOO_LARGE_MESSAGE, HttpStatus.PAYLOAD_TOO_LARGE);
-    public static final String PAYLOAD_TOO_LARGE_JSON = ERROR_CODE_KEY + PAYLOAD_TOO_LARGE_CODE + ","
-            + ERROR_MESSAGE_KEY + PAYLOAD_TOO_LARGE_MESSAGE + "}";
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","

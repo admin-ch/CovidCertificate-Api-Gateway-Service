@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +34,7 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
                         @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON)
                 })
 )
-@ApiResponse(responseCode = "413",
-        content = @Content(
-                schema = @Schema(implementation = RestError.class),
-                mediaType = "application/json",
-                examples = {
-                        @ExampleObject(name = "PAYLOAD_TOO_LARGE", value = PAYLOAD_TOO_LARGE_JSON)
-                }
-        ))
+@Slf4j
 public class ResponseStatusExceptionHandler {
 
     @ExceptionHandler(value = {CreateCertificateException.class})
@@ -64,7 +58,8 @@ public class ResponseStatusExceptionHandler {
     }
 
     @ExceptionHandler(value = {Exception.class})
-    protected ResponseEntity<Object> handleException() {
+    protected ResponseEntity<Object> handleException(Exception e) {
+        log.error("Exception during processing", e);
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -84,6 +79,7 @@ public class ResponseStatusExceptionHandler {
     }
     
     private ResponseEntity<RestError> handleError(RestError restError) {
+        log.error("Error {}", restError);
         return new ResponseEntity<>(restError, restError.getHttpStatus());
     }
 }

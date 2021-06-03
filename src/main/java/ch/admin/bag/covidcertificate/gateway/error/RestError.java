@@ -1,10 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.error;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
@@ -12,6 +9,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class RestError implements Serializable {
     private int errorCode;
     private String errorMessage;

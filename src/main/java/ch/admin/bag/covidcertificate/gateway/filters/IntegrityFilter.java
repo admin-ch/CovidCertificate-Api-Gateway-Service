@@ -45,7 +45,7 @@ public class IntegrityFilter extends OncePerRequestFilter {
         }
     }
 
-    private static boolean checkIntegrity(CustomHttpRequestWrapper request) throws SignatureParseException {
+    private static boolean checkIntegrity(CachedBodyHttpServletRequest request) throws SignatureParseException {
         Base64.Decoder decoder = Base64.getDecoder();
         String signaturePublicKey = request.getHeader(HEADER_KEY_NAME);
         String signatureHash = request.getHeader(HEADER_HASH_NAME);
@@ -63,8 +63,6 @@ public class IntegrityFilter extends OncePerRequestFilter {
                 signature.update(body.getBytes());
 
                 return signature.verify(decodedHash);
-            } catch (IOException e) {
-                log.warn("Unable to read request body", e);
             } catch (Exception e) {
                 log.warn("Error while verifying request integrity", e);
             }
@@ -76,7 +74,7 @@ public class IntegrityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        CustomHttpRequestWrapper wrappedRequest = new CustomHttpRequestWrapper(httpServletRequest);
+        CachedBodyHttpServletRequest wrappedRequest = new CachedBodyHttpServletRequest(httpServletRequest);
         RestError restError = null;
         try {
             if (checkIntegrity(wrappedRequest)) {
