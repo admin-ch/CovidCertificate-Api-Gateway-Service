@@ -73,12 +73,14 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_VACCINATION_INFO", value = INVALID_VACCINATION_INFO_JSON),
                     }
             )
     )
     public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for vaccination certificate");
         String userExtId = validateAndGetId(createDto);
+        createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_VACCINATION, userExtId);
@@ -115,12 +117,14 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_TEST_CENTER", value = INVALID_TEST_CENTER),
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_TEST_INFO", value = INVALID_TEST_INFO_JSON),
                     }
             )
     )
     public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for test certificate");
         String userExtId = validateAndGetId(createDto);
+        createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_TEST, userExtId);
@@ -153,12 +157,14 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT", value = INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT),
                             @ExampleObject(name = "INVALID_COUNTRY_OF_TEST", value = INVALID_COUNTRY_OF_TEST),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON)
                     }
             )
     )
     public CovidCertificateCreateResponseDto create(@RequestBody RecoveryCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery certificate");
         String userExtId = validateAndGetId(createDto);
+        createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_RECOVERY, userExtId);
