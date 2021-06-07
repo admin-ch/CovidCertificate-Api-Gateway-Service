@@ -16,7 +16,7 @@ public class TestCertificateDataDto {
     private String manufacturerCode;
     @Schema(example = "2020-09-24T17:29:41Z", description = "date and time of the test sample collection. Format: ISO 8601 date incl. time.")
     private ZonedDateTime sampleDateTime;
-    @Schema(example = "de", description = "name of centre or facility. Format: string, maxLength: 50 CHAR.")
+    @Schema(example = "Walk-in-Lyss AG", description = "name of centre or facility. Format: string, maxLength: 50 CHAR.")
     private String testingCentreOrFacility;
     @Schema(example = "CH", description = "the country in which the covid certificate owner has been tested. Format: string (2 chars according to ISO 3166 Country Codes).")
     private String memberStateOfTest;

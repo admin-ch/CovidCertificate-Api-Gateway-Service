@@ -11,6 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CovidCertificatePersonDto {
     private CovidCertificatePersonNameDto name;
-    @Schema(example= "1950-06-04", description = "birthdate of the covid certificate owner. Format: ISO 8601 date without time. Range: can be between 1900-01-01 and 2099-12-31.")
+    @Schema(example= "1964-03-14", description = "birthdate of the covid certificate owner. Format: ISO 8601 date without time.")
     private LocalDate dateOfBirth;
 }
