@@ -85,9 +85,21 @@ public class ErrorList {
 
     public static final int INVALID_AUTHORIZATION_COMBINATION_CODE = 493;
     public static final String INVALID_AUTHORIZATION_COMBINATION_MESSAGE = "Invalid authorization combination of OTP and identity";
-    public static final RestError INVALID_AUTHORIZATION_COMBINATION = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final RestError INVALID_AUTHORIZATION_COMBINATION = new RestError(INVALID_AUTHORIZATION_COMBINATION_CODE, INVALID_AUTHORIZATION_COMBINATION_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_AUTHORIZATION_COMBINATION_JSON = ERROR_CODE_KEY + INVALID_AUTHORIZATION_COMBINATION_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_AUTHORIZATION_COMBINATION_MESSAGE + "}";
+
+    public static final int INVALID_IDENTITY_USER_CODE = 494;
+    public static final String INVALID_IDENTITY_USER_MESSAGE = "Invalid identity user";
+    public static final RestError INVALID_IDENTITY_USER = new RestError(INVALID_IDENTITY_USER_CODE, INVALID_IDENTITY_USER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_IDENTITY_USER_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_MESSAGE + "}";
+
+    public static final int INVALID_IDENTITY_USER_ROLE_CODE = 494;
+    public static final String INVALID_IDENTITY_USER_ROLE_MESSAGE = "Invalid identity user role";
+    public static final RestError INVALID_IDENTITY_USER_ROLE = new RestError(INVALID_IDENTITY_USER_ROLE_CODE, INVALID_IDENTITY_USER_ROLE_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_IDENTITY_USER_ROLE_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_ROLE_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_ROLE_MESSAGE + "}";
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","

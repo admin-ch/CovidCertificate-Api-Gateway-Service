@@ -1,0 +1,4458 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0"
+	targetNamespace="http://adnovum.ch/nevisidm/ws/services/v1"
+	xmlns:tns="http://adnovum.ch/nevisidm/ws/services/v1"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--
+  =============================================================================
+  Basic types, used as input for CRUD operations
+  =============================================================================
+  -->
+  <xs:complexType name="abstractEntity">
+    <xs:sequence>
+      <xs:element name="ctlCreUid" type="xs:string" minOccurs="0"/>
+      <xs:element name="ctlCreDat" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="ctlModUid" type="xs:string" minOccurs="0"/>
+      <xs:element name="ctlModDat" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="ctlTcn" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- IDM model types -->
+
+  <!--
+  The following xs:element is here because we need a generated ObjectFactory method for the User type
+  (And only for the User type!).
+  This ObjectFactory method is called when the User object gets unmarshalled from its String representation.
+  -->
+  <xs:element name="User" type="tns:user"/>
+
+  <xs:complexType name="user">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <!-- user attributes -->
+          <xs:element name="loginId" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="clientExtId" 		type="xs:string" 			minOccurs="0"/> <!-- deprecated: use abstractRequest.clientExtId -->
+          <xs:element name="clientName" 		type="xs:string" 			minOccurs="0"/> <!-- deprecated: use abstractRequest.clientName -->
+          <xs:element name="state" 				type="tns:userState" 		minOccurs="0"/>
+          <xs:element name="lastLogin" 			type="xs:dateTime" 			minOccurs="0"/>
+          <xs:element name="lastLoginFailure" 	type="xs:dateTime" 			minOccurs="0"/>
+          <xs:element name="isTechnicalUser" 	type="xs:boolean" 			minOccurs="0"/>
+          <xs:element name="firstName" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="remarks" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="gender" 			type="tns:userGender" 		minOccurs="0"/>
+          <xs:element name="sex" 				type="tns:userSex" 			minOccurs="0"/>
+          <xs:element name="birthDate" 			type="xs:date" 				minOccurs="0"/>
+          <xs:element name="validFrom" 			type="xs:dateTime" 	    	minOccurs="0"/>
+          <xs:element name="validTo" 			type="xs:dateTime" 			minOccurs="0"/>
+          <xs:element name="title" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="telephone" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="email" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="telefax" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="mobile" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="addressLine1" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="addressLine2" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="postalCode" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="city" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="country" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="language" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="templateCollection" type="xs:string" 			minOccurs="0"/>
+          <xs:element name="modificationComment" type="xs:string" 			minOccurs="0"/>
+          <xs:element name="stateChangedDate" 	 type="xs:dateTime" 		minOccurs="0"/>
+          <xs:element name="stateChangeReasonCd" type="xs:int" 				minOccurs="0" />
+          <xs:element name="stateChangeDetail"   type="xs:string" 			minOccurs="0" />
+		  <!-- address extension conforming to eCH-00100 standard -->
+          <xs:element name="street" 			 type="tns:streetType" 					minOccurs="0"/>
+          <xs:element name="houseNumber" 		 type="tns:houseNumberType" 				minOccurs="0"/>
+          <xs:element name="dwellingNumber" 	 type="tns:dwellingNumberType" 			minOccurs="0"/>
+          <xs:element name="postOfficeBoxNumber" type="tns:postOfficeBoxNumberType" 	minOccurs="0"/>
+          <xs:element name="postOfficeBoxText"	 type="tns:postOfficeBoxTextType" 		minOccurs="0"/>
+          <xs:element name="locality"	 		 type="tns:locality" 					minOccurs="0"/>
+
+          <!-- attached objects -->
+          <xs:element name="profiles" 			type="tns:profile" 				minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="credentials" 		type="tns:credential" 			minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="certificates" 		type="tns:certificate" 			minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="mobileSignatures" 	type="tns:mobileSignature"		minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="samlFederations" 	type="tns:samlFederation"		minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="securityQuestions" 	type="tns:securityQuestions"	minOccurs="0" maxOccurs="unbounded" nillable="true" />
+          <xs:element name="properties" 		type="tns:propertyValue" 		minOccurs="0" maxOccurs="unbounded" nillable="true" />
+
+          <!-- search template attributes (only used as input for query operations) -->
+          <xs:element name="birthDateFrom" 		type="xs:date" 				minOccurs="0"/>
+       	  <xs:element name="birthDateTo" 		type="xs:date" 				minOccurs="0"/>
+       	  <xs:element name="validFromLow" 		type="xs:date" 				minOccurs="0"/>
+       	  <xs:element name="validFromHi" 		type="xs:date" 				minOccurs="0"/>
+       	  <xs:element name="validToLow" 		type="xs:date" 				minOccurs="0"/>
+       	  <xs:element name="validToHi"  		type="xs:date" 				minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="client">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="remarks" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="displayName"		type="tns:dictEntry" 		minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="authorization">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="role" type="tns:role" minOccurs="0" maxOccurs="1"/>
+
+          <!-- client, unit and application data room (for IDM roles only) -->
+          <xs:element name="authorizedUnits" type="tns:unit" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="authorizedApplications" type="tns:application" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="authorizedClients" type="tns:client" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="authorizedEnterpriseRoles" type="tns:enterpriseRole" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="unitGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="appGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="clientGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="eRoleGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="directAssignment" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="validFrom" type="xs:dateTime" minOccurs="0" nillable="true" />
+          <xs:element name="validTo" type="xs:dateTime" minOccurs="0" nillable="true" />
+          <xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="role">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="description" type="xs:string" minOccurs="0"/>
+          <xs:element name="applicationName" type="xs:string" minOccurs="0"/>
+          <xs:element name="applicationExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="propertyValue">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="scopeName" type="xs:string" minOccurs="0"/> <!-- optional target e.g. "applName,roleName" for onProfileForApp scope -->
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="credential">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+        	<xs:element name="userExtId" 				type="xs:string" 				minOccurs="0" nillable="true" />
+        	<xs:element name="state" 					type="tns:credentialState" 		minOccurs="0" />
+        	<xs:element name="type" 					type="tns:credentialType" 		minOccurs="0" />
+        	<xs:element name="lastLogin" 				type="xs:dateTime" 				minOccurs="0" />
+        	<xs:element name="lastLoginFailure" 		type="xs:dateTime" 				minOccurs="0" />
+        	<xs:element name="lastChange" 				type="xs:dateTime" 				minOccurs="0" />
+        	<xs:element name="validFrom" 				type="xs:dateTime" 				minOccurs="0" />
+        	<xs:element name="validTo" 					type="xs:dateTime" 				minOccurs="0" />
+        	<xs:element name="failureCount" 			type="xs:int" 					minOccurs="0" />
+        	<xs:element name="successCount" 			type="xs:int" 					minOccurs="0" />
+        	<xs:element name="resetCount" 				type="xs:int" 					minOccurs="0" />
+        	<xs:element name="value" 					type="xs:string" 				minOccurs="0" />
+        	<xs:element name="newValue" 				type="xs:string" 				minOccurs="0" />
+        	<xs:element name="extId" 					type="xs:string" 				minOccurs="0" />
+        	<xs:element name="properties" 				type="tns:propertyValue"		minOccurs="0" maxOccurs="unbounded" nillable="true"  />
+        	<xs:element name="policyName" 				type="xs:string" 				minOccurs="0" />
+        	<xs:element name="policyExtId" 				type="xs:string" 				minOccurs="0" />
+        	<xs:element name="stateChangeReasonCd" 		type="xs:int" 					minOccurs="0" />
+        	<xs:element name="stateChangeDetail" 		type="xs:string" 				minOccurs="0" />
+        	<xs:element name="name" 					type="xs:string" 				minOccurs="0" />
+            <xs:element name="context" 					type="xs:string" 				minOccurs="0" />
+            <xs:element name="modificationComment"		type="xs:string" 				minOccurs="0" />
+        	<xs:element name="autoTransitionState"		type="tns:credentialState" 		minOccurs="0" />
+        	<xs:element name="autoTransitionDate"		type="xs:dateTime" 				minOccurs="0" />
+
+        	<!-- search template attributes (only used as input for query operations) -->
+        	<xs:element name="lastLoginLow" 			type="xs:date" 					minOccurs="0" />
+        	<xs:element name="lastLoginHi" 				type="xs:date" 					minOccurs="0" />
+        	<xs:element name="lastLoginFailureLow" 		type="xs:date" 					minOccurs="0" />
+        	<xs:element name="lastLoginFailureHi" 		type="xs:date" 					minOccurs="0" />
+        	<xs:element name="lastChangeLow" 			type="xs:date" 					minOccurs="0" />
+        	<xs:element name="lastChangeHi" 			type="xs:date" 					minOccurs="0" />
+        	<xs:element name="autoTransitionDateLow"	type="xs:date" 					minOccurs="0" />
+        	<xs:element name="autoTransitionDateHi" 	type="xs:date" 					minOccurs="0" />
+        	<xs:element name="validFromLow" 			type="xs:date" 					minOccurs="0" />
+        	<xs:element name="validFromHi" 				type="xs:date" 					minOccurs="0" />
+        	<xs:element name="validToLow" 				type="xs:date" 					minOccurs="0" />
+        	<xs:element name="validToHi"  				type="xs:date" 					minOccurs="0" />
+
+        	<!-- only for creation of URLTickets -->
+            <xs:element name="urlPrefix"				type="xs:string" 				minOccurs="0" />
+
+            <!-- credential extensions -->
+            <xs:element name="certificate" 				type="tns:certificate" 			minOccurs="0" maxOccurs="1" />
+          	<xs:element name="mobileSignature" 			type="tns:mobileSignature"		minOccurs="0" maxOccurs="1" />
+          	<xs:element name="samlFederation" 			type="tns:samlFederation"		minOccurs="0" maxOccurs="1" />
+         	<xs:element name="securityQuestion" 		type="tns:securityQuestions"	minOccurs="0" maxOccurs="1" />
+         	<xs:element name="oath" 					type="tns:oath"					minOccurs="0" maxOccurs="1" />
+         	<xs:element name="fidoUaf" 					type="tns:fidoUaf"				minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="profile">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="extId" type="xs:string" minOccurs="0"/>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:profileState" minOccurs="0" />
+          <xs:element name="remarks" type="xs:string" minOccurs="0"/>
+          <xs:element name="unit" type="tns:unit" minOccurs="0"/>
+          <xs:element name="roles" type="tns:role" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="authorizations" type="tns:authorization" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="deputedExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="modificationComment" type="xs:string" minOccurs="0" />
+          <xs:element name="enterpriseRoles" type="tns:enterpriseRole" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="validFrom" type="xs:dateTime" minOccurs="0" nillable="true" />
+          <xs:element name="validTo" type="xs:dateTime" minOccurs="0" nillable="true" />
+        </xs:sequence>
+        <xs:attribute name="defaultProfile" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="unit">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" 					type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 					type="xs:string" 			minOccurs="0"/>
+          <xs:element name="state" 					type="tns:unitState" 		minOccurs="0" />
+          <xs:element name="displayName" 			type="tns:dictEntry" 		minOccurs="0"/>
+          <xs:element name="displayAbbreviation" 	type="tns:dictEntry" 		minOccurs="0"/>
+          <xs:element name="location" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="description" 			type="xs:string" 			minOccurs="0" />
+          <xs:element name="parentExtId" 			type="xs:string" 			minOccurs="0" />
+          <xs:element name="properties" 			type="tns:propertyValue" 	minOccurs="0" nillable="true" maxOccurs="unbounded"/>
+          <xs:element name="hname" 					type="xs:string" 			minOccurs="0" />
+          <xs:element name="localizedHname" 		type="tns:dictEntry" 		minOccurs="0" />
+          <xs:element name="client" 				type="tns:client" 			minOccurs="0" />
+          <xs:element name="profileless"			type="xs:boolean" 			minOccurs="0" />
+          <xs:element name="modificationComment" 	type="xs:string" 			minOccurs="0" />
+          <xs:element name="validFrom"				type="xs:dateTime"			minOccurs="0" nillable="true" />
+          <xs:element name="validTo"				type="xs:dateTime"			minOccurs="0" nillable="true" />
+          <xs:element name="policyName" 			type="xs:string" 			minOccurs="0" /> <!-- policyType: UnitPolicy -->
+          <xs:element name="childUnits" 			type="tns:unit" 			minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dictEntry">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="entries" type="tns:dictEntryValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dictEntryValue">
+    <xs:sequence>
+      <xs:element name="lang" type="xs:string"/>
+      <xs:element name="value" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="application">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="description" type="xs:string" minOccurs="0"/>
+          <xs:element name="url" type="xs:string" minOccurs="0"/>
+          <xs:element name="displayName" type="tns:dictEntry" minOccurs="0"/>
+          <xs:element name="displayed" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="roles" type="tns:role" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="property">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string"/>
+          <xs:element name="scope" type="tns:propertyScope"/>
+          <xs:element name="guiPrecedence" type="xs:int" minOccurs="0" />
+          <xs:element name="allowedValues" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="policy">
+  	<xs:complexContent>
+  		<xs:extension base="tns:abstractEntity">
+  			<xs:sequence>
+  				<xs:element name="name" 		type="xs:string"		minOccurs="0" maxOccurs="1" />
+  				<xs:element name="extId" 		type="xs:string" 		minOccurs="0" maxOccurs="1"/>
+  				<xs:element name="type" 		type="tns:policyType" 	minOccurs="0" maxOccurs="1" />
+  				<xs:element name="default" 		type="xs:boolean"		minOccurs="0" maxOccurs="1" />
+  				<xs:element name="description"	type="xs:string"		minOccurs="0" maxOccurs="1" />
+  				<xs:element name="config"		type="xs:string"		minOccurs="0" maxOccurs="1" />
+  			</xs:sequence>
+  		</xs:extension>
+  	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="certificate">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:credentialState" minOccurs="0"/>
+          <xs:element name="shaFingerprint" type="xs:string" minOccurs="0"/>
+          <xs:element name="certificate" type="xs:string" minOccurs="0"/>
+          <xs:element name="serial" type="xs:string" minOccurs="0"/>
+          <xs:element name="issuerDn" type="xs:string" minOccurs="0"/>
+          <xs:element name="issuerCn" type="xs:string" minOccurs="0"/>
+          <xs:element name="subjectDn" type="xs:string" minOccurs="0"/>
+          <xs:element name="subjectCn" type="xs:string" minOccurs="0"/>
+          <xs:element name="subjectKeyIdentifier" type="xs:string" minOccurs="0"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="template">
+  	<xs:complexContent>
+  		<xs:extension base="tns:abstractEntity">
+  			<xs:sequence>
+  				<xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+  				<xs:element name="documentType" type="tns:fileType" minOccurs="0" maxOccurs="1" />
+  				<xs:element name="commEventType" type="tns:commEventType" minOccurs="0" maxOccurs="1"/>
+  				<xs:element name="precedence" type="xs:int" minOccurs="0" maxOccurs="1"/>
+  				<xs:element name="content" type="tns:templateContent" minOccurs="0" maxOccurs="unbounded"/>
+  			</xs:sequence>
+  		</xs:extension>
+  	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="templateContent">
+  	<xs:complexContent>
+  		<xs:extension base="tns:abstractEntity">
+  			<xs:sequence>
+				<xs:element name="lang" type="xs:string" minOccurs="1" maxOccurs="1"/>
+  				<xs:element name="sender" type="xs:string" minOccurs="0" />
+  				<xs:element name="receiver" type="xs:string" minOccurs="0" />
+  				<xs:element name="receiverCC" type="xs:string" minOccurs="0" />
+  				<xs:element name="receiverBCC" type="xs:string" minOccurs="0" />
+  				<xs:element name="subject" type="xs:string" minOccurs="0" />
+  				<xs:element name="mandPlaceholders" type="xs:string" minOccurs="0" />
+  				<xs:element name="optPlaceholders" type="xs:string" minOccurs="0" />
+  				<xs:element name="tableNames" type="xs:string" minOccurs="0" />
+  				<xs:element name="stringContent" type="xs:string" minOccurs="0" />
+  				<xs:element name="binaryContent" type="xs:base64Binary" minOccurs="0" />
+  				<xs:element name="pdfFileName" type="xs:string" minOccurs="0" />
+			</xs:sequence>
+  		</xs:extension>
+  	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="mobileSignature">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:credentialState" minOccurs="0"/>
+          <xs:element name="identificator" type="xs:string" minOccurs="0"/>
+          <xs:element name="msspIdentifier" type="xs:string" minOccurs="0"/>
+          <xs:element name="msisdn" type="xs:string" minOccurs="0"/>
+          <xs:element name="signerCert" type="xs:string" minOccurs="0"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="samlFederation">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:credentialState" minOccurs="0"/>
+          <xs:element name="subjectNameId" type="xs:string" minOccurs="0"/>
+          <xs:element name="subjectNameIdFormat" type="xs:string" minOccurs="0"/>
+          <xs:element name="issuerNameId" type="xs:string" minOccurs="0"/>
+          <xs:element name="issuerNameIdFormat" type="xs:string" minOccurs="0"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="oath">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="type" type="tns:oathType" minOccurs="0"/>
+          <xs:element name="algorithm" type="tns:oathAlgorithm" minOccurs="0"/>
+          <xs:element name="digits" type="xs:int" minOccurs="0"/>
+          <xs:element name="period" type="xs:long" minOccurs="0"/>
+          <xs:element name="counter" type="xs:long" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="oathType">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="HOTP" />
+  		<xs:enumeration value="TOTP" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="oathAlgorithm">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="SHA1" />
+  		<xs:enumeration value="SHA256" />
+  		<xs:enumeration value="SHA512" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="securityQuestions">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:credentialState" minOccurs="0"/>
+          <xs:element name="answers" type="tns:personalAnswer" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="personalAnswer">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="question" type="tns:personalQuestion" minOccurs="0"/>
+          <xs:element name="answer" type="xs:string" minOccurs="0"/>
+          <xs:element name="revealCount" type="xs:int" minOccurs="0" />
+          <xs:element name="failureCount" type="xs:int"	minOccurs="0" />
+          <xs:element name="successCount" type="xs:int"	minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="personalQuestion">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="extId" type="xs:string" minOccurs="0"/>
+          <xs:element name="description" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:personalQuestionState" minOccurs="0"/>
+          <xs:element name="displayName" type="tns:dictEntry" minOccurs="0"/>
+          <xs:element name="content" type="tns:dictEntry" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fidoUaf">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="aaid" type="xs:string" minOccurs="0"/>
+          <xs:element name="keyId" type="xs:string" minOccurs="0"/>
+          <xs:element name="signCounter" type="xs:int" minOccurs="0"/>
+          <xs:element name="authenticatorVersion" type="xs:int" minOccurs="0"/>
+		  <xs:element name="deviceId" type="xs:string" minOccurs="0" />
+          <xs:element name="appId" type="xs:string" minOccurs="0"/>
+          <xs:element name="publicKeyAlgorithm" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="enterpriseRole">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="description" type="xs:string" minOccurs="0"/>
+          <xs:element name="displayName" type="tns:dictEntry" minOccurs="0"/>
+          <xs:element name="roles" type="tns:role" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="applicationClientAssignment">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+        <xs:sequence>
+		  <xs:element name="application" type="tns:application" minOccurs="0" maxOccurs="1"/>
+		  <xs:element name="client" type="tns:client" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+   	  </xs:extension>
+  	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="context">
+    <xs:sequence/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:simpleType name="credentialState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACTIVE"/>
+      <xs:enumeration value="DISABLED"/>
+      <xs:enumeration value="ARCHIVED"/>
+      <xs:enumeration value="INITIAL"/>
+      <xs:enumeration value="EXPIRED"/>
+      <xs:enumeration value="RESET_CODE"/>
+      <xs:enumeration value="LOCKED"/>
+      <xs:enumeration value="LOCKED_TEMPORARY"/>
+      <xs:enumeration value="ADMIN_CHANGED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="userState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACTIVE"/>
+      <xs:enumeration value="DISABLED"/>
+      <xs:enumeration value="ARCHIVED"/>
+      <xs:enumeration value="INEXISTENT"/> <!-- internal state only, do not use -->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="userGender">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="MALE" />
+  		<xs:enumeration value="FEMALE" />
+		<xs:enumeration value="OTHER" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="userSex">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="MALE" />
+  		<xs:enumeration value="FEMALE" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="unitState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACTIVE"/>
+      <xs:enumeration value="DISABLED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="profileState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACTIVE"/>
+      <xs:enumeration value="DISABLED"/>
+      <xs:enumeration value="ARCHIVED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="personalQuestionState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ACTIVE"/>
+      <xs:enumeration value="DISABLED"/>
+      <xs:enumeration value="REVOKED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:simpleType name="propertyScope">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ON_USER_GLOBAL"/>
+      <xs:enumeration value="ON_PROFILE_GLOBAL"/>
+      <xs:enumeration value="ON_APPLICATION_GLOBAL"/>
+      <xs:enumeration value="ON_UNIT_GLOBAL"/>
+      <xs:enumeration value="ON_ROLE_FOR_APPLICATION"/>
+	  <xs:enumeration value="ON_PROFILE_FOR_APPLICATION"/>
+	  <xs:enumeration value="ON_PROFILE_FOR_APPLICATION_GLOBAL"/>
+	  <xs:enumeration value="ON_CREDENTIAL_CERTIFICATE_GLOBAL"/>
+	  <xs:enumeration value="ON_CREDENTIAL_GENERIC_GLOBAL"/>
+	  <xs:enumeration value="ON_CREDENTIAL_MOBILESIGNATURE_GLOBAL"/>
+	  <xs:enumeration value="ON_CREDENTIAL_SAMLFEDERATION_GLOBAL"/>
+	  <xs:enumeration value="ON_CREDENTIAL_SECURITYQUESTIONS_GLOBAL"/>
+	  <xs:enumeration value="ON_ENTERPRISE_ROLE_GLOBAL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="credentialType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PASSWORD"/>
+      <xs:enumeration value="CERTIFICATE"/>
+      <xs:enumeration value="SECURID_ACCOUNT"/>
+      <xs:enumeration value="TICKET"/>					<!-- one time password -->
+      <xs:enumeration value="SAFEWORD_ACCOUNT"/>
+      <xs:enumeration value="OTP"/>						<!-- OTP card -->
+      <xs:enumeration value="TEMP_STRONG_PASSWORD"/>	<!-- one time password for strong authentication -->
+      <xs:enumeration value="GENERIC"/>
+      <xs:enumeration value="KERBEROS"/>
+      <xs:enumeration value="MTAN" />
+      <xs:enumeration value="VASCO" />
+      <xs:enumeration value="DEVICE_PASSWORD" />
+      <xs:enumeration value="PUK" />
+      <xs:enumeration value="URL_TICKET" />
+      <xs:enumeration value="MOBILE_SIGNATURE" />
+      <xs:enumeration value="SAML_FEDERATION" />
+      <xs:enumeration value="SECURITY_QUESTIONS" />
+      <xs:enumeration value="CONTEXT_PASSWORD" />
+      <xs:enumeration value="OATH" />
+      <xs:enumeration value="FIDO_UAF" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="policyType">
+  	<xs:restriction base="xs:string">
+  		<!-- credential policy types -->
+  		<xs:enumeration value="PASSWORD_POLICY" />
+  		<xs:enumeration value="OTP_CARD_POLICY" />
+  		<xs:enumeration value="TICKET_POLICY" />
+  		<xs:enumeration value="TEMP_STRONG_PASSWORD_POLICY" />
+  		<xs:enumeration value="CERTIFICATE_POLICY" />
+  		<xs:enumeration value="GENERIC_CREDENTIAL_POLICY" />
+  		<xs:enumeration value="MOBILE_SIGNATURE_POLICY" />
+  		<xs:enumeration value="TAN_POLICY" />
+  		<xs:enumeration value="DEVICE_PASSWORD_POLICY" />
+  		<xs:enumeration value="PUK_POLICY" />
+  		<xs:enumeration value="URLTICKET_POLICY" />
+  		<xs:enumeration value="VASCO_POLICY" />
+  		<xs:enumeration value="SAML_FEDERATION_POLICY" />
+  		<xs:enumeration value="SECURITY_QUESTIONS_POLICY" />
+   		<xs:enumeration value="CONTEXT_PASSWORD_POLICY" />
+   		<xs:enumeration value="OATH_POLICY" />
+  		<!-- other policy types -->
+  		<xs:enumeration value="LOGIN_POLICY" />
+  		<xs:enumeration value="PROFILE_POLICY" />
+  		<xs:enumeration value="CLIENT_POLICY" />
+  		<xs:enumeration value="UNIT_POLICY" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="caller">
+    <xs:sequence>
+      <xs:element name="user" type="tns:user"/>
+      <xs:element name="selectedProfileApplications" type="tns:application" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="selectedProfileUnits" type="tns:unit" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="file">
+      <xs:sequence>
+          <xs:element name="content" type="xs:base64Binary" />
+          <xs:element name="type" type="tns:fileType" />
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="fileType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PDF"/>
+      <xs:enumeration value="SMS"/>
+      <xs:enumeration value="EMAIL"/>
+      <xs:enumeration value="HTML_EMAIL"/>
+      <xs:enumeration value="OO"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="commEventType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TICKET" />
+      <xs:enumeration value="RESET_CODE" />
+      <xs:enumeration value="TMP_STRONG_PWD" />
+      <xs:enumeration value="NEW_PASSWORD" />
+      <xs:enumeration value="DEACTIVATION_WARNING" />
+      <xs:enumeration value="TICKET_EXPIRATION_WARNING" />
+      <xs:enumeration value="CERTIFICATE_EXPIRATION_WARNING" />
+      <xs:enumeration value="OTP_INIT" />
+      <xs:enumeration value="OTP_RENEW" />
+      <xs:enumeration value="OTP_RESET" />
+      <xs:enumeration value="OTP_EXPIRATION_WARNING" />
+      <xs:enumeration value="OTP_LOW_ON_CHALLENGES_WARNING" />
+      <xs:enumeration value="PUK_INIT" />
+      <xs:enumeration value="PUK_RESET" />
+      <xs:enumeration value="URL_TICKET" />
+      <xs:enumeration value="SELFADMIN_TICKET_NOTIFICATION" />
+      <xs:enumeration value="SELFADMIN_MOBILE_NOTIFICATION" />
+      <xs:enumeration value="USER_NOTIFICATION_1" />
+      <xs:enumeration value="USER_NOTIFICATION_2" />
+      <xs:enumeration value="USER_NOTIFICATION_3" />
+      <xs:enumeration value="USER_NOTIFICATION_4" />
+      <xs:enumeration value="USER_NOTIFICATION_5" />
+      <xs:enumeration value="USER_NOTIFICATION_6" />
+      <xs:enumeration value="USER_NOTIFICATION_7" />
+      <xs:enumeration value="USER_NOTIFICATION_8" />
+      <xs:enumeration value="USER_NOTIFICATION_9" />
+      <xs:enumeration value="VASCO_ASSIGNMENT" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="sendingMethod">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="NONE" />
+  		<xs:enumeration value="PRINT" />
+  		<xs:enumeration value="EMAIL" />
+  		<xs:enumeration value="PDF_EMAIL" />
+  		<xs:enumeration value="PDF_STORE" />
+  		<xs:enumeration value="SMS_SMTP" />
+  		<xs:enumeration value="HTML_EMAIL" />
+  	</xs:restriction>
+  </xs:simpleType>
+
+  <!-- types of address extension elements conforming to eCH-00100 standard -->
+  <xs:simpleType name="streetType">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="60"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="houseNumberType">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="12"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="dwellingNumberType">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="postOfficeBoxNumberType">
+    <xs:restriction base="xs:unsignedInt">
+      <xs:maxInclusive value="99999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="postOfficeBoxTextType">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="15"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="locality">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--
+  =============================================================================
+  fault types
+  =============================================================================
+  -->
+
+  <xs:element name="BusinessException" type="tns:BusinessExceptionType"/>
+  <xs:element name="TechnicalException" type="tns:TechnicalExceptionType"/>
+
+  <xs:complexType name="BusinessExceptionType">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="reason" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementIndex" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TechnicalExceptionType">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+  =============================================================================
+  Message types (AdminService)
+  =============================================================================
+  -->
+
+  <!-- read-write administration -->
+
+  <xs:element name="createUser" type="tns:createUser"/>
+  <xs:element name="createUserResponse" type="tns:createUserResponse"/>
+  <xs:element name="createUserWithProfile" type="tns:createUserWithProfile"/>
+  <xs:element name="createUserWithProfileResponse" type="tns:createUserWithProfileResponse"/>
+  <xs:element name="createUserWithCredentials" type="tns:createUserWithCredentials"/>
+  <xs:element name="createUserWithCredentialsResponse" type="tns:createUserWithCredentialsResponse"/>
+  <xs:element name="createUserWithProfileAndCredentials" type="tns:createUserWithProfileAndCredentials"/>
+  <xs:element name="createUserWithProfileAndCredentialsResponse" type="tns:createUserWithProfileAndCredentialsResponse"/>
+  <xs:element name="updateUser" type="tns:updateUser"/>
+  <xs:element name="updateUserResponse" type="tns:updateUserResponse"/>
+  <xs:element name="deleteUser" type="tns:deleteUser"/>
+  <xs:element name="deleteUserResponse" type="tns:deleteUserResponse"/>
+
+  <xs:element name="createProfile" type="tns:createProfile"/>
+  <xs:element name="createProfileResponse" type="tns:createProfileResponse"/>
+  <xs:element name="updateProfile" type="tns:updateProfile"/>
+  <xs:element name="updateProfileResponse" type="tns:updateProfileResponse"/>
+  <xs:element name="deleteProfile" type="tns:deleteProfile"/>
+  <xs:element name="deleteProfileResponse" type="tns:deleteProfileResponse"/>
+  <xs:element name="addAuthorizationToProfile" type="tns:addAuthorizationToProfile"/>
+  <xs:element name="addAuthorizationToProfileResponse" type="tns:addAuthorizationToProfileResponse"/>
+  <xs:element name="removeAuthorizationFromProfile" type="tns:removeAuthorizationFromProfile"/>
+  <xs:element name="removeAuthorizationFromProfileResponse" type="tns:removeAuthorizationFromProfileResponse"/>
+
+  <xs:element name="createCredential" type="tns:createCredential"/>
+  <xs:element name="createCredentialResponse" type="tns:createCredentialResponse"/>
+  <xs:element name="createPUKCredential" type="tns:createPUKCredential"/>
+  <xs:element name="createPUKCredentialResponse" type="tns:createPUKCredentialResponse"/>
+  <xs:element name="updateCredential" type="tns:updateCredential"/>
+  <xs:element name="updateCredentialResponse" type="tns:updateCredentialResponse"/>
+  <xs:element name="resetCredential" type="tns:resetCredential"/>
+  <xs:element name="resetCredentialResponse" type="tns:resetCredentialResponse"/>
+  <xs:element name="unlockCredential" type="tns:unlockCredential"/>
+  <xs:element name="unlockCredentialResponse" type="tns:unlockCredentialResponse"/>
+  <xs:element name="deleteCredential" type="tns:deleteCredential"/>
+  <xs:element name="deleteCredentialResponse" type="tns:deleteCredentialResponse"/>
+  <xs:element name="deleteCredentials" type="tns:deleteCredentials"/>
+  <xs:element name="deleteCredentialsResponse" type="tns:deleteCredentialsResponse"/>
+  <xs:element name="createMobileSignature" type="tns:createMobileSignature"/>
+  <xs:element name="createMobileSignatureResponse" type="tns:createMobileSignatureResponse"/>
+  <xs:element name="updateMobileSignature" type="tns:updateMobileSignature"/>
+  <xs:element name="updateMobileSignatureResponse" type="tns:updateMobileSignatureResponse"/>
+  <xs:element name="shareOATH" type="tns:shareOATH"/>
+  <xs:element name="shareOATHResponse" type="tns:shareOATHResponse"/>
+
+  <xs:element name="assignCredential" type="tns:assignCredential"/>
+  <xs:element name="assignCredentialResponse" type="tns:assignCredentialResponse"/>
+  <xs:element name="unassignCredential" type="tns:unassignCredential"/>
+  <xs:element name="unassignCredentialResponse" type="tns:unassignCredentialResponse"/>
+
+  <xs:element name="createUnit" type="tns:createUnit"/>
+  <xs:element name="createUnitResponse" type="tns:createUnitResponse"/>
+  <xs:element name="updateUnit" type="tns:updateUnit"/>
+  <xs:element name="updateUnitResponse" type="tns:updateUnitResponse"/>
+  <xs:element name="deleteUnit" type="tns:deleteUnit"/>
+  <xs:element name="deleteUnitResponse" type="tns:deleteUnitResponse"/>
+
+  <xs:element name="createApplication" type="tns:createApplication"/>
+  <xs:element name="createApplicationResponse" type="tns:createApplicationResponse"/>
+  <xs:element name="updateApplication" type="tns:updateApplication"/>
+  <xs:element name="updateApplicationResponse" type="tns:updateApplicationResponse"/>
+  <xs:element name="deleteApplication" type="tns:deleteApplication"/>
+  <xs:element name="deleteApplicationResponse" type="tns:deleteApplicationResponse"/>
+  <xs:element name="addRoleToApplication" type="tns:addRoleToApplication"/>
+  <xs:element name="addRoleToApplicationResponse" type="tns:addRoleToApplicationResponse"/>
+  <xs:element name="removeRoleFromApplication" type="tns:removeRoleFromApplication"/>
+  <xs:element name="removeRoleFromApplicationResponse" type="tns:removeRoleFromApplicationResponse"/>
+
+  <xs:element name="assignPolicies" type="tns:assignPolicies" />
+  <xs:element name="assignPoliciesResponse" type="tns:assignPoliciesResponse" />
+  <xs:element name="revokePolicies" type="tns:revokePolicies" />
+  <xs:element name="revokePoliciesResponse" type="tns:revokePoliciesResponse" />
+
+  <xs:element name="createClient" type="tns:createClient"/>
+  <xs:element name="createClientResponse" type="tns:createClientResponse"/>
+  <xs:element name="updateClient" type="tns:updateClient"/>
+  <xs:element name="updateClientResponse" type="tns:updateClientResponse"/>
+
+  <xs:element name="createPolicy" type="tns:createPolicy"/>
+  <xs:element name="createPolicyResponse" type="tns:createPolicyResponse"/>
+  <xs:element name="updatePolicy" type="tns:updatePolicy"/>
+  <xs:element name="updatePolicyResponse" type="tns:updatePolicyResponse"/>
+  <xs:element name="deletePolicy" type="tns:deletePolicy"/>
+  <xs:element name="deletePolicyResponse" type="tns:deletePolicyResponse"/>
+
+  <xs:element name="createTemplate" type="tns:createTemplate"/>
+  <xs:element name="createTemplateResponse" type="tns:createTemplateResponse"/>
+  <xs:element name="updateTemplate" type="tns:updateTemplate"/>
+  <xs:element name="updateTemplateResponse" type="tns:updateTemplateResponse"/>
+  <xs:element name="deleteTemplate" type="tns:deleteTemplate"/>
+  <xs:element name="deleteTemplateResponse" type="tns:deleteTemplateResponse"/>
+
+  <xs:element name="createEnterpriseRole" type="tns:createEnterpriseRole"/>
+  <xs:element name="createEnterpriseRoleResponse" type="tns:createEnterpriseRoleResponse"/>
+  <xs:element name="updateEnterpriseRole" type="tns:updateEnterpriseRole"/>
+  <xs:element name="updateEnterpriseRoleResponse" type="tns:updateEnterpriseRoleResponse"/>
+  <xs:element name="deleteEnterpriseRole" type="tns:deleteEnterpriseRole"/>
+  <xs:element name="deleteEnterpriseRoleResponse" type="tns:deleteEnterpriseRoleResponse"/>
+  <xs:element name="assignRolesToEnterpriseRole" type="tns:assignRolesToEnterpriseRole"/>
+  <xs:element name="assignRolesToEnterpriseRoleResponse" type="tns:assignRolesToEnterpriseRoleResponse"/>
+  <xs:element name="unassignRolesFromEnterpriseRole" type="tns:unassignRolesFromEnterpriseRole"/>
+  <xs:element name="unassignRolesFromEnterpriseRoleResponse" type="tns:unassignRolesFromEnterpriseRoleResponse"/>
+  <xs:element name="addEnterpriseRoleToProfile" type="tns:addEnterpriseRoleToProfile"/>
+  <xs:element name="addEnterpriseRoleToProfileResponse" type="tns:addEnterpriseRoleToProfileResponse"/>
+  <xs:element name="removeEnterpriseRoleFromProfile" type="tns:removeEnterpriseRoleFromProfile"/>
+  <xs:element name="removeEnterpriseRoleFromProfileResponse" type="tns:removeEnterpriseRoleFromProfileResponse"/>
+  <xs:element name="revealSecurityQuestions" type="tns:revealSecurityQuestions"/>
+  <xs:element name="revealSecurityQuestionsResponse" type="tns:revealSecurityQuestionsResponse"/>
+  <xs:element name="createPersonalQuestion" type="tns:createPersonalQuestion"/>
+  <xs:element name="createPersonalQuestionResponse" type="tns:createPersonalQuestionResponse"/>
+  <xs:element name="updatePersonalQuestion" type="tns:updatePersonalQuestion"/>
+  <xs:element name="updatePersonalQuestionResponse" type="tns:updatePersonalQuestionResponse"/>
+  <xs:element name="deletePersonalQuestion" type="tns:deletePersonalQuestion"/>
+  <xs:element name="deletePersonalQuestionResponse" type="tns:deletePersonalQuestionResponse"/>
+
+  <!-- read-only queries -->
+
+  <xs:element name="queryApplications" type="tns:queryApplications"/>
+  <xs:element name="queryApplicationsResponse" type="tns:queryApplicationsResponse"/>
+  <xs:element name="queryClients" type="tns:queryClients"/>
+  <xs:element name="queryClientsResponse" type="tns:queryClientsResponse"/>
+  <xs:element name="queryCredentials" type="tns:queryCredentials"/>
+  <xs:element name="queryCredentialsResponse" type="tns:queryCredentialsResponse"/>
+  <xs:element name="queryProfiles" type="tns:queryProfiles"/>
+  <xs:element name="queryProfilesResponse" type="tns:queryProfilesResponse"/>
+  <xs:element name="queryProperties" type="tns:queryProperties"/>
+  <xs:element name="queryPropertiesResponse" type="tns:queryPropertiesResponse"/>
+  <xs:element name="queryRoles" type="tns:queryRoles"/>
+  <xs:element name="queryRolesResponse" type="tns:queryRolesResponse"/>
+  <xs:element name="queryUnits" type="tns:queryUnits"/>
+  <xs:element name="queryUnitsResponse" type="tns:queryUnitsResponse"/>
+  <xs:element name="queryUnitsAndFilter" type="tns:queryUnitsAndFilter"/> 					<!-- deprecated -->
+  <xs:element name="queryUnitsAndFilterResponse" type="tns:queryUnitsAndFilterResponse"/> 	<!-- deprecated -->
+  <xs:element name="queryUsers" type="tns:queryUsers"/>
+  <xs:element name="queryUsersResponse" type="tns:queryUsersResponse"/>
+  <xs:element name="queryPolicies" type="tns:queryPolicies" />
+  <xs:element name="queryPoliciesResponse" type="tns:queryPoliciesResponse" />
+  <xs:element name="queryTemplates" type="tns:queryTemplates"/>
+  <xs:element name="queryTemplatesResponse" type="tns:queryTemplatesResponse"/>
+  <xs:element name="queryEnterpriseRoles" type="tns:queryEnterpriseRoles"/>
+  <xs:element name="queryEnterpriseRolesResponse" type="tns:queryEnterpriseRolesResponse"/>
+  <xs:element name="queryPersonalQuestions" type="tns:queryPersonalQuestions"/>
+  <xs:element name="queryPersonalQuestionsResponse" type="tns:queryPersonalQuestionsResponse"/>
+  <xs:element name="queryApplicationClientAssignments" type="tns:queryApplicationClientAssignments"/>
+  <xs:element name="queryApplicationClientAssignmentsResponse" type="tns:queryApplicationClientAssignmentsResponse"/>
+
+  <xs:element name="getUsersByLoginId" type="tns:getUsersByLoginId"/>
+  <xs:element name="getUsersByLoginIdResponse" type="tns:getUsersByLoginIdResponse"/>
+  <xs:element name="getUsersByExtId" type="tns:getUsersByExtId" />
+  <xs:element name="getUsersByExtIdResponse" type="tns:getUsersByExtIdResponse" />
+  <xs:element name="getUsersByProfileExtId" type="tns:getUsersByProfileExtId"/>
+  <xs:element name="getUsersByProfileExtIdResponse" type="tns:getUsersByProfileExtIdResponse"/>
+  <xs:element name="getUnits" type="tns:getUnits"/>
+  <xs:element name="getUnitsResponse" type="tns:getUnitsResponse"/>
+  <xs:element name="getEnterpriseRoles" type="tns:getEnterpriseRoles" />
+  <xs:element name="getEnterpriseRolesResponse" type="tns:getEnterpriseRolesResponse" />
+  <xs:element name="getPersonalQuestions" type="tns:getPersonalQuestions" />
+  <xs:element name="getPersonalQuestionsResponse" type="tns:getPersonalQuestionsResponse" />
+
+  <!-- bulk operations -->
+  <xs:element name="bulkGetAllUsersRequestMessage" type="tns:bulkGetAllUsersRequest"/>
+  <xs:element name="bulkGetAllUsersResponseMessage" type="tns:bulkGetAllUsersResponse"/>
+
+  <xs:element name="addAuthorizationsToProfiles" type="tns:addAuthorizationsToProfiles"/>
+  <xs:element name="addAuthorizationsToProfilesResponse" type="tns:addAuthorizationsToProfilesResponse"/>
+  <xs:element name="removeAuthorizationsFromProfiles" type="tns:removeAuthorizationsFromProfiles"/>
+  <xs:element name="removeAuthorizationsFromProfilesResponse" type="tns:removeAuthorizationsFromProfilesResponse"/>
+  <xs:element name="updateDataroomOfAuthorization" type="tns:updateDataroomOfAuthorization"/>
+  <xs:element name="updateDataroomOfAuthorizationResponse" type="tns:updateDataroomOfAuthorizationResponse"/>
+
+  <!-- document operations -->
+  <xs:element name="getDocumentForCredential" type="tns:getDocumentForCredential" />
+  <xs:element name="getDocomentForCredentialResponse" type="tns:getDocumentForCredentialResponse" />
+
+  <!-- communication operations -->
+  <xs:element name="sendUserNotification" type="tns:sendUserNotification"/>
+  <xs:element name="sendUserNotificationResponse" type="tns:sendUserNotificationResponse"/>
+
+  <!-- history operations -->
+  <xs:element name="getHistoryOfUser" type="tns:getHistoryOfUser" />
+  <xs:element name="getHistoryOfUserResponse" type="tns:getHistoryOfUserResponse" />
+
+  <xs:element name="getHistoryOfUserLoginInfo" type="tns:getHistoryOfUserLoginInfo" />
+  <xs:element name="getHistoryOfUserLoginInfoResponse" type="tns:getHistoryOfUserLoginInfoResponse" />
+
+  <xs:element name="getHistoryOfProfile" type="tns:getHistoryOfProfile" />
+  <xs:element name="getHistoryOfProfileResponse" type="tns:getHistoryOfProfileResponse" />
+
+  <xs:element name="getHistoryOfCredential" type="tns:getHistoryOfCredential" />
+  <xs:element name="getHistoryOfCredentialResponse" type="tns:getHistoryOfCredentialResponse" />
+
+  <xs:element name="getHistoryOfCredentialLoginInfo" type="tns:getHistoryOfCredentialLoginInfo" />
+  <xs:element name="getHistoryOfCredentialLoginInfoResponse" type="tns:getHistoryOfCredentialLoginInfoResponse" />
+
+  <xs:element name="getHistoryOfUnit" type="tns:getHistoryOfUnit" />
+  <xs:element name="getHistoryOfUnitResponse" type="tns:getHistoryOfUnitResponse" />
+
+  <xs:element name="getHistoryOfRole" type="tns:getHistoryOfRole" />
+  <xs:element name="getHistoryOfRoleResponse" type="tns:getHistoryOfRoleResponse" />
+  
+  <xs:element name="getHistoryOfEnterpriseRole" type="tns:getHistoryOfEnterpriseRole" />
+  <xs:element name="getHistoryOfEnterpriseRoleResponse" type="tns:getHistoryOfEnterpriseRoleResponse" />
+
+  <xs:element name="getHistoryOfApplication" type="tns:getHistoryOfApplication" />
+  <xs:element name="getHistoryOfApplicationResponse" type="tns:getHistoryOfApplicationResponse" />
+
+  <xs:element name="getHistoryOfClient" type="tns:getHistoryOfClient" />
+  <xs:element name="getHistoryOfClientResponse" type="tns:getHistoryOfClientResponse" />
+
+  <xs:element name="getHistoryOfAuthorization" type="tns:getHistoryOfAuthorization" />
+  <xs:element name="getHistoryOfAuthorizationResponse" type="tns:getHistoryOfAuthorizationResponse" />
+
+  <xs:element name="checkPasswordPolicy" type="tns:checkPasswordPolicy" />
+  <xs:element name="checkPasswordPolicyResponse" type="tns:checkPasswordPolicyResponse" />
+
+  <xs:element name="getAuthorizers" type="tns:getAuthorizers" />
+  <xs:element name="getAuthorizersResponse" type="tns:getAuthorizersResponse" />
+
+	<!--
+	=============================================================================
+	Abstract message types
+	=============================================================================
+	-->
+
+	<xs:complexType name="abstractRequest" abstract="true">
+		<xs:sequence>
+			<xs:element name="clientExtId" type="xs:string" minOccurs="0" /> <!-- not specified means clientName -->
+			<xs:element name="clientName" type="xs:string" minOccurs="0" />  <!-- not specified means the caller's client -->
+			<xs:element name="clientIndependent" type="xs:boolean" minOccurs="0" />
+			<xs:element name="context" type="tns:context" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="detail" type="xs:int" minOccurs="0" />
+			<xs:element name="detailLevels" type="tns:detailLevels" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="abstractQuery" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="numRecords" type="xs:int" />
+					<xs:element name="skipRecords" type="xs:int" />
+					<xs:element name="sortByField" type="xs:string"
+						minOccurs="0" /> <!-- deprecated, use sorting -->
+					<xs:element name="sortOrder" type="tns:sortOrder"
+						minOccurs="0" /> <!-- deprecated, use sorting -->
+					<xs:element name="sorting" type="tns:sorting" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xs:element name="maxRecursionDepth" type="xs:int"
+						minOccurs="0" /> <!-- for recursive queries -->
+					<xs:element name="technicalFilter" type="tns:technicalFilter"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="sorting">
+		<xs:sequence>
+			<xs:element name="fieldName"	type="xs:string" minOccurs="1" />
+			<xs:element name="order"		type="tns:sortOrder" minOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="technicalFilter">
+		<xs:sequence>
+			<xs:element name="ctlCreDatFrom" 		type="xs:dateTime" minOccurs="0" />
+			<xs:element name="ctlCreDatTo" 			type="xs:dateTime" minOccurs="0" />
+			<xs:element name="ctlModDatFrom" 		type="xs:dateTime" minOccurs="0" />
+			<xs:element name="ctlModDatTo" 			type="xs:dateTime" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="abstractGet">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="maxRecursionDepth" type="xs:int"
+						minOccurs="0" /> <!-- for recursive gets -->
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="detailLevels">
+		<xs:sequence>
+			<xs:element name="profileDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="propertyDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="applicationDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="credentialDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="certificateDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="mobileSignatureDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="samlFederationDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="securityQuestionsDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="unitDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="userDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="userLoginInfoDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="roleDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="authorizationDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+			<xs:element name="authorizationDataroomDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="clientDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="policyDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="templateDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="enterpriseRoleDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="personalQuestionDetailLevel" type="tns:detailLevel" minOccurs="0" />
+			<xs:element name="defaultDetailLevel" type="tns:detailLevel" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="detailLevel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="EXCLUDE" />
+			<xs:enumeration value="LOW" />
+			<xs:enumeration value="MEDIUM" />
+			<xs:enumeration value="HIGH" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="sortOrder">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ASC" />
+			<xs:enumeration value="DESC" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!--
+	=============================================================================
+	Specific message types (AdminService)
+	=============================================================================
+	-->
+
+	<!-- read-write administration -->
+
+	<xs:complexType name="createUser">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createUserRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createUserRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createUserResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createUserWithProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createUserWithProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createUserWithProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createUserWithProfileResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createUserWithCredentials">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createUserWithCredentialsRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createUserWithCredentialsRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createUserWithCredentialsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createUserWithProfileAndCredentials">
+		<xs:sequence>
+			<xs:element name="request"
+				type="tns:createUserWithProfileAndCredentialsRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createUserWithProfileAndCredentialsRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createUserWithProfileAndCredentialsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateUser">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateUserRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateUserRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateUserResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteUser">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteUserRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteUserRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteUserResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createProfileResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:profile" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateProfileResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteProfileResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="addAuthorizationToProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:addAuthorizationToProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="addAuthorizationToProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" minOccurs="1"
+						maxOccurs="1" />
+					<xs:element name="authorization" type="tns:authorization"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="addAuthorizationToProfileResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="removeAuthorizationFromProfile">
+		<xs:sequence>
+			<xs:element name="request"
+				type="tns:removeAuthorizationFromProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="removeAuthorizationFromProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" minOccurs="1"
+						maxOccurs="1" />
+					<xs:element name="authorization" type="tns:authorization"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="removeAuthorizationFromProfileResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential" minOccurs="1" maxOccurs="1" />
+					<xs:element name="mobileSignature" type="tns:mobileSignature" minOccurs="0" maxOccurs="1" />
+					<xs:element name="samlFederation" type="tns:samlFederation" minOccurs="0" maxOccurs="1" />
+					<xs:element name="securityQuestions" type="tns:securityQuestions" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createCredentialResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:credential" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createPUKCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createPUKCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createPUKCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"	minOccurs="1" maxOccurs="1" />
+          			<xs:element name="createPasswordFlag" type="xs:boolean" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="passwordPolicyName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createPUKCredentialResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:credential" minOccurs="1" maxOccurs="2" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential" minOccurs="1" maxOccurs="1" />
+					<xs:element name="mobileSignature" type="tns:mobileSignature" minOccurs="0" maxOccurs="1" />
+					<xs:element name="samlFederation" type="tns:samlFederation" minOccurs="0" maxOccurs="1" />
+					<xs:element name="securityQuestions" type="tns:securityQuestions" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateCredentialResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="resetCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:resetCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="resetCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="resetCredentialResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:credential" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="unlockCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:unlockCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unlockCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="unlockCredentialResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:credential" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteCredentialResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteCredentials">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteCredentialsRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteCredentialsRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteCredentialsResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createMobileSignature">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createMobileSignatureRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createMobileSignatureRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="mobileSignature" type="tns:mobileSignature" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createMobileSignatureResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:mobileSignature" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateMobileSignature">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateMobileSignatureRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateMobileSignatureRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="mobileSignature" type="tns:mobileSignature"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateMobileSignatureResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+  <xs:complexType name="shareOATH">
+    <xs:sequence>
+      <xs:element name="request" type="tns:shareOATHRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="shareOATHRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+	    <xs:sequence>
+	      <xs:element name="credentialExtId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	    </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="shareOATHResponse">
+	<xs:sequence>
+		<xs:element name="return" type="tns:shareOATHResult" minOccurs="1" maxOccurs="1" />
+	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="shareOATHResult">
+	<xs:sequence>
+		<xs:element name="type" 			type="tns:oathType" 		minOccurs="0"/>
+        <xs:element name="algorithm" 		type="tns:oathAlgorithm"	minOccurs="0"/>
+        <xs:element name="digits" 			type="xs:int" 				minOccurs="0"/>
+        <xs:element name="period" 			type="xs:long" 				minOccurs="0"/>
+        <xs:element name="counter" 			type="xs:long" 				minOccurs="0"/>
+		<xs:element name="account" 			type="xs:string" 			minOccurs="0" />
+		<xs:element name="issuer" 			type="xs:string" 			minOccurs="0" />
+		<xs:element name="secret" 			type="xs:string" 			minOccurs="0" />
+		<xs:element name="qrCodeContent" 	type="xs:string" 			minOccurs="0" />
+		<xs:element name="qrCode" 			type="xs:base64Binary" 		minOccurs="0" />
+	</xs:sequence>
+  </xs:complexType>
+
+	<xs:complexType name="assignCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:assignCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="assignCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="user" type="tns:user"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="assignCredentialResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="unassignCredential">
+		<xs:sequence>
+			<xs:element name="request" type="tns:unassignCredentialRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unassignCredentialRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="credential" type="tns:credential"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="unassignCredentialResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createUnit">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createUnitRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createUnitRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="unit" type="tns:unit" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createUnitResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:unit" minOccurs="1"
+				maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateUnit">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateUnitRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateUnitRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="unit" type="tns:unit" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateUnitResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteUnit">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteUnitRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteUnitRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="unit" type="tns:unit" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteUnitResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createApplication">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createApplicationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createApplicationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="assignedClients" type="tns:client"
+						minOccurs="0" maxOccurs="unbounded" nillable="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createApplicationResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:application"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateApplication">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateApplicationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateApplicationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateApplicationResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteApplication">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteApplicationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteApplicationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application"
+						minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteApplicationResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="addRoleToApplication">
+		<xs:sequence>
+			<xs:element name="request" type="tns:addRoleToApplicationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="addRoleToApplicationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="role" type="tns:role" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="addRoleToApplicationResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="removeRoleFromApplication">
+		<xs:sequence>
+			<xs:element name="request" type="tns:removeRoleFromApplicationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="removeRoleFromApplicationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="role" type="tns:role" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="removeRoleFromApplicationResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="assignPolicies">
+		<xs:sequence>
+			<xs:element name="request" type="tns:assignPoliciesRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="assignPoliciesRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element name="unit" type="tns:unit" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="assignPoliciesResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="revokePolicies">
+		<xs:sequence>
+			<xs:element name="request" type="tns:revokePoliciesRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="revokePoliciesRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element name="unit" type="tns:unit" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="revokePoliciesResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createEnterpriseRole">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createEnterpriseRoleRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createEnterpriseRoleRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="createEnterpriseRoleResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateEnterpriseRole">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateEnterpriseRoleRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateEnterpriseRoleRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="updateEnterpriseRoleResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteEnterpriseRole">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteEnterpriseRoleRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteEnterpriseRoleRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="deleteEnterpriseRoleResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="assignRolesToEnterpriseRole">
+		<xs:sequence>
+			<xs:element name="request" type="tns:assignRolesToEnterpriseRoleRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="assignRolesToEnterpriseRoleRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+					<xs:element name="roles" type="tns:role" maxOccurs="unbounded" />
+					<xs:element name="failIfAssigned" type="xs:boolean" minOccurs="0" default="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="assignRolesToEnterpriseRoleResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+	<xs:complexType name="unassignRolesFromEnterpriseRole">
+		<xs:sequence>
+			<xs:element name="request" type="tns:unassignRolesFromEnterpriseRoleRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="unassignRolesFromEnterpriseRoleRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+					<xs:element name="roles" type="tns:role" maxOccurs="unbounded" />
+					<xs:element name="failIfNotAssigned" type="xs:boolean" minOccurs="0" default="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="unassignRolesFromEnterpriseRoleResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+	<xs:complexType name="addEnterpriseRoleToProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:addEnterpriseRoleToProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="addEnterpriseRoleToProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+					<xs:element name="profile" type="tns:profile" minOccurs="1" maxOccurs="1" />
+								        
+			        <xs:element name="validFrom" type="xs:dateTime" minOccurs="0" nillable="true" />
+			        <xs:element name="validTo" type="xs:dateTime" minOccurs="0" nillable="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="addEnterpriseRoleToProfileResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+	<xs:complexType name="removeEnterpriseRoleFromProfile">
+		<xs:sequence>
+			<xs:element name="request" type="tns:removeEnterpriseRoleFromProfileRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="removeEnterpriseRoleFromProfileRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="extId" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" minOccurs="1" maxOccurs="1" />
+					<xs:element name="profile" type="tns:profile" minOccurs="1" maxOccurs="1" />
+					
+			        <xs:element name="validFrom" type="xs:dateTime" minOccurs="0" nillable="true" />
+			        <xs:element name="validTo" type="xs:dateTime" minOccurs="0" nillable="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="removeEnterpriseRoleFromProfileResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+	<xs:complexType name="revealSecurityQuestions">
+		<xs:sequence>
+			<xs:element name="request" type="tns:revealSecurityQuestionsRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="revealSecurityQuestionsRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="securityQuestions" type="tns:securityQuestions" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="revealSecurityQuestionsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:securityQuestions" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<!-- Personal Question -->
+
+	<xs:complexType name="createPersonalQuestion">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createPersonalQuestionRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createPersonalQuestionRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="personalQuestion" type="tns:personalQuestion" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="createPersonalQuestionResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:personalQuestion" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updatePersonalQuestion">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updatePersonalQuestionRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updatePersonalQuestionRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="PersonalQuestion" type="tns:personalQuestion" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="updatePersonalQuestionResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deletePersonalQuestion">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deletePersonalQuestionRequest" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deletePersonalQuestionRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="PersonalQuestion" type="tns:personalQuestion" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="deletePersonalQuestionResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- read-only queries -->
+
+	<xs:complexType name="queryProfiles">
+		<xs:sequence>
+			<xs:element name="query" type="tns:profileQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="profileQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryProfilesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:profile" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryClients">
+		<xs:sequence>
+			<xs:element name="query" type="tns:clientQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="clientQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="client" type="tns:client" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryClientsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:client" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryRoles">
+		<xs:sequence>
+			<xs:element name="query" type="tns:roleQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="roleQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="role" type="tns:role" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryRolesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:role" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryUnits">
+		<xs:sequence>
+			<xs:element name="query" type="tns:unitQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unitQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="unit" type="tns:unit" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryUnitsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:unit" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="queryUnitsAndFilter">
+		<xs:sequence>
+			<xs:element name="query" type="tns:unitQuery" />
+			<xs:element name="permission" type="xs:string" minOccurs="1"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="queryUnitsAndFilterResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:unit" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="getUnits">
+		<xs:sequence>
+			<xs:element name="get" type="tns:unitGet" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unitGet">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="extIds" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element name="languageCode" type="xs:string" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="getUnitsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:unit" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryUsers">
+		<xs:sequence>
+			<xs:element name="query" type="tns:userQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="userQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="user" type="tns:user" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryUsersResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryProperties">
+		<xs:sequence>
+			<xs:element name="query" type="tns:propertyQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="propertyQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="property" type="tns:property" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryPropertiesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:property" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryApplications">
+		<xs:sequence>
+			<xs:element name="query" type="tns:applicationQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="applicationQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="application" type="tns:application" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryApplicationsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:application"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryPolicies">
+		<xs:sequence>
+			<xs:element name="query" type="tns:policyQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="policyQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="0"/>
+					<xs:element name="unit" type="tns:unit" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryPoliciesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:policy" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="getUsersByProfileExtId">
+		<xs:sequence>
+			<xs:element name="get" type="tns:userGetByProfileExtId" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="userGetByProfileExtId">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="profileExtIds" type="xs:string"
+						nillable="true" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="getUsersByProfileExtIdResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="getUsersByLoginId">
+		<xs:sequence>
+			<xs:element name="get" type="tns:userGetByLoginId" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="userGetByLoginId">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="loginIds" type="xs:string" nillable="true"
+						minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="userGetByUserProperty">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="propertyValue" type="tns:propertyValue"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="getUsersByLoginIdResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="getUsersByExtId">
+		<xs:sequence>
+			<xs:element name="get" type="tns:userGetByExtId" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="userGetByExtId">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="extIds" type="xs:string" nillable="true"
+						minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="getUsersByExtIdResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:user" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="queryEnterpriseRoles">
+		<xs:sequence>
+			<xs:element name="query" type="tns:enterpriseRoleQuery" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="enterpriseRoleQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="enterpriseRole" type="tns:enterpriseRole" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="queryEnterpriseRolesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:enterpriseRole" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="getEnterpriseRoles">
+		<xs:sequence>
+			<xs:element name="get" type="tns:enterpriseRolesGet" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="enterpriseRolesGet">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="extIds" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="lang" type="xs:string" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="getEnterpriseRolesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:enterpriseRole" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="queryPersonalQuestions">
+		<xs:sequence>
+			<xs:element name="query" type="tns:personalQuestionQuery" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="personalQuestionQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="personalQuestion" type="tns:personalQuestion" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="queryPersonalQuestionsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:personalQuestion" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="getPersonalQuestions">
+		<xs:sequence>
+			<xs:element name="get" type="tns:personalQuestionsGet" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="personalQuestionsGet">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractGet">
+				<xs:sequence>
+					<xs:element name="extIds" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="lang" type="xs:string" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="getPersonalQuestionsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:personalQuestion" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="queryApplicationClientAssignments">
+		<xs:sequence>
+			<xs:element name="query" type="tns:applicationClientAssignmentQuery" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="applicationClientAssignmentQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="applicationClientAssignment" type="tns:applicationClientAssignment" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="queryApplicationClientAssignmentsResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:applicationClientAssignment" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createClient">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createClientRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createClientRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="client" type="tns:client" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createClientResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:client" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateClient">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateClientRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateClientRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="client" type="tns:client" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateClientResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createPolicy">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createPolicyRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createPolicyRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createPolicyResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:policy" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updatePolicy">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updatePolicyRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updatePolicyRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updatePolicyResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deletePolicy">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deletePolicyRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deletePolicyRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="policy" type="tns:policy" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deletePolicyResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="createTemplate">
+		<xs:sequence>
+			<xs:element name="request" type="tns:createTemplateRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="createTemplateRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="template" type="tns:template" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="createTemplateResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:template" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="updateTemplate">
+		<xs:sequence>
+			<xs:element name="request" type="tns:updateTemplateRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateTemplateRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="template" type="tns:template" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateTemplateResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="deleteTemplate">
+		<xs:sequence>
+			<xs:element name="request" type="tns:deleteTemplateRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="deleteTemplateRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="template" type="tns:template" minOccurs="1" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="deleteTemplateResponse">
+		<xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="queryTemplates">
+		<xs:sequence>
+			<xs:element name="query" type="tns:templateQuery" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="templateQuery">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractQuery">
+				<xs:sequence>
+					<xs:element name="template" type="tns:template" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="queryTemplatesResponse">
+		<xs:sequence>
+			<xs:element name="return" type="tns:template" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+  <!-- bulk operations -->
+
+  <xs:complexType name="bulkGetAllUsersRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+	    <xs:sequence>
+	      <xs:element name="timestamp" type="xs:dateTime" nillable="true"/>
+	    </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="bulkGetAllUsersResponse">
+  	<xs:sequence>
+  	  <xs:element name="return" type="tns:user" minOccurs="0" maxOccurs="unbounded"/>
+  	  <xs:element name="timestamp" type="xs:dateTime" nillable="true"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+
+	<xs:complexType name="addAuthorizationsToProfiles">
+		<xs:sequence>
+			<xs:element name="request"
+				type="tns:addAuthorizationsToProfilesRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="addAuthorizationsToProfilesRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile"
+						maxOccurs="unbounded" />
+					<xs:element name="authorization" type="tns:authorization"
+						maxOccurs="unbounded" />
+					<xs:element name="failIfExists" type="xs:boolean"
+						minOccurs="0" default="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="addAuthorizationsToProfilesResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+	<xs:complexType name="removeAuthorizationsFromProfiles">
+		<xs:sequence>
+			<xs:element name="request"
+				type="tns:removeAuthorizationsFromProfilesRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="removeAuthorizationsFromProfilesRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile"
+						maxOccurs="unbounded" />
+					<xs:element name="authorization" type="tns:authorization"
+						maxOccurs="unbounded" />
+					<xs:element name="failIfNotExists" type="xs:boolean"
+						minOccurs="0" default="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="removeAuthorizationsFromProfilesResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+
+	<xs:simpleType name="updateDataroomMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="add" />
+			<xs:enumeration value="remove" />
+			<xs:enumeration value="recreate" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="updateDataroomOfAuthorization">
+		<xs:sequence>
+			<xs:element name="request"
+				type="tns:updateDataroomOfAuthorizationRequest" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="updateDataroomOfAuthorizationRequest">
+		<xs:complexContent>
+			<xs:extension base="tns:abstractRequest">
+				<xs:sequence>
+					<xs:element name="profile" type="tns:profile"
+						maxOccurs="unbounded" />
+					<xs:element name="authorization" type="tns:authorization" />
+					<xs:element name="mode" type="tns:updateDataroomMode" />
+					<xs:element name="failIfNotExists" type="xs:boolean"
+						minOccurs="0" default="true" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="updateDataroomOfAuthorizationResponse">
+		<xs:sequence />
+	</xs:complexType>
+
+
+
+  <!-- document operations -->
+
+  <xs:complexType name="getDocumentForCredential">
+    <xs:sequence>
+      <xs:element name="get" type="tns:documentForCredential"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentForCredential">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractGet">
+	    <xs:sequence>
+	      <xs:element name="credentialExtId" type="xs:string" />
+	      <xs:element name="commEventType" type="tns:commEventType" />
+	      <xs:element name="fileType" type="tns:fileType" minOccurs="0" />
+	    </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentForCredentialResponse">
+  	<xs:sequence>
+  	  <xs:element name="return" type="tns:file" minOccurs="0" />
+  	</xs:sequence>
+  </xs:complexType>
+
+  <!-- communication operations -->
+
+  <xs:complexType name="sendUserNotification">
+	<xs:sequence>
+		<xs:element name="request" type="tns:SendUserNotificationRequest" />
+	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SendUserNotificationRequest">
+	<xs:complexContent>
+		<xs:extension base="tns:abstractRequest">
+			<xs:sequence>
+				<xs:element name="sendingMethod" type="tns:sendingMethod" minOccurs="1" maxOccurs="1" />
+				<xs:element name="commEventType" type="tns:commEventType" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="user" type="tns:user" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="synchronous" type="xs:boolean" default="false"/>
+		</xs:extension>
+	</xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="sendUserNotificationResponse">
+	<xs:sequence>
+	</xs:sequence>
+   </xs:complexType>
+
+  <!-- History operations -->
+
+  <!-- General history related objects -->
+
+  <xs:complexType name="abstractHistoryGet">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractGet">
+	    <xs:sequence>
+	      <xs:element name="dateFrom"  			type="xs:dateTime" 			minOccurs="0"/>
+       	  <xs:element name="dateTo"    			type="xs:dateTime" 			minOccurs="0"/>
+       	  <xs:element name="actorExtId"   		type="xs:string" 			minOccurs="0"/>
+       	  <xs:element name="typeOfOperation"    type="tns:operationType" 	minOccurs="0"/>
+          <xs:element name="numRecords" 		type="xs:int" 				minOccurs="0"/>
+	  	  <xs:element name="skipRecords" 		type="xs:int"				minOccurs="0"/>
+	  	  <xs:element name="versionFrom" 		type="xs:int" 				minOccurs="0"/>
+	  	  <xs:element name="versionTo" 			type="xs:int" 				minOccurs="0"/>
+	    </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="operationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INSERT"/>
+      <xs:enumeration value="UPDATE"/>
+      <xs:enumeration value="DELETE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="abstractHistory">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractEntity">
+       <xs:sequence>
+  		  <xs:element name="versionDate"		type="xs:dateTime" 			minOccurs="0"/>
+  		  <xs:element name="versionNumber" 		type="xs:int" 				minOccurs="0"/>
+  		  <xs:element name="event"	 			type="tns:operationType" 	minOccurs="0"/>
+  		  <xs:element name="originator"	 		type="xs:string" 			minOccurs="0"/>
+  	   </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfUser -->
+
+  <xs:complexType name="getHistoryOfUser">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfUserRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUserRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="user" 				type="tns:user" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfUserResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfUserResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUserResponse">
+    <xs:sequence>
+      <xs:element name="userHistory" 				type="tns:HistoryOfUser" 				minOccurs="0"	maxOccurs="unbounded" />
+      <xs:element name="profileHistoryForUser" 		type="tns:ProfileHistoryForUser"		minOccurs="0"	maxOccurs="unbounded" />
+      <xs:element name="credentialHistoryForUser" 	type="tns:CredentialHistoryForUser"		minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUser">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      	  <!-- user attributes -->
+          <xs:element name="loginId" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="state" 				type="tns:userState" 		minOccurs="0"/>
+          <xs:element name="firstName" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="remarks" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="gender" 			type="tns:userGender"		minOccurs="0"/>
+          <xs:element name="sex" 				type="tns:userSex"			minOccurs="0"/>
+          <xs:element name="birthDate" 			type="xs:date" 				minOccurs="0"/>
+          <xs:element name="title"	 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="telephone" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="email" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="telefax" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="mobile" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="addressLine1" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="addressLine2" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="postalCode" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="city" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="country" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="language" 			type="xs:string" 			minOccurs="0"/>
+          <xs:element name="templateCollection" type="xs:string" 			minOccurs="0"/>
+          <xs:element name="modificationComment" type="xs:string" 			minOccurs="0"/>
+		  <xs:element name="isTechnicalUser" 	type="xs:boolean" 			minOccurs="0"/>
+          <xs:element name="validFrom" 			type="xs:dateTime"			minOccurs="0"/>
+          <xs:element name="validTo" 			type="xs:dateTime" 			minOccurs="0"/>
+          <xs:element name="stateChangedDate" 	 type="xs:dateTime" 		minOccurs="0"/>
+          <xs:element name="stateChangeReasonCd" type="xs:int" 				minOccurs="0"/>
+          <xs:element name="stateChangeDetail" 	 type="xs:string" 			minOccurs="0"/>
+		  <!-- address extension conforming to eCH-00100 standard -->
+          <xs:element name="street" 			type="tns:streetType" 					minOccurs="0"/>
+          <xs:element name="houseNumber" 		type="tns:houseNumberType" 				minOccurs="0"/>
+          <xs:element name="dwellingNumber" 	type="tns:dwellingNumberType" 			minOccurs="0"/>
+          <xs:element name="postOfficeBoxNumber" type="tns:postOfficeBoxNumberType" 	minOccurs="0"/>
+          <xs:element name="postOfficeBoxText"	type="tns:postOfficeBoxTextType" 		minOccurs="0"/>
+          <xs:element name="locality"			type="tns:locality" 					minOccurs="0"/>
+
+          <!-- attached objects -->
+          <xs:element name="properties" 		type="tns:propertyValue" 	minOccurs="0" maxOccurs="unbounded" nillable="true" />
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ProfileHistoryForUser">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="profileExtId"				type="xs:string"		minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="CredentialHistoryForUser">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="credentialExtId"			type="xs:string"		minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfUserLoginInfo -->
+
+  <xs:complexType name="getHistoryOfUserLoginInfo">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfUserLoginInfoRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUserLoginInfoRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="userExtId" 		type="xs:string" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfUserLoginInfoResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfUserLoginInfoResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUserLoginInfoResponse">
+    <xs:sequence>
+      <xs:element name="userLoginInfoHistory"		type="tns:HistoryOfUserLoginInfo" 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUserLoginInfo">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="lastLogin"			type="xs:dateTime"		minOccurs="0"/>
+      		<xs:element name="lastFailure"			type="xs:dateTime"		minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfProfile -->
+
+  <xs:complexType name="getHistoryOfProfile">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfProfileRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfProfileRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="profile" 			type="tns:profile" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfProfileResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfProfileResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfProfileResponse">
+    <xs:sequence>
+      <xs:element name="profileHistory" 					type="tns:HistoryOfProfile" 					minOccurs="0"	maxOccurs="unbounded" />
+      <xs:element name="authorizationHistoryForProfile" 	type="tns:HistoryOfAuthorizationForProfile" 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfProfile">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" minOccurs="0"/>
+          <xs:element name="extId" type="xs:string" minOccurs="0"/>
+          <xs:element name="state" type="tns:profileState" minOccurs="0" />
+          <xs:element name="remarks" type="xs:string" minOccurs="0"/>
+          <xs:element name="unit" type="tns:unit" minOccurs="0"/>
+          <xs:element name="properties" type="tns:propertyValue" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="modificationComment" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="defaultProfile" 		type="xs:boolean"/>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfAuthorizationForProfile">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="roleName"			type="xs:string"		minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfCredential -->
+
+  <xs:complexType name="getHistoryOfCredential">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfCredentialRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredentialRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="credential" 		type="tns:credential" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfCredentialResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfCredentialResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredentialResponse">
+    <xs:sequence>
+      <xs:element name="credentialHistory" 				type="tns:HistoryOfCredential" 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredential">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="state" 				type="tns:credentialState" 	minOccurs="0" />
+        	<xs:element name="type" 				type="tns:credentialType" 	minOccurs="0" />
+        	<xs:element name="lastChange" 			type="xs:dateTime" 			minOccurs="0" />
+        	<xs:element name="validFrom" 			type="xs:dateTime" 			minOccurs="0" />
+        	<xs:element name="validTo" 				type="xs:dateTime" 			minOccurs="0"/>
+        	<xs:element name="resetCount" 			type="xs:int" 				minOccurs="0" />
+        	<xs:element name="stateChangeReasonCd" 	type="xs:int" 				minOccurs="0"/>
+        	<xs:element name="stateChangeDetail" 	type="xs:string" 			minOccurs="0"/>
+        	<xs:element name="value" 				type="xs:string" 			minOccurs="0" />
+        	<xs:element name="extId" 				type="xs:string" 			minOccurs="0" />
+        	<xs:element name="policyName" 			type="xs:string" 			minOccurs="0" />
+        	<xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+        	<xs:element name="properties" 			type="tns:propertyValue"	minOccurs="0" maxOccurs="unbounded" nillable="true"  />
+          	<xs:element name="modificationComment" 	type="xs:string" 			minOccurs="0" />
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfCredential -->
+
+  <xs:complexType name="getHistoryOfCredentialLoginInfo">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfCredentialLoginInfoRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredentialLoginInfoRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="credentialExtId" 		type="xs:string" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfCredentialLoginInfoResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfCredentialLoginInfoResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredentialLoginInfoResponse">
+    <xs:sequence>
+      <xs:element name="credentialLoginInfoHistory" 			type="tns:HistoryOfCredentialLoginInfo" 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfCredentialLoginInfo">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="lastLogin" 			type="xs:dateTime" 			minOccurs="0" />
+        	<xs:element name="lastLoginFailure" 	type="xs:dateTime" 			minOccurs="0" />
+        	<xs:element name="failureCount" 		type="xs:int" 				minOccurs="0" />
+        	<xs:element name="successCount" 		type="xs:int" 				minOccurs="0" />
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfUnit -->
+
+  <xs:complexType name="getHistoryOfUnit">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfUnitRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUnitRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="unit" 		type="tns:unit" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfUnitResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfUnitResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUnitResponse">
+    <xs:sequence>
+      <xs:element name="unitHistory" 				type="tns:HistoryOfUnit"	 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfUnit">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+          <xs:element name="name" 					type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 					type="xs:string" 			minOccurs="0"/>
+          <xs:element name="state" 					type="tns:unitState" 		minOccurs="0" />
+          <xs:element name="location" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="description" 			type="xs:string" 			minOccurs="0" />
+          <xs:element name="parentExtId" 			type="xs:string" 			minOccurs="0" />
+          <xs:element name="properties" 			type="tns:propertyValue" 	minOccurs="0" nillable="true" maxOccurs="unbounded"/>
+          <xs:element name="hname" 					type="xs:string" 			minOccurs="0" />
+          <xs:element name="profileless"			type="xs:boolean" 			minOccurs="0" />
+       	  <xs:element name="modificationComment" 	type="xs:string" 			minOccurs="0" />
+       	  <xs:element name="policyName" 			type="xs:string" 			minOccurs="0" />
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfRole -->
+
+  <xs:complexType name="getHistoryOfRole">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfRoleRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfRoleRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="role" 		type="tns:role" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfRoleResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfRoleResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfRoleResponse">
+    <xs:sequence>
+      <xs:element name="roleHistory" 				type="tns:HistoryOfRole"	 	minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfRole">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string"			minOccurs="0" 	maxOccurs="1"/>
+          <xs:element name="description" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="applicationName" 	type="xs:string" 			minOccurs="0"/>
+          <xs:element name="applicationExtId" 	type="xs:string"	 		minOccurs="0"/>
+          <xs:element name="properties" 		type="tns:propertyValue" 	minOccurs="0" 	maxOccurs="unbounded"	nillable="true" />
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfEnterpriseRole -->
+
+  <xs:complexType name="getHistoryOfEnterpriseRole">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfEnterpriseRoleRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfEnterpriseRoleRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="enterpriseRole" 		type="tns:enterpriseRole" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfEnterpriseRoleResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfEnterpriseRoleResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfEnterpriseRoleResponse">
+    <xs:sequence>
+      <xs:element name="enterpriseRoleHistory" 				type="tns:HistoryOfEnterpriseRole"	 	minOccurs="0"	maxOccurs="unbounded" />
+      <xs:element name="roleHistoryForEnterpriseRole"	        type="tns:RoleHistoryForEnterpriseRole" minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfEnterpriseRole">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string"			minOccurs="0" 	maxOccurs="1"/>
+          <xs:element name="description" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="clientName" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="displayNameDe" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="displayNameFr" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="displayNameIt" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="displayNameEn" 		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="properties" 		type="tns:propertyValue" 	minOccurs="0" 	maxOccurs="unbounded"	nillable="true" />
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="RoleHistoryForEnterpriseRole">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="name"				type="xs:string"			minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfApplication -->
+
+  <xs:complexType name="getHistoryOfApplication">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfApplicationRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfApplicationRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="application" 		type="tns:application" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfApplicationResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfApplicationResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfApplicationResponse">
+    <xs:sequence>
+      <xs:element name="applicationHistory" 				type="tns:HistoryOfApplication"	 	 minOccurs="0"	maxOccurs="unbounded" />
+      <xs:element name="roleHistoryForApplication"	        type="tns:RoleHistoryForApplication" minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfApplication">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      	  <xs:element name="name"				type="xs:string"			minOccurs="0"/>
+          <xs:element name="extId"				type="xs:string" 			minOccurs="0" 	maxOccurs="1"/>
+          <xs:element name="description"		type="xs:string" 			minOccurs="0"/>
+          <xs:element name="url"				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="properties"			type="tns:propertyValue"	minOccurs="0" 	maxOccurs="unbounded"	nillable="true" />
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="RoleHistoryForApplication">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+      		<xs:element name="name"				type="xs:string"			minOccurs="0"/>
+  	   	</xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfClient -->
+
+  <xs:complexType name="getHistoryOfClient">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfClientRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfClientRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="client" 		type="tns:client" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfClientResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfClientResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfClientResponse">
+    <xs:sequence>
+      <xs:element name="clientHistory" 				type="tns:HistoryOfClient"	 	 minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfClient">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+          <xs:element name="name" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="extId" 				type="xs:string" 			minOccurs="0"/>
+          <xs:element name="remarks" 			type="xs:string" 			minOccurs="0"/>
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Objects for getHistoryOfAuthorization -->
+
+  <xs:complexType name="getHistoryOfAuthorization">
+    <xs:sequence>
+      <xs:element name="get" type="tns:HistoryOfAuthorizationRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfAuthorizationRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractHistoryGet">
+        <xs:sequence>
+	      <xs:element name="profile" 		type="tns:profile" />
+	      <xs:element name="role"	 		type="tns:role" />
+	    </xs:sequence>
+	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getHistoryOfAuthorizationResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:HistoryOfAuthorizationResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfAuthorizationResponse">
+    <xs:sequence>
+      <xs:element name="authorizationHistory" 				type="tns:HistoryOfAuthorization"	 	 minOccurs="0"	maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HistoryOfAuthorization">
+   <xs:complexContent>
+      <xs:extension base="tns:abstractHistory">
+      	<xs:sequence>
+          <xs:element name="unitGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="appGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="clientGlobal" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="eRoleGlobal" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+  	  </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+
+  <xs:complexType name="checkPasswordPolicy">
+  	<xs:sequence>
+   	  <xs:element name="request" type="tns:PasswordPolicyCheckRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PasswordPolicyCheckRequest">
+	<xs:complexContent>
+	  <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+	  	  <xs:element name="password" type="xs:string" minOccurs="1"/>
+	  	  <xs:element name="policyExtId" type="xs:string" minOccurs="0"/>
+	      <xs:element name="unitExtId" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:extension>
+	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="checkPasswordPolicyResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:PasswordPolicyCheckResult"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PasswordPolicyCheckResult">
+    <xs:sequence>
+       <xs:element name="policyInformations" type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+       <xs:element name="policyViolations"   type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorizers">
+  	<xs:sequence>
+   	  <xs:element name="request" type="tns:GetAuthorizersRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetAuthorizersRequest">
+	<xs:complexContent>
+	  <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+	  	  <xs:element name="profileExtId" type="xs:string" minOccurs="1"/>
+	      <xs:element name="roleExtId" type="xs:string" minOccurs="1"/>
+	    </xs:sequence>
+	  </xs:extension>
+	</xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorizersResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:user" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+  =============================================================================
+  Message types (LoginService)
+  =============================================================================
+  -->
+
+  <xs:element name="activateResetPassword" type="tns:activateResetPassword"/>
+  <xs:element name="activateResetPasswordResponse" type="tns:activateResetPasswordResponse"/>
+
+  <xs:element name="changePassword" type="tns:changePassword"/>
+  <xs:element name="changePasswordResponse" type="tns:changePasswordResponse"/>
+
+  <xs:element name="generateResetPassword" type="tns:generateResetPassword"/>
+  <xs:element name="generateResetPasswordResponse" type="tns:generateResetPasswordResponse"/>
+
+  <xs:element name="getChallenge" type="tns:getChallenge"/>
+  <xs:element name="getChallengeResponse" type="tns:getChallengeResponse"/>
+
+  <xs:element name="verifyCredentialState" type="tns:verifyCredentialState"/>
+  <xs:element name="verifyCredentialStateResponse" type="tns:verifyCredentialStateResponse"/>
+
+  <xs:element name="getUserByLoginId" type="tns:getUserByLoginId"/>
+  <xs:element name="getUserByLoginIdResponse" type="tns:getUserByLoginIdResponse"/>
+
+  <xs:element name="getUserByEmail" type="tns:getUserByEmail"/>
+  <xs:element name="getUserByEmailResponse" type="tns:getUserByEmailResponse"/>
+
+  <xs:element name="getUserByCredential" type="tns:getUserByCredential"/>
+  <xs:element name="getUserByCredentialResponse" type="tns:getUserByCredentialResponse"/>
+
+  <xs:element name="getUsersByUserProperty" type="tns:getUsersByUserProperty"/>
+  <xs:element name="getUsersByUserPropertyResponse" type="tns:getUsersByUserPropertyResponse"/>
+
+  <xs:element name="updateAuthenticatedCredentials" type="tns:updateAuthenticatedCredentials"/>
+  <xs:element name="updateAuthenticatedCredentialsResponse" type="tns:updateAuthenticatedCredentialsResponse"/>
+
+  <xs:element name="verifyCertificate" type="tns:verifyCertificate"/>
+  <xs:element name="verifyCertificateResponse" type="tns:verifyCertificateResponse"/>
+
+  <xs:element name="verifyPassword" type="tns:verifyPassword"/>
+  <xs:element name="verifyPasswordResponse" type="tns:verifyPasswordResponse"/>
+
+  <xs:element name="verifyOTP" type="tns:verifyOTP"/>
+  <xs:element name="verifyOTPResponse" type="tns:verifyOTPResponse"/>
+
+  <xs:element name="verifyResponse" type="tns:verifyResponse"/>
+  <xs:element name="verifyResponseResponse" type="tns:verifyResponseResponse"/>
+
+  <xs:element name="verifyResponseOnly" type="tns:verifyResponseOnly"/>
+  <xs:element name="verifyResponseOnlyResponse" type="tns:verifyResponseOnlyResponse"/>
+
+  <xs:element name="updateCredentialForAuthSuccess" type="tns:updateCredentialForAuthSuccess"/>
+  <xs:element name="updateCredentialForAuthSuccessResponse" type="tns:updateCredentialForAuthSuccessResponse"/>
+
+  <xs:element name="updateCredentialForAuthFailure" type="tns:updateCredentialForAuthFailure"/>
+  <xs:element name="updateCredentialForAuthFailureResponse" type="tns:updateCredentialForAuthFailureResponse"/>
+
+  <xs:element name="uploadCertificate" type="tns:uploadCertificate"/>
+  <xs:element name="uploadCertificateResponse" type="tns:uploadCertificateResponse"/>
+
+  <xs:element name="revokeCertificate" type="tns:revokeCertificate"/>
+  <xs:element name="revokeCertificateResponse" type="tns:revokeCertificateResponse"/>
+
+  <xs:element name="ping" type="tns:ping" />
+  <xs:element name="pong" type="tns:pong" />
+
+  <xs:element name="verifyURLTicket" type="tns:verifyURLTicket"/>
+  <xs:element name="verifyURLTicketResponse" type="tns:verifyURLTicketResponse"/>
+
+  <xs:element name="resetPassword" type="tns:resetPassword"/>
+  <xs:element name="resetPasswordResponse" type="tns:resetPasswordResponse"/>
+
+  <xs:element name="getPersonalQuestionsForUser" type="tns:getPersonalQuestionsForUser"/>
+  <xs:element name="getPersonalQuestionsForUserResponse" type="tns:getPersonalQuestionsForUserResponse"/>
+
+  <xs:element name="verifySecurityQuestions" type="tns:verifySecurityQuestions"/>
+  <xs:element name="verifySecurityQuestionsResponse" type="tns:verifySecurityQuestionsResponse"/>
+
+  <xs:element name="countRequiredPersonalAnswers" type="tns:countRequiredPersonalAnswers" />
+  <xs:element name="countRequiredPersonalAnswersResponse" type="tns:countRequiredPersonalAnswersResponse" />
+
+  <!--
+  =============================================================================
+  Specific message types (LoginService)
+  =============================================================================
+  -->
+
+  <xs:complexType name="verifyPassword">
+    <xs:sequence>
+      <xs:element name="request" type="tns:passwordVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="passwordVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="password" type="xs:string" minOccurs="0"/>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="email" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+          <xs:element name="updateCredentialOnSuccess" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialContext" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyPasswordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verifyOTP">
+    <xs:sequence>
+      <xs:element name="request" type="tns:otpVerifyRequest" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="otpVerifyRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="email" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="1"/>
+          <xs:element name="challenge" type="xs:string" minOccurs="0"/>
+          <xs:element name="password" type="xs:string" minOccurs="0"/>
+          <xs:element name="label" type="xs:string" minOccurs="0"/>
+          <xs:element name="updateUserInfoOnSuccess" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyOTPResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="credentialVerifyResult">
+    <xs:sequence>
+      <xs:element name="credentialCheckStatus" type="tns:credentialCheckStatus" minOccurs="0"/>
+      <xs:element name="credentialState" type="tns:credentialState" minOccurs="0"/>
+      <xs:element name="user" type="tns:user" minOccurs="0"/>
+      <xs:element name="userState" type="tns:userState" minOccurs="0"/>
+      <xs:element name="credentialUpdatedOnSuccess" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getChallenge">
+    <xs:sequence>
+      <xs:element name="request" type="tns:challengeGet" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="challengeGet">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="email" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getChallengeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:challengeGetResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="challengeGetResult">
+    <xs:sequence>
+      <xs:element name="challenge" type="xs:string" minOccurs="0"/>
+      <xs:element name="credentialState" type="tns:credentialState" minOccurs="0"/>
+      <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+      <xs:element name="user" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verifyCredentialState">
+    <xs:sequence>
+      <xs:element name="request" type="tns:credentialStateVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="credentialStateVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyCredentialStateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialStateVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="credentialStateVerifyResult">
+    <xs:sequence>
+      <xs:element name="credentialState" type="tns:credentialState" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="changePassword">
+    <xs:sequence>
+      <xs:element name="request" type="tns:passwordChange" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="passwordChange">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="password" type="xs:string" minOccurs="0"/>
+          <xs:element name="newPassword" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="credentialContext" type="xs:string" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="changePasswordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:passwordChangeResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="passwordChangeResult">
+    <xs:complexContent>
+      <xs:extension base="tns:credentialVerifyResult">
+        <xs:sequence>
+          <xs:element name="policyInformations" type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="policyViolations" type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="policyDetail">
+    <xs:sequence>
+      <xs:element name="messageTag" type="xs:string" minOccurs="0"/>
+      <xs:element name="limitValue" type="xs:int"/>
+      <xs:element name="configString" type="xs:string" minOccurs="0"/>
+      <xs:element name="messageFallback" type="xs:string" minOccurs="0"/>
+      <xs:element name="displayName" type="xs:string" minOccurs="0"/>
+      <xs:element name="actualValue" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByLoginId">
+	<xs:sequence>
+		<xs:element name="request" type="tns:userGetByLoginIdForLogin" />
+	</xs:sequence>
+  </xs:complexType>
+
+   <xs:complexType name="userGetByLoginIdForLogin">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractGet">
+        <xs:sequence>
+          <xs:element name="updateLoginInfo" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+          <xs:element name="loginId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+          <xs:element name="impersonatedLoginId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="impersonatedUserExtId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="impersonatedClientExtId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="impersonatedClientName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByLoginIdResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByEmail">
+	<xs:sequence>
+		<xs:element name="request" type="tns:userGetByEmailForLogin" />
+	</xs:sequence>
+  </xs:complexType>
+
+   <xs:complexType name="userGetByEmailForLogin">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractGet">
+        <xs:sequence>
+          <xs:element name="updateLoginInfo" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+          <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByEmailResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByCredential">
+    <xs:sequence>
+      <xs:element name="request" type="tns:userGetByCredential" minOccurs="0" />
+      </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="userGetByCredential">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractGet">
+        <xs:sequence>
+          <xs:element name="credentialValue" 	type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="credentialType" 	type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="samlFederation" type="tns:samlFederation" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByCredentialResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByUserProperty">
+    <xs:sequence>
+      <xs:element name="request" type="tns:userGetByUserProperty" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByUserPropertyResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:user" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verifyCertificate">
+    <xs:sequence>
+      <xs:element name="request" type="tns:certificateVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="certificate" type="tns:certificate" minOccurs="0"/>
+          <xs:element name="updateCredentialOnSuccess" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyCertificateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:certificateVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateVerifyResult">
+    <xs:sequence>
+      <xs:element name="credentialCheckStatus" type="tns:credentialCheckStatus" minOccurs="0"/>
+      <xs:sequence>
+        <xs:element name="users" type="tns:user" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:element name="credentialUpdatedOnSuccess" type="xs:boolean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generateResetPassword">
+    <xs:sequence>
+      <xs:element name="request" type="tns:resetPasswordGenerate" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordGenerate">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="generateResetPasswordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:resetPasswordGenerateResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordGenerateResult">
+    <xs:sequence>
+      <xs:element name="codes" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="credentialState" type="tns:credentialState" minOccurs="0"/>
+      <xs:element name="user" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="activateResetPassword">
+    <xs:sequence>
+      <xs:element name="request" type="tns:resetPasswordActivate" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordActivate">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="codes" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="activateResetPasswordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:resetPasswordActivateResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordActivateResult">
+    <xs:sequence>
+      <xs:element name="credentialState" type="tns:credentialState" minOccurs="0"/>
+      <xs:element name="user" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateAuthenticatedCredentials">
+    <xs:sequence>
+      <xs:element name="request" type="tns:user" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateAuthenticatedCredentialsResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="verifyResponse">
+    <xs:sequence>
+      <xs:element name="request" type="tns:responseVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="responseVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="email" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="challenge" type="xs:string" minOccurs="0"/>
+          <xs:element name="response" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyResponseOnly">
+    <xs:sequence>
+      <xs:element name="request" type="tns:responseOnlyVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="responseOnlyVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="loginId" type="xs:string" minOccurs="0"/>
+          <xs:element name="email" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="response" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="user" type="tns:user" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyResponseResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="verifyResponseOnlyResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="credentialCheckStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CLIENT_NOT_FOUND"/>
+      <xs:enumeration value="LOGIN_FAILED"/>
+      <xs:enumeration value="LOGIN_FAILED_LOCK_WARN"/>
+      <xs:enumeration value="LOGIN_FAILED_NOW_LOCKED"/>
+      <xs:enumeration value="LOGIN_FAILED_NOW_TMPLOCKED"/>
+      <xs:enumeration value="LOGIN_FAILED_USER_NOT_ACTIVE"/>
+      <xs:enumeration value="LOGIN_OK"/>
+      <xs:enumeration value="CRED_CHANGE_REQUIRED"/>
+      <xs:enumeration value="CRED_CHANGE_REJECTED"/>
+      <xs:enumeration value="CRED_CHANGE_OK"/>
+      <xs:enumeration value="LOGIN_UNCHECKED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="credentialUpdate">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="credential" type="tns:credential" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="credentialUpdateResult">
+    <xs:sequence>
+      <xs:element name="credentialCheckStatus" type="tns:credentialCheckStatus" minOccurs="0"/>
+      <xs:element name="credential" type="tns:credential" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateCredentialForAuthSuccess">
+  	<xs:sequence>
+  		<xs:element name="credentialUpdate" type="tns:credentialUpdate" minOccurs="0"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateCredentialForAuthSuccessResponse">
+  	<xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="updateCredentialForAuthFailure">
+  	<xs:sequence>
+  		<xs:element name="credentialUpdate" type="tns:credentialUpdate" minOccurs="0"/>
+        <xs:element name="incrementFailureCount" type="xs:boolean" minOccurs="0"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateCredentialForAuthFailureResponse">
+  	<xs:sequence>
+      <xs:element name="return" type="tns:credentialUpdateResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="uploadCertificate">
+    <xs:sequence>
+      <xs:element name="request" type="tns:certificateUpload" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateUpload">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="plainCertificateValue" type="xs:string" minOccurs="0"/>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="uploadCertificateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:certificateUploadResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateUploadResult">
+    <xs:sequence>
+      <xs:element name="credential" type="tns:credential" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="revokeCertificate">
+    <xs:sequence>
+      <xs:element name="request" type="tns:certificateRevoke" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateRevoke">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="certificate" type="tns:certificate" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="revokeCertificateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:certificateRevokeResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="certificateRevokeResult">
+    <xs:sequence>
+      <xs:element name="credential" type="tns:credential" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ping">
+  	<xs:sequence>
+  		<xs:element name="request" type="tns:pingRequest" minOccurs="0" />
+  	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pingRequest">
+  	<xs:sequence>
+  		<xs:element name="description" type="xs:string" minOccurs="0"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pong">
+  	<xs:sequence>
+  		<xs:element name="return" type="tns:pongResult" minOccurs="0" />
+  	</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pongResult">
+  	<xs:sequence>
+  		<xs:element name="description" type="xs:string" minOccurs="0"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verifyURLTicket">
+    <xs:sequence>
+      <xs:element name="request" type="tns:URLTicketVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="URLTicketVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="ticketTuple" type="xs:string" minOccurs="0"/>
+          <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+          <xs:element name="deleteCredentialOnSuccess" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifyURLTicketResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPassword">
+    <xs:sequence>
+      <xs:element name="request" type="tns:resetPasswordRequest" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="credential" type="tns:credential" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="resetPasswordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:passwordResetResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="passwordResetResult">
+    <xs:sequence>
+	  <xs:element name="credential" type="tns:credential" minOccurs="0" maxOccurs="1" />
+      <xs:element name="policyInformations" type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="policyViolations" type="tns:policyDetail" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getPersonalQuestionsForUser">
+    <xs:sequence>
+      <xs:element name="request" type="tns:personalQuestionsForUserGet" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="personalQuestionsForUserGet">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="answeredQuestions" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getPersonalQuestionsForUserResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:personalQuestionsForUserGetResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="personalQuestionsForUserGetResult">
+    <xs:sequence>
+      <xs:element name="personalQuestions" type="tns:personalQuestion" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="verifySecurityQuestions">
+    <xs:sequence>
+      <xs:element name="request" type="tns:securityQuestionsVerify" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="securityQuestionsVerify">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="securityQuestionExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="securityQuestionAnswer" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="verifySecurityQuestionsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:credentialVerifyResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="countRequiredPersonalAnswers">
+    <xs:sequence>
+      <xs:element name="request" type="tns:requiredPersonalAnswersCount" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="requiredPersonalAnswersCount">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="userExtId" type="xs:string" minOccurs="0"/>
+          <xs:element name="policyExtId" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="countRequiredPersonalAnswersResponse">
+  	<xs:sequence>
+  		<xs:element name="return" type="tns:requiredPersonalAnswersResult" minOccurs="0"/>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="requiredPersonalAnswersResult">
+    <xs:sequence>
+      <xs:element name="requiredAnswerNumber" type="xs:int" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+  =============================================================================
+  Message types (SelfAdminService)
+  =============================================================================
+  -->
+
+  <xs:element name="changeMyLanguage" type="tns:changeMyLanguage"/>
+  <xs:element name="changeMyLanguageResponse" type="tns:changeMyLanguageResponse"/>
+
+  <xs:element name="changeMyPassword" type="tns:changeMyPassword"/>
+  <xs:element name="changeMyPasswordResponse" type="tns:changeMyPasswordResponse"/>
+
+  <xs:element name="getCaller" type="tns:getCaller"/>
+  <xs:element name="getCallerResponse" type="tns:getCallerResponse"/>
+
+  <xs:element name="updateCaller" type="tns:updateCaller"/>
+  <xs:element name="updateCallerResponse" type="tns:updateCallerResponse"/>
+
+  <xs:element name="checkAuthorizationForUnit" type="tns:checkAuthorizationForUnit"/>
+  <xs:element name="checkAuthorizationForUnitResponse" type="tns:checkAuthorizationForUnitResponse"/>
+
+  <xs:element name="createDeputy" type="tns:createDeputy"/>
+  <xs:element name="createDeputyResponse" type="tns:createDeputyResponse"/>
+
+  <xs:element name="deleteDeputy" type="tns:deleteDeputy"/>
+  <xs:element name="deleteDeputyResponse" type="tns:deleteDeputyResponse"/>
+
+  <xs:element name="deleteCaller" type="tns:deleteCaller"/>
+  <xs:element name="deleteCallerResponse" type="tns:deleteCallerResponse"/>
+
+  <!--
+  =============================================================================
+  Specific message types (SelfAdminService)
+  =============================================================================
+  -->
+
+  <xs:complexType name="changeMyLanguage">
+    <xs:sequence>
+      <xs:element name="newLanguage" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="changeMyLanguageResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="changeMyPassword">
+    <xs:sequence>
+      <xs:element name="oldPassword" type="xs:string" minOccurs="1"/>
+      <xs:element name="newPassword" type="xs:string" minOccurs="1"/>
+      <xs:element name="credentialType" type="tns:credentialType" minOccurs="0"/>
+      <xs:element name="credentialContext" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="changeMyPasswordResponse">
+     <xs:sequence>
+      <xs:element name="return" type="tns:passwordChangeResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCaller">
+    <xs:sequence>
+      <xs:element name="filter" type="tns:callerFilter" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="callerFilter">
+  	<xs:complexContent>
+   	  <xs:extension base="tns:abstractQuery">
+        <xs:sequence>
+      	  <xs:element name="languageCode" type="xs:string" minOccurs="0"/>
+    	</xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="getCallerResponse">
+    <xs:sequence>
+      <xs:element name="caller" type="tns:caller"/>
+    </xs:sequence>
+  </xs:complexType>
+
+   <xs:complexType name="updateCaller">
+    <xs:sequence>
+      <xs:element name="request" type="tns:updateCallerRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateCallerRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractRequest">
+        <xs:sequence>
+          <xs:element name="user" type="tns:user" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="updateCallerResponse">
+    <xs:sequence />
+  </xs:complexType>
+
+  <xs:complexType name="checkAuthorizationForUnit">
+    <xs:sequence>
+      <xs:element name="idmRoles" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="permissions" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="unitExtId" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="checkAuthorizationForUnitResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="queryCredentials">
+  	<xs:sequence>
+  		<xs:element name="query" type="tns:credentialQuery"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="queryCredentialsResponse">
+  	<xs:sequence>
+  		<xs:element name="return" type="tns:credential" maxOccurs="unbounded" minOccurs="0"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="credentialQuery">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractQuery">
+        <xs:sequence>
+          <xs:element name="credential" type="tns:credential"></xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="createDeputy">
+    <xs:sequence>
+      <xs:element name="deputedProfileExtId" type="xs:string" minOccurs="1"/>
+      <xs:element name="deputyUserExtId" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDeputyResponse">
+    <xs:sequence>
+  	  <xs:element name="return" type="tns:profile" maxOccurs="1" minOccurs="1"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deleteDeputy">
+    <xs:sequence>
+      <xs:element name="deputyProfileExtId" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deleteDeputyResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="deleteCaller">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="deleteCallerResponse">
+    <xs:sequence />
+  </xs:complexType>
+
+</xs:schema>

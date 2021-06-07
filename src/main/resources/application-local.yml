@@ -26,3 +26,6 @@ ha-authcode-generation-service:
 cc-api-gateway-service:
   jwt:
     publicKey: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm7g5sfd8MtTfUh29hlW6q+pZCZPY8McM0JbF1ZwXZ80Zx2gNDAiUTQrY1cuH9KpgB0JOITMyR6y+e7N4QFlaiHejwULPe+CUJOlgiTd/wqT64JDWXon8OjqZqpXE3es7ubtDG1LOjIeNo9UZcqzvzRcqi+RIPYQ+WHB7fexn1fp7FSb0YEuMDHLuqLmiFKw7elmf6OwguL9J2XhEJXl9oLYDKjkkH1lmoLtWcDUOR4OEDT+SMrDGQu8c7M73Ze1vyzD3wLrmVDoNACTLAMJmU4b8ZP/aONUpyZenneKpWeLjhGXwXmeXtIhJMKwBcEp7MkB9CFt1q/1LJAawIP8fawIDAQAB"
+
+eiam-am-service:
+  url: "https://services.gate-r.eiam.admin.ch/nevisidm/services/v1_42/AdminService"
