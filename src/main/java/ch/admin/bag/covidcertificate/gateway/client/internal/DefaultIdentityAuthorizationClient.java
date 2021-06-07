@@ -2,8 +2,8 @@ package ch.admin.bag.covidcertificate.gateway.client.internal;
 
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
-import ch.admin.bag.covidcertificate.gateway.client.eiam.generated.Authorization;
-import ch.admin.bag.covidcertificate.gateway.client.eiam.generated.QueryUsersResponse;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Authorization;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.QueryUsersResponse;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
 import lombok.RequiredArgsConstructor;

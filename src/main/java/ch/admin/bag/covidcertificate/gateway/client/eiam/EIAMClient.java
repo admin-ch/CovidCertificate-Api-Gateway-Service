@@ -1,6 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.client.eiam;
 
-import ch.admin.bag.covidcertificate.gateway.client.eiam.generated.*;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.*;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 import java.util.List;

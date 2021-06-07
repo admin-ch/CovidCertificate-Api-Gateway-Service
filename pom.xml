@@ -203,8 +203,8 @@
                 </executions>
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
-                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>ch.admin.bag.covidcertificate.gateway.client.eiam.generated</generatePackage>
+                    <generateDirectory>${project.basedir}/target/generated-sources</generateDirectory>
+                    <generatePackage>ch.admin.bag.covidcertificate.gateway.eiam.adminservice</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
                         <include>nevisidm_adminservice_v1_43.wsdl</include>
