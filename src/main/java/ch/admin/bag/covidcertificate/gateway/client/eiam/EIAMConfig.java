@@ -1,13 +1,12 @@
-package ch.admin.bag.covidcertificate.gateway.config;
+package ch.admin.bag.covidcertificate.gateway.client.eiam;
 
-import ch.admin.bag.covidcertificate.gateway.client.eiam.AdvancedHttpClientFactoryBean;
-import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
-import ch.admin.bag.covidcertificate.gateway.client.eiam.JeapSaajSoapMessageFactory;
+import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
 import io.jsonwebtoken.io.Decoders;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -15,6 +14,7 @@ import org.springframework.ws.client.support.interceptor.PayloadValidatingInterc
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
 @Configuration
+@Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 public class EIAMConfig {
     private static final String CONTEXT_PATH = "ch.admin.bag.covidcertificate.gateway.eiam.adminservice";
     private static final String KEYSTORE_TYPE = "pkcs12";
