@@ -52,7 +52,7 @@ public class AdvancedHttpClientFactoryBean implements FactoryBean<HttpClient> {
 
     @Override
     public HttpClient getObject() throws Exception {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        var httpClientBuilder = HttpClientBuilder.create();
         handleInterceptors(httpClientBuilder);
         handleSSLConnection(httpClientBuilder);
         handleRequestConfig(httpClientBuilder);
@@ -102,7 +102,7 @@ public class AdvancedHttpClientFactoryBean implements FactoryBean<HttpClient> {
     }
 
     protected void handleRequestConfig(HttpClientBuilder httpClientBuilder) {
-        RequestConfig requestConfig = RequestConfig.custom()
+        var requestConfig = RequestConfig.custom()
                 .setConnectTimeout(connectTimeout)
                 .setSocketTimeout(readTimeout)
                 .build();
@@ -111,13 +111,13 @@ public class AdvancedHttpClientFactoryBean implements FactoryBean<HttpClient> {
 
     protected void handleSSLConnection(HttpClientBuilder httpClientBuilder) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
         if (this.keystoreLocation != null || this.truststoreLocation != null) {
-            SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+            var sslContextBuilder = SSLContexts.custom();
             if (this.keystoreLocation != null) {
-                KeyStore keystore = getKeyStore();
+                var keystore = getKeyStore();
                 sslContextBuilder.loadKeyMaterial(keystore, this.keystorePassword.toCharArray());
             }
             if (this.truststoreLocation != null) {
-                KeyStore truststore = getTruststore();
+                var truststore = getTruststore();
                 sslContextBuilder.loadTrustMaterial(truststore);
             }
             httpClientBuilder.setSslcontext(sslContextBuilder.build());
@@ -125,16 +125,16 @@ public class AdvancedHttpClientFactoryBean implements FactoryBean<HttpClient> {
     }
 
     private KeyStore getTruststore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore truststore = KeyStore.getInstance(truststoreType);
-        try (InputStream fis = truststoreLocation.getInputStream()) {
+        var truststore = KeyStore.getInstance(truststoreType);
+        try (var fis = truststoreLocation.getInputStream()) {
             truststore.load(fis, this.truststorePassword.toCharArray());
         }
         return truststore;
     }
 
     private KeyStore getKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        KeyStore keystore = KeyStore.getInstance(keystoreType);
-        try (InputStream fis = keystoreLocation.getInputStream()) {
+        var keystore = KeyStore.getInstance(keystoreType);
+        try (var fis = keystoreLocation.getInputStream()) {
             keystore.load(fis, this.keystorePassword.toCharArray());
         }
         return keystore;
