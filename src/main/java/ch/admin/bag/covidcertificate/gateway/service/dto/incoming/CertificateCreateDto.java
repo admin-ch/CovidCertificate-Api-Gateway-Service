@@ -14,6 +14,8 @@ public abstract class CertificateCreateDto {
     @Schema(example= "de", description = "language for the PDF (together with english). Accepted languages are: de, it, fr, rm")
     private String language;
     private String otp;
-    @Schema(description = "Address of the recipient. A printout of the certificate will be sent to the certificate holder if this parameter is passed.")
+    @Schema(description = "Address of the recipient. A printout of the certificate will be sent to the certificate holder if this parameter is passed. " +
+            "The first line of the address is automatically filled with the givenName and familyName from the name attribute."
+    )
     private CovidCertificateAddressDto address;
 }

@@ -9,11 +9,9 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class CovidCertificateAddressDto {
-    @Schema(required = true, description = "Recipient of the certificate", example = "Hans Muster")
-    private String line1;
-    @Schema(description = "Optional second address line")
-    private String line2;
-    @Schema(required = true, example = "3000", maxLength = 4, minLength = 4)
+    @Schema(required = true, description = "Street and number of the certificate holder.", example = "Musterweg 4b")
+    private String streetAndNr;
+    @Schema(required = true, example = "3000", maxLength = 4, minLength = 4, type = "integer")
     private String zipCode;
     @Schema(required = true, example = "Bern")
     private String city;
