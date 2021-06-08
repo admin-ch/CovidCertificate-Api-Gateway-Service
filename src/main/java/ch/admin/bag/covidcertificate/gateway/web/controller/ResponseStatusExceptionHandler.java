@@ -31,7 +31,10 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
                 examples = {
                         @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
                         @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
-                        @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON)
+                        @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON),
+                        @ExampleObject(name = "INVALID_AUTHORIZATION_COMBINATION", value = INVALID_AUTHORIZATION_COMBINATION_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER", value = INVALID_IDENTITY_USER_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER_ROLE", value = INVALID_IDENTITY_USER_ROLE_JSON)
                 })
 )
 @Slf4j

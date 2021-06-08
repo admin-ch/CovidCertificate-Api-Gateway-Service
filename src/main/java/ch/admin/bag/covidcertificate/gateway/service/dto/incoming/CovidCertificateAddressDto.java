@@ -15,4 +15,8 @@ public class CovidCertificateAddressDto {
     private String zipCode;
     @Schema(required = true, example = "Bern")
     private String city;
+    @Schema(required = true, description = "Abbreviation of the canton issuing the certificate. " +
+            "This will be used as the sender of the paper based delivery.", example = "BE"
+    )
+    private String cantonCodeSender;
 }

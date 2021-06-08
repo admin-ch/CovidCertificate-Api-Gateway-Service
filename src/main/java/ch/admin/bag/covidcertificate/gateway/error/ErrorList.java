@@ -44,13 +44,26 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Invalid date of first positive test result}";
     public static final String INVALID_COUNTRY_OF_TEST = ERROR_CODE_KEY + 467 + ","
             + ERROR_MESSAGE_KEY + "Invalid country of test}";
-    public static final String INVALID_COUNTRY_SHORT_FORM = ERROR_CODE_KEY + 468 + ","
-            + ERROR_MESSAGE_KEY + "Country short form can not be mapped}";
     public static final String INVALID_LANGUAGE = ERROR_CODE_KEY + 469 + ","
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
             + ERROR_MESSAGE_KEY + "Invalid UVCI format.}";
-    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 471 + ","
+    public static final int INVALID_VACCINATION_INFO_CODE = 471;
+    public static final String INVALID_VACCINATION_INFO_MESSAGE = "Invalid vaccination info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_VACCINATION_INFO = new RestError(INVALID_VACCINATION_INFO_CODE, INVALID_VACCINATION_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String INVALID_VACCINATION_INFO_JSON = ERROR_CODE_KEY + INVALID_VACCINATION_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_VACCINATION_INFO_MESSAGE + "}";
+    public static final int INVALID_TEST_INFO_CODE = 472;
+    public static final String INVALID_TEST_INFO_MESSAGE = "Invalid test info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_TEST_INFO = new RestError(INVALID_TEST_INFO_CODE, "Invalid test info! Exactly one element is expected in the array.", HttpStatus.BAD_REQUEST);
+    public static final String INVALID_TEST_INFO_JSON = ERROR_CODE_KEY + INVALID_TEST_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_TEST_INFO_MESSAGE + "}";
+    public static final int INVALID_RECOVERY_INFO_CODE = 473;
+    public static final String INVALID_RECOVERY_INFO_MESSAGE = "Invalid recovery info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_RECOVERY_INFO = new RestError(INVALID_RECOVERY_INFO_CODE, INVALID_RECOVERY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String INVALID_RECOVERY_INFO_JSON = ERROR_CODE_KEY + INVALID_RECOVERY_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_RECOVERY_INFO_MESSAGE + "}";
+    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 474 + ","
             + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
 
     // Authorization
@@ -67,10 +80,28 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + SIGNATURE_PARSE_MESSAGE + "}";
 
     public static final int INVALID_BEARER_CODE = 492;
-    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing bearer token";
+    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing OTP";
     public static final RestError INVALID_BEARER = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_BEARER_JSON = ERROR_CODE_KEY + INVALID_BEARER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_BEARER_MESSAGE + "}";
+
+    public static final int INVALID_AUTHORIZATION_COMBINATION_CODE = 493;
+    public static final String INVALID_AUTHORIZATION_COMBINATION_MESSAGE = "Invalid authorization combination of OTP and identity";
+    public static final RestError INVALID_AUTHORIZATION_COMBINATION = new RestError(INVALID_AUTHORIZATION_COMBINATION_CODE, INVALID_AUTHORIZATION_COMBINATION_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_AUTHORIZATION_COMBINATION_JSON = ERROR_CODE_KEY + INVALID_AUTHORIZATION_COMBINATION_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_AUTHORIZATION_COMBINATION_MESSAGE + "}";
+
+    public static final int INVALID_IDENTITY_USER_CODE = 494;
+    public static final String INVALID_IDENTITY_USER_MESSAGE = "Invalid identity user";
+    public static final RestError INVALID_IDENTITY_USER = new RestError(INVALID_IDENTITY_USER_CODE, INVALID_IDENTITY_USER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_IDENTITY_USER_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_MESSAGE + "}";
+
+    public static final int INVALID_IDENTITY_USER_ROLE_CODE = 494;
+    public static final String INVALID_IDENTITY_USER_ROLE_MESSAGE = "Invalid identity user role";
+    public static final RestError INVALID_IDENTITY_USER_ROLE = new RestError(INVALID_IDENTITY_USER_ROLE_CODE, INVALID_IDENTITY_USER_ROLE_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_IDENTITY_USER_ROLE_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_ROLE_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_ROLE_MESSAGE + "}";
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
