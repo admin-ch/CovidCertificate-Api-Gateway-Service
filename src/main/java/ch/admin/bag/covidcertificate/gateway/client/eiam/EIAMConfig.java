@@ -34,7 +34,7 @@ public class EIAMConfig {
             HttpComponentsMessageSender messageSender,
             PayloadValidatingInterceptor interceptor,
             JeapSaajSoapMessageFactory messageFactory) {
-        EIAMClient eiamClient = new EIAMClient();
+        var eiamClient = new EIAMClient();
         eiamClient.setDefaultUri(url);
         eiamClient.setMarshaller(marshaller);
         eiamClient.setUnmarshaller(marshaller);
@@ -46,7 +46,7 @@ public class EIAMConfig {
 
     @Bean
     public Jaxb2Marshaller getJaxb2Marshaller() {
-        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        var marshaller = new Jaxb2Marshaller();
         marshaller.setContextPath(CONTEXT_PATH);
         return marshaller;
     }
@@ -58,7 +58,7 @@ public class EIAMConfig {
 
     @Bean
     public HttpClient getHttpClient() throws Exception {
-        AdvancedHttpClientFactoryBean httpClientFactory = new AdvancedHttpClientFactoryBean();
+        var httpClientFactory = new AdvancedHttpClientFactoryBean();
         httpClientFactory.setKeystoreType(KEYSTORE_TYPE);
         httpClientFactory.setKeystoreLocation(new ByteArrayResource(Decoders.BASE64.decode(keystore)));
         httpClientFactory.setKeystorePassword(keystorePassword);
@@ -73,7 +73,7 @@ public class EIAMConfig {
 
     @Bean
     public PayloadValidatingInterceptor getPayloadValidatingInterceptor() {
-        PayloadValidatingInterceptor interceptor = new PayloadValidatingInterceptor();
+        var interceptor = new PayloadValidatingInterceptor();
         interceptor.setSchema(new ClassPathResource("eiam/nevisidm_servicetypes_v1_43.xsd"));
         interceptor.setValidateRequest(true);
         interceptor.setValidateResponse(true);

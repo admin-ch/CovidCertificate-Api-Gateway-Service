@@ -9,18 +9,18 @@ public class EIAMClient extends WebServiceGatewaySupport {
     private static final String CLIENT_NAME = "GGG";
 
     public QueryUsersResponse queryUser(String uuid, String idpSource) {
-        QueryUsers request = getQueryUsers(uuid, idpSource);
+        var request = getQueryUsers(uuid, idpSource);
         return (QueryUsersResponse) getWebServiceTemplate().marshalSendAndReceive(request);
     }
 
     private QueryUsers getQueryUsers(String uuid, String idpSource) {
-        QueryUsers request = new QueryUsers();
+        var request = new QueryUsers();
         request.setQuery(getUserQuery(uuid, idpSource));
         return request;
     }
 
     private UserQuery getUserQuery(String uuid, String idpSource) {
-        UserQuery userQuery = new UserQuery();
+        var userQuery = new UserQuery();
         userQuery.setClientName(CLIENT_NAME);
         userQuery.setDetailLevels(getDetailLevels());
         userQuery.setUser(getUser(uuid, idpSource));
@@ -28,7 +28,7 @@ public class EIAMClient extends WebServiceGatewaySupport {
     }
 
     private User getUser(String uuid, String idpSource) {
-        User user = new User();
+        var user = new User();
         user.setState(UserState.ACTIVE);
         List<SamlFederation> samlFederations = user.getSamlFederations();
         samlFederations.add(getSamlFederation(uuid, idpSource));
@@ -36,14 +36,14 @@ public class EIAMClient extends WebServiceGatewaySupport {
     }
 
     private SamlFederation getSamlFederation(String uuid, String idpSource) {
-        SamlFederation samlFederation = new SamlFederation();
+        var samlFederation = new SamlFederation();
         samlFederation.setSubjectNameId(uuid);
         samlFederation.setIssuerNameId(idpSource);
         return samlFederation;
     }
 
     private DetailLevels getDetailLevels() {
-        DetailLevels detailLevels = new DetailLevels();
+        var detailLevels = new DetailLevels();
         detailLevels.setUserDetailLevel(DetailLevel.MEDIUM);
         detailLevels.setProfileDetailLevel(DetailLevel.MEDIUM);
         detailLevels.setAuthorizationDetailLevel(DetailLevel.LOW);
