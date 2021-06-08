@@ -156,6 +156,13 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -210,10 +217,14 @@
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/target/generated-sources</generateDirectory>
                     <generatePackage>ch.admin.bag.covidcertificate.gateway.eiam.adminservice</generatePackage>
-                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaDirectory>${project.basedir}/src/main/resources/eiam</schemaDirectory>
                     <schemaIncludes>
                         <include>nevisidm_adminservice_v1_43.wsdl</include>
                     </schemaIncludes>
+                    <bindingDirectory>src/main/resources/bindings</bindingDirectory>
+                    <bindingIncludes>
+                        <include>eiam-jaxb-binding.xjb</include>
+                    </bindingIncludes>
                 </configuration>
             </plugin>
         </plugins>

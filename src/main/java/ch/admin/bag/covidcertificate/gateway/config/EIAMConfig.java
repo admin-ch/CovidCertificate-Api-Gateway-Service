@@ -3,11 +3,13 @@ package ch.admin.bag.covidcertificate.gateway.config;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.AdvancedHttpClientFactoryBean;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.JeapSaajSoapMessageFactory;
+import io.jsonwebtoken.io.Decoders;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.PayloadValidatingInterceptor;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
@@ -19,9 +21,11 @@ public class EIAMConfig {
     private static final String TRUSTSTORE_TYPE = "jks";
     @Value("${eiam-admin-service.url}")
     private String url;
-    @Value("${app.conn.eiam-admin-service.key-store-password}")
+    @Value("${eiam-admin-service.keystore}")
+    private String keystore;
+    @Value("${eiam-admin-service.keystore-password}")
     private String keystorePassword;
-    @Value("${app.conn.eiam-admin-service.trust-store-password}")
+    @Value("${eiam-admin-service.truststore-password}")
     private String truststorePassword;
 
     @Bean
@@ -56,12 +60,10 @@ public class EIAMConfig {
     public HttpClient getHttpClient() throws Exception {
         AdvancedHttpClientFactoryBean httpClientFactory = new AdvancedHttpClientFactoryBean();
         httpClientFactory.setKeystoreType(KEYSTORE_TYPE);
-        // TODO: Insert value.
-        httpClientFactory.setKeystoreLocation(new FileSystemResource(""));
+        httpClientFactory.setKeystoreLocation(new ByteArrayResource(Decoders.BASE64.decode(keystore)));
         httpClientFactory.setKeystorePassword(keystorePassword);
         httpClientFactory.setTruststoreType(TRUSTSTORE_TYPE);
-        // TODO: Insert value.
-        httpClientFactory.setTruststoreLocation(new FileSystemResource(""));
+        httpClientFactory.setTruststoreLocation(new ClassPathResource("truststore.jks"));
         httpClientFactory.setTruststorePassword(truststorePassword);
         httpClientFactory.setMaxConnTotal(10);
         httpClientFactory.setConnectTimeout(1000);
@@ -72,8 +74,7 @@ public class EIAMConfig {
     @Bean
     public PayloadValidatingInterceptor getPayloadValidatingInterceptor() {
         PayloadValidatingInterceptor interceptor = new PayloadValidatingInterceptor();
-        // TODO: Insert value.
-        interceptor.setSchema(new FileSystemResource(""));
+        interceptor.setSchema(new ClassPathResource("eiam/nevisidm_servicetypes_v1_43.xsd"));
         interceptor.setValidateRequest(true);
         interceptor.setValidateResponse(true);
         return interceptor;

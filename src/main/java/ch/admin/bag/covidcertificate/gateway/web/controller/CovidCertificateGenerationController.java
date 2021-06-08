@@ -173,6 +173,7 @@ public class CovidCertificateGenerationController {
 
     private String validateAndGetId(CertificateCreateDto createDto) throws InvalidBearerTokenException {
         if (createDto.getIdentity() != null && StringUtils.isEmpty(createDto.getOtp())) {
+            log.info("Identity available: login with eiam");
             identityAuthorizationClient.authorize(createDto.getIdentity().getUuid(), createDto.getIdentity().getIdpSource());
             return createDto.getIdentity().getUuid();
         } else if (createDto.getOtp() != null && createDto.getIdentity() == null) {

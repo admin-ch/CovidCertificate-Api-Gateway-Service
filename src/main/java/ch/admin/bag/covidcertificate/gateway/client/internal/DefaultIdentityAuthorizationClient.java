@@ -33,7 +33,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             log.info("User does not exist in eIAM. {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
-        if (checkUserRoleExists(response)) {
+        if (!checkUserRoleExists(response)) {
             log.info("User does not have required role in eIAM. {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
             throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
         }
@@ -41,6 +41,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
 
     private QueryUsersResponse queryUser(String uuid, String idpSource) {
         try {
+            log.info("Calling eiam Admin-Service with {} and {}", uuid, idpSource);
             return eiamClient.queryUser(uuid, idpSource);
         } catch (Exception e) {
             log.error("Error when calling eIAM-AM queryUser service.", e);
@@ -48,18 +49,18 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         }
     }
 
-    private Boolean checkUserExists(QueryUsersResponse response) {
+    private boolean checkUserExists(QueryUsersResponse response) {
         try {
-            return (response.getReturn() == null || response.getReturn().isEmpty());
+            return (response.getReturns() == null || response.getReturns().isEmpty());
         } catch (Exception e) {
             log.error("Error when checking eIAM-AM user exists.", e);
             throw e;
         }
     }
 
-    private Boolean checkUserRoleExists(QueryUsersResponse response) {
+    private boolean checkUserRoleExists(QueryUsersResponse response) {
         try {
-            List<Authorization> authorizations = response.getReturn().get(0)
+            List<Authorization> authorizations = response.getReturns().get(0)
                     .getProfiles().get(0)
                     .getAuthorizations();
             return (authorizations.stream().anyMatch(authorization -> authorization.getRole().getExtId().equals(ROLE)));
