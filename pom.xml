@@ -54,6 +54,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -147,6 +156,13 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -185,6 +201,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/target/generated-sources</generateDirectory>
+                    <generatePackage>ch.admin.bag.covidcertificate.gateway.eiam.adminservice</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources/eiam</schemaDirectory>
+                    <schemaIncludes>
+                        <include>nevisidm_adminservice_v1_43.wsdl</include>
+                    </schemaIncludes>
+                    <bindingDirectory>src/main/resources/bindings</bindingDirectory>
+                    <bindingIncludes>
+                        <include>eiam-jaxb-binding.xjb</include>
+                    </bindingIncludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

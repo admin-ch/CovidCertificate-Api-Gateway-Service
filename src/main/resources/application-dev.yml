@@ -25,3 +25,9 @@ ha-authcode-generation-service:
 cc-api-gateway-service:
   jwt:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
+
+eiam-admin-service:
+  url: ${vcap.services.cc-eiam-admin-service.credentials.url}
+  keystore: ${vcap.services.cc-eiam-admin-service.credentials.keystore}
+  keystore-password: ${vcap.services.cc-eiam-admin-service.credentials.keystore-password}
+  truststore-password: ${vcap.services.cc-eiam-admin-service.credentials.truststore-password}

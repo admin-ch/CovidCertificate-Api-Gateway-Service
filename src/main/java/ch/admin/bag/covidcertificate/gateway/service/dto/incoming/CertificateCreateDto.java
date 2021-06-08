@@ -11,7 +11,8 @@ import lombok.*;
 public abstract class CertificateCreateDto {
     @JsonUnwrapped
     private CovidCertificatePersonDto personData;
-    @Schema(example= "de", description = "language for the PDF (together with english). Accepted languages are: de, it, fr, rm")
+    @Schema(example = "de", description = "language for the PDF (together with english). Accepted languages are: de, it, fr, rm")
     private String language;
     private String otp;
+    private IdentityDto identity;
 }
