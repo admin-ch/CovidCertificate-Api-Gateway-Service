@@ -26,5 +26,5 @@ cc-api-gateway-service:
   jwt:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
 
-eiam-am-service:
+eiam-admin-service:
   url: "https://services.gate-a.eiam.admin.ch/nevisidm/services/v1_42/AdminService"
