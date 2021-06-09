@@ -63,6 +63,8 @@ public class ErrorList {
     public static final RestError INVALID_RECOVERY_INFO = new RestError(INVALID_RECOVERY_INFO_CODE, INVALID_RECOVERY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_RECOVERY_INFO_JSON = ERROR_CODE_KEY + INVALID_RECOVERY_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_RECOVERY_INFO_MESSAGE + "}";
+    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 474 + ","
+            + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;

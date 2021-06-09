@@ -72,8 +72,8 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_COUNTRY_OF_VACCINATION", value = INVALID_COUNTRY_OF_VACCINATION),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
-                            @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_VACCINATION_INFO", value = INVALID_VACCINATION_INFO_JSON),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
                     }
             )
     )
@@ -118,6 +118,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_TEST_INFO", value = INVALID_TEST_INFO_JSON),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
                     }
             )
     )
@@ -157,7 +158,8 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT", value = INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT),
                             @ExampleObject(name = "INVALID_COUNTRY_OF_TEST", value = INVALID_COUNTRY_OF_TEST),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
-                            @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON)
+                            @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                     }
             )
     )
