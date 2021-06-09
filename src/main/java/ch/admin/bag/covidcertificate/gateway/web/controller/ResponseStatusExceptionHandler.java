@@ -1,7 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
-import ch.admin.bag.covidcertificate.gateway.filters.PayloadLimitException;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
@@ -47,11 +46,6 @@ public class ResponseStatusExceptionHandler {
 
     @ExceptionHandler(value = {RevokeCertificateException.class})
     protected ResponseEntity<RestError> createCertificateConflict(RevokeCertificateException ex) {
-        return handleError(ex.getError());
-    }
-
-    @ExceptionHandler(value = {PayloadLimitException.class})
-    protected ResponseEntity<RestError> bodyLimitReached(PayloadLimitException ex) {
         return handleError(ex.getError());
     }
 
