@@ -1,5 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
+import ch.admin.bag.covidcertificate.gateway.error.RestError;
+import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
 import ch.admin.bag.covidcertificate.gateway.service.util.WebClientUtils;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +55,8 @@ public class CovidCertificateGenerationService {
             return response;
 
         } catch (WebClientResponseException e) {
-            throw WebClientUtils.handleWebClientResponseError(e);
+            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
+            throw new CreateCertificateException(errorResponse);
         }
     }
 }
