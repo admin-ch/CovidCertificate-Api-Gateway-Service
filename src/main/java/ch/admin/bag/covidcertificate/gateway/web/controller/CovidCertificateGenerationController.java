@@ -83,7 +83,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto.getAddress().getCantonCodeSender());
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto.getAddress());
         return covidCertificate;
 
     }
@@ -128,7 +128,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_TEST, userExtId, createDto.getAddress().getCantonCodeSender());
+        logKpi(KPI_TYPE_TEST, userExtId, createDto.getAddress());
         return covidCertificate;
     }
 
@@ -169,7 +169,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto.getAddress().getCantonCodeSender());
+        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto.getAddress());
         return covidCertificate;
     }
 
@@ -185,13 +185,13 @@ public class CovidCertificateGenerationController {
         }
     }
 
-    private void logKpi(String type, String userExtId, String canton) {
+    private void logKpi(String type, String userExtId, CovidCertificateAddressDto addressDto) {
         LocalDateTime timestamp = LocalDateTime.now();
         kpiDataService.saveKpiData(timestamp, type, userExtId);
-        if (canton != null) {
+        if (addressDto != null && addressDto.getCantonCodeSender() != null) {
             log.info("kpi: {} {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
-                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId), kv(KPI_CANTON, canton));
-            kpiDataService.saveKpiData(timestamp, KPI_CANTON, canton);
+                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId), kv(KPI_CANTON, addressDto.getCantonCodeSender()));
+            kpiDataService.saveKpiData(timestamp, KPI_CANTON, addressDto.getCantonCodeSender());
         } else {
             log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
                     kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
