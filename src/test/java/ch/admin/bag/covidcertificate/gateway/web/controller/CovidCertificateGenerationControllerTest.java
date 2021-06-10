@@ -39,19 +39,15 @@ class CovidCertificateGenerationControllerTest {
 
     @Mock
     private CovidCertificateGenerationService generationService;
-
     @Mock
     private BearerTokenValidationService tokenValidationService;
-
     @Mock
     private KpiDataService kpiDataService;
-
     @Mock
     private IdentityAuthorizationClient identityAuthorizationClient;
 
     @InjectMocks
     private CovidCertificateGenerationController controller;
-
     private MockMvc mockMvc;
 
     @BeforeAll
@@ -93,49 +89,49 @@ class CovidCertificateGenerationControllerTest {
         private VaccinationCertificateCreateDto vaccineCreateDto;
 
         @BeforeEach()
-        void setUp() {
+        void initialize() {
             this.vaccineCreateDto = fixture.create(VaccinationCertificateCreateDto.class);
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withOtp() throws Exception {
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(vaccineCreateDto)))
+                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.vaccineCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
 
         @Test
-        void createsVaccineCertificateWithAddressSuccessfully() throws Exception {
-            ReflectionTestUtils.setField(vaccineCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+        void createsVaccineCertificateSuccessfully__withOtpAndAddress() throws Exception {
+            ReflectionTestUtils.setField(this.vaccineCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(vaccineCreateDto)))
+                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.vaccineCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
         }
 
         @Test
-        void createsVaccineCertificateWithEiamSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withIdentity() throws Exception {
             var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(vaccineCreateDto, "identity", identityDto);
-            ReflectionTestUtils.setField(vaccineCreateDto, "otp", "");
+            ReflectionTestUtils.setField(this.vaccineCreateDto, "identity", identityDto);
+            ReflectionTestUtils.setField(this.vaccineCreateDto, "otp", "");
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(vaccineCreateDto)))
+                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
             verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
@@ -144,19 +140,36 @@ class CovidCertificateGenerationControllerTest {
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
 
-
         @Test
-        void returns403__ifOtpIsMissing() throws Exception {
-            ReflectionTestUtils.setField(vaccineCreateDto, "otp", null);
+        void returns403__withNoAuthorization() throws Exception {
+            ReflectionTestUtils.setField(this.vaccineCreateDto, "otp", null);
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(vaccineCreateDto)))
+                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
             verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
+        }
+
+        @Test
+        void returns403__withBothAuthorizations() throws Exception {
+            var identityDto = fixture.create(IdentityDto.class);
+            ReflectionTestUtils.setField(this.vaccineCreateDto, "identity", identityDto);
+
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
+                    .andExpect(status().isForbidden());
+
+            verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
     }
@@ -168,49 +181,49 @@ class CovidCertificateGenerationControllerTest {
         private TestCertificateCreateDto testCreateDto;
 
         @BeforeEach()
-        void setUp() {
+        void initialize() {
             this.testCreateDto = fixture.create(TestCertificateCreateDto.class);
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withOtp() throws Exception {
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(testCreateDto)))
+                    .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.testCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
         }
 
         @Test
-        void createsVaccineCertificateWithAddressSuccessfully() throws Exception {
-            ReflectionTestUtils.setField(testCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+        void createsVaccineCertificateSuccessfully__withOtpAndAddress() throws Exception {
+            ReflectionTestUtils.setField(this.testCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(testCreateDto)))
+                    .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.testCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
         }
 
         @Test
-        void createsVaccineCertificateWithEiamSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withIdentity() throws Exception {
             var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(testCreateDto, "identity", identityDto);
-            ReflectionTestUtils.setField(testCreateDto, "otp", "");
+            ReflectionTestUtils.setField(this.testCreateDto, "identity", identityDto);
+            ReflectionTestUtils.setField(this.testCreateDto, "otp", "");
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(testCreateDto)))
+                    .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
             verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
@@ -219,20 +232,37 @@ class CovidCertificateGenerationControllerTest {
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
         }
 
-
         @Test
-        void returns403__ifOtpIsMissing() throws Exception {
-            ReflectionTestUtils.setField(testCreateDto, "otp", null);
+        void returns403__withNoAuthorization() throws Exception {
+            ReflectionTestUtils.setField(this.testCreateDto, "otp", null);
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(testCreateDto)))
+                    .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(generationService, never()).createCovidCertificate(any(TestCertificateCreateDto.class));
             verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(TestCertificateCreateDto.class));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
+        }
+
+        @Test
+        void returns403__withBothAuthorizations() throws Exception {
+            var identityDto = fixture.create(IdentityDto.class);
+            ReflectionTestUtils.setField(this.testCreateDto, "identity", identityDto);
+
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.testCreateDto)))
+                    .andExpect(status().isForbidden());
+
+            verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
     }
 
@@ -243,49 +273,49 @@ class CovidCertificateGenerationControllerTest {
         private RecoveryCertificateCreateDto recoveryCreateDto;
 
         @BeforeEach()
-        void setUp() {
+        void initialize() {
             this.recoveryCreateDto = fixture.create(RecoveryCertificateCreateDto.class);
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withOtp() throws Exception {
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(recoveryCreateDto)))
+                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.recoveryCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
 
         @Test
-        void createsVaccineCertificateWithAddressSuccessfully() throws Exception {
-            ReflectionTestUtils.setField(recoveryCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+        void createsVaccineCertificateSuccessfully__withOtpAndAddress() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(recoveryCreateDto)))
+                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
+            verify(tokenValidationService, times(1)).validate(eq(this.recoveryCreateDto.getOtp()));
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(tokenValidationService, times(1)).validate(any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
         }
 
         @Test
-        void createsVaccineCertificateWithEiamSuccessfully() throws Exception {
+        void createsVaccineCertificateSuccessfully__withIdentity() throws Exception {
             var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(recoveryCreateDto, "identity", identityDto);
-            ReflectionTestUtils.setField(recoveryCreateDto, "otp", "");
+            ReflectionTestUtils.setField(this.recoveryCreateDto, "identity", identityDto);
+            ReflectionTestUtils.setField(this.recoveryCreateDto, "otp", "");
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(recoveryCreateDto)))
+                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
             verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
@@ -294,20 +324,37 @@ class CovidCertificateGenerationControllerTest {
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
 
-
         @Test
-        void returns403__ifOtpIsMissing() throws Exception {
-            ReflectionTestUtils.setField(recoveryCreateDto, "otp", null);
+        void returns403__withNoAuthorization() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryCreateDto, "otp", null);
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(recoveryCreateDto)))
+                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+        }
+
+        @Test
+        void returns403__withBothAuthorizations() throws Exception {
+            var identityDto = fixture.create(IdentityDto.class);
+            ReflectionTestUtils.setField(this.recoveryCreateDto, "identity", identityDto);
+
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
+                    .andExpect(status().isForbidden());
+
+            verify(tokenValidationService, never()).validate(any());
+            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
     }
 }
