@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.antMatcher("/api/v1/covidcertificate/**")
                 .csrf()
-                .disable()
+                .disable()//csrf disabled for machine to machine api
                 .headers()
                 .frameOptions()
                 .disable()
