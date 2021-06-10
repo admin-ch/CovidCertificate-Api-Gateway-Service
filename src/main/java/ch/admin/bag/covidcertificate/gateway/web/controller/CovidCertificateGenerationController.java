@@ -63,7 +63,6 @@ public class CovidCertificateGenerationController {
                     schema = @Schema(implementation = RestError.class),
                     mediaType = "application/json",
                     examples = {
-                            @ExampleObject(name = "NO_VACCINATION_DATA", value = NO_VACCINATION_DATA),
                             @ExampleObject(name = "NO_PERSON_DATA", value = NO_PERSON_DATA),
                             @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
                             @ExampleObject(name = "INVALID_MEDICINAL_PRODUCT", value = INVALID_MEDICINAL_PRODUCT),
@@ -111,7 +110,6 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
-                            @ExampleObject(name = "NO_TEST_DATA", value = NO_TEST_DATA),
                             @ExampleObject(name = "INVALID_MEMBER_STATE_OF_TEST", value = INVALID_MEMBER_STATE_OF_TEST),
                             @ExampleObject(name = "INVALID_TYP_OF_TEST", value = INVALID_TYP_OF_TEST),
                             @ExampleObject(name = "INVALID_TEST_CENTER", value = INVALID_TEST_CENTER),
@@ -154,7 +152,6 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
-                            @ExampleObject(name = "NO_RECOVERY_DATA", value = NO_RECOVERY_DATA),
                             @ExampleObject(name = "INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT", value = INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT),
                             @ExampleObject(name = "INVALID_COUNTRY_OF_TEST", value = INVALID_COUNTRY_OF_TEST),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
