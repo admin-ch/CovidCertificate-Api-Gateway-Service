@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultIdentityAuthorizationClientTest {
+class DefaultIdentityAuthorizationClientTest {
     private final JFixture jFixture = new JFixture();
 
     String uuid;
