@@ -1,12 +1,11 @@
 package ch.admin.bag.covidcertificate.gateway.service.dto.incoming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CovidCertificateAddressDto {
     @Schema(required = true, description = "Street and number of the certificate holder.", example = "Musterweg 4b")

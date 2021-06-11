@@ -84,7 +84,6 @@ public class CovidCertificateGenerationController {
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_VACCINATION, userExtId, createDto.getAddress());
         return covidCertificate;
-
     }
 
     @PostMapping("/test")

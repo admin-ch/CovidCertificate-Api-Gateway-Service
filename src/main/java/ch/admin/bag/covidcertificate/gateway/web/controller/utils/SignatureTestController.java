@@ -60,7 +60,7 @@ public class SignatureTestController {
         Path filePath = Paths.get(PRIVATE_CERT_PATH);
         byte[] privateKeyBytes = Files.readAllBytes(filePath);
         String privateKeyContent = new String(privateKeyBytes);
-        privateKeyContent = privateKeyContent.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
+        privateKeyContent = privateKeyContent.replace("\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent));
