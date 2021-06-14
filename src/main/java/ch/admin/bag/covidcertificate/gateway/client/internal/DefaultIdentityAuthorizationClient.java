@@ -23,6 +23,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class DefaultIdentityAuthorizationClient implements IdentityAuthorizationClient {
     private static final String ROLE = "9500.GGG-Covidcertificate.CertificateCreator";
+    private static final String ROLE_SUPERUSER = "9500.GGG-Covidcertificate.SuperUserCC";
 
     public final EIAMClient eiamClient;
 
@@ -63,7 +64,8 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             List<Authorization> authorizations = response.getReturns().get(0)
                     .getProfiles().get(0)
                     .getAuthorizations();
-            return (authorizations.stream().anyMatch(authorization -> authorization.getRole().getExtId().equals(ROLE)));
+            return (authorizations.stream().anyMatch(authorization ->
+                    authorization.getRole().getExtId().equals(ROLE) || authorization.getRole().getExtId().equals(ROLE_SUPERUSER)));
         } catch (Exception e) {
             log.error("Error when checking eIAM-AM user role exists.", e);
             throw e;
