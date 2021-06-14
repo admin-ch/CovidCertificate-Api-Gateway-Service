@@ -97,6 +97,12 @@ public class ErrorList {
     public static final String INVALID_IDENTITY_USER_ROLE_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_ROLE_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_ROLE_MESSAGE + "}";
 
+    public static final int INVALID_OTP_LENGTH_CODE = 496;
+    public static final String INVALID_OTP_LENGTH_MESSAGE = "Invalid OTP length";
+    public static final RestError INVALID_OTP_LENGTH = new RestError(INVALID_OTP_LENGTH_CODE, INVALID_OTP_LENGTH_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_OTP_LENGTH_JSON = ERROR_CODE_KEY + INVALID_OTP_LENGTH_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_OTP_LENGTH_MESSAGE + "}";
+
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
             + ERROR_MESSAGE_KEY + "Duplicate UVCI.}";

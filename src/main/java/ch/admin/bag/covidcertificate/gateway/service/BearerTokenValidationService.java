@@ -16,6 +16,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_OTP_LENGTH;
 
 @Component
 @Slf4j
@@ -27,6 +28,7 @@ public class BearerTokenValidationService {
     private static final String IDP_SOURCE_CLAIM_KEY = "idpsource";
     private static final String TYP_CLAIM_KEY = "typ";
     private static final String AUTH_MACHINE_JWT = "authmachine+jwt";
+    private static final int OTP_LENGTH = 723;
 
     @Value("${cc-api-gateway-service.jwt.publicKey}")
     private String publicKey;
@@ -53,6 +55,11 @@ public class BearerTokenValidationService {
     public String validate(String token) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
+        if (!token.startsWith("eyJ")) {
+            log.warn("Token has invalid start characters");
+            throw new InvalidBearerTokenException(INVALID_OTP_LENGTH);
+        }
+
         try {
 
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
@@ -75,8 +82,13 @@ public class BearerTokenValidationService {
             log.warn("Token expired", e);
             throw new InvalidBearerTokenException(INVALID_BEARER);
         } catch (SignatureException e) {
-            log.warn("Signature invalid", e);
-            throw new InvalidBearerTokenException(INVALID_BEARER);
+            if (e.getMessage().toLowerCase().contains("signature length not correct")) {
+                log.warn("Invalid signature length", e);
+                throw new InvalidBearerTokenException(INVALID_OTP_LENGTH);
+            } else {
+                log.warn("Signature invalid", e);
+                throw new InvalidBearerTokenException(INVALID_BEARER);
+            }
         } catch (UnsupportedJwtException e) {
             log.warn("Token is not signed", e);
             throw new InvalidBearerTokenException(INVALID_BEARER);
