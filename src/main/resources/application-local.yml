@@ -16,7 +16,7 @@ spring:
 
 
 ha-authcode-generation-service:
-  uri: http://localhost:8120
+  uri: http://localhost:8120/
 
   monitor:
     prometheus:

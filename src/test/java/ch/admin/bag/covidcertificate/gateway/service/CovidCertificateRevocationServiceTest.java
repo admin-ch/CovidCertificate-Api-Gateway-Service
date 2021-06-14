@@ -39,7 +39,7 @@ class CovidCertificateRevocationServiceTest {
     void initialize() {
         this.revocationService = new CovidCertificateRevocationService(WebClient.create());
         ReflectionTestUtils.setField(this.revocationService, "serviceUri",
-                String.format("http://localhost:%s", mockManagementService.getPort()));
+                String.format("http://localhost:%s/", mockManagementService.getPort()));
     }
 
     @Test
