@@ -37,7 +37,7 @@ class CovidCertificateGenerationServiceTest {
     void initialize() {
         this.generationService = new CovidCertificateGenerationService(WebClient.create());
         ReflectionTestUtils.setField(this.generationService, "serviceUri",
-                String.format("http://localhost:%s", mockManagementService.getPort()));
+                String.format("http://localhost:%s/", mockManagementService.getPort()));
     }
 
     @Test
