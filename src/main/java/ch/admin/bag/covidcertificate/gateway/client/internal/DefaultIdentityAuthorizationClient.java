@@ -42,10 +42,10 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
 
     private QueryUsersResponse queryUser(String uuid, String idpSource) {
         try {
-            log.info("Calling eiam Admin-Service with {} and {}", uuid, idpSource);
+            log.info("Calling eIAM AdminService queryUsers. {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
             return eiamClient.queryUser(uuid, idpSource);
         } catch (Exception e) {
-            log.error("Error when calling eIAM-AM queryUser service.", e);
+            log.error("Error when calling eIAM AdminService queryUsers. {} {}", kv("uuid", uuid), kv("idpSource", idpSource), e);
             throw e;
         }
     }
@@ -54,7 +54,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         try {
             return (response.getReturns() == null || response.getReturns().isEmpty());
         } catch (Exception e) {
-            log.error("Error when checking eIAM-AM user exists.", e);
+            log.error("Error when checking eIAM user exists.", e);
             throw e;
         }
     }
@@ -67,7 +67,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             return (authorizations.stream().anyMatch(authorization ->
                     authorization.getRole().getExtId().equals(ROLE) || authorization.getRole().getExtId().equals(ROLE_SUPERUSER)));
         } catch (Exception e) {
-            log.error("Error when checking eIAM-AM user role exists.", e);
+            log.error("Error when checking eIAM user role exists.", e);
             throw e;
         }
     }

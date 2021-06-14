@@ -6,11 +6,16 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import java.util.List;
 
 public class EIAMClient extends WebServiceGatewaySupport {
-    private static final String CLIENT_NAME = "GGG";
+    public static final String CLIENT_NAME = "GGG";
 
     public QueryUsersResponse queryUser(String uuid, String idpSource) {
-        var request = getQueryUsers(uuid, idpSource);
-        return (QueryUsersResponse) getWebServiceTemplate().marshalSendAndReceive(request);
+        return (QueryUsersResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(getQueryUsers(uuid, idpSource));
+    }
+
+    public QueryClientsResponse queryClient() {
+        return (QueryClientsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(getQueryClients());
     }
 
     private QueryUsers getQueryUsers(String uuid, String idpSource) {
@@ -49,5 +54,23 @@ public class EIAMClient extends WebServiceGatewaySupport {
         detailLevels.setAuthorizationDetailLevel(DetailLevel.LOW);
         detailLevels.setDefaultDetailLevel(DetailLevel.EXCLUDE);
         return detailLevels;
+    }
+
+    private QueryClients getQueryClients() {
+        var request = new QueryClients();
+        request.setQuery(getClientQuery());
+        return request;
+    }
+
+    private ClientQuery getClientQuery() {
+        var clientQuery = new ClientQuery();
+        clientQuery.setClient(getClient());
+        return clientQuery;
+    }
+
+    private Client getClient() {
+        Client client = new Client();
+        client.setName(CLIENT_NAME);
+        return client;
     }
 }
