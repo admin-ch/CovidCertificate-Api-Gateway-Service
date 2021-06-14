@@ -49,6 +49,17 @@ public class DefaultIdentityAuthorizationClientTest {
     }
 
     @Test
+    void givenSuperUserExists_whenAuthorize_thenOk() {
+        // given
+        when(eiamClient.queryUser(any(String.class), any(String.class)))
+                .thenReturn(getQueryUsersResponse("9500.GGG-Covidcertificate.SuperUserCC"));
+        // when
+        client.authorize(uuid, ipdSource);
+        // then
+        verify(eiamClient).queryUser(any(String.class), any(String.class));
+    }
+
+    @Test
     void givenUserNotExists_whenAauthorize_thenThrowsException() {
         // given
         when(eiamClient.queryUser(any(String.class), any(String.class)))
