@@ -28,7 +28,6 @@ public class BearerTokenValidationService {
     private static final String IDP_SOURCE_CLAIM_KEY = "idpsource";
     private static final String TYP_CLAIM_KEY = "typ";
     private static final String AUTH_MACHINE_JWT = "authmachine+jwt";
-    private static final int OTP_LENGTH = 723;
 
     @Value("${cc-api-gateway-service.jwt.publicKey}")
     private String publicKey;
