@@ -11,7 +11,7 @@ public class CovidCertificateAddressDto {
     @Schema(required = true, description = "Street and number of the certificate holder.", example = "Musterweg 4b")
     private String streetAndNr;
     @Schema(required = true, example = "3000", maxLength = 4, minLength = 4, type = "integer")
-    private String zipCode;
+    private int zipCode;
     @Schema(required = true, example = "Bern")
     private String city;
     @Schema(required = true, description = "Abbreviation of the canton issuing the certificate. " +

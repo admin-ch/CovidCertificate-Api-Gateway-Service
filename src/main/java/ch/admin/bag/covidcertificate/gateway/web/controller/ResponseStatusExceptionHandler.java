@@ -4,11 +4,13 @@ import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,25 +57,26 @@ public class ResponseStatusExceptionHandler {
         return handleError(ex.getError());
     }
 
+    @ExceptionHandler(value = {HttpMessageNotReadableException.class})
+    protected ResponseEntity<RestError> notReadableRequestPayload(HttpMessageNotReadableException ex) {
+        RestError error;
+        try {
+            var rootException = (InvalidFormatException)ex.getCause();
+            assert rootException != null;
+            var errorMessage = "Unable to parse " + rootException.getValue() + " to " + rootException.getTargetType();
+            log.warn("HttpMessage with invalid format received: ", rootException);
+            error = new RestError(HttpStatus.BAD_REQUEST.value(), errorMessage, HttpStatus.BAD_REQUEST);
+        } catch (ClassCastException | AssertionError processingException) {
+            log.warn("HttpMessage is not readable: ", ex);
+            error = new RestError(HttpStatus.BAD_REQUEST.value(), "Http message not readable", HttpStatus.BAD_REQUEST);
+        }
+        return handleError(error);
+    }
+
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<Object> handleException(Exception e) {
         log.error("Exception during processing", e);
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(value = {HttpMessageNotReadableException.class})
-    protected ResponseEntity<RestError> notReadableRequestPayload(HttpMessageNotReadableException ex) {
-        var errorMessage = getRootCauseMessage(ex);
-        var error = new RestError(HttpStatus.BAD_REQUEST.value(), errorMessage, HttpStatus.BAD_REQUEST);
-        return handleError(error);
-    }
-
-    private String getRootCauseMessage(NestedRuntimeException ex){
-        return Stream.of(ex.getRootCause(), ex.getCause(), ex)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Throwable::getMessage)
-                .orElse("");
     }
     
     private ResponseEntity<RestError> handleError(RestError restError) {
