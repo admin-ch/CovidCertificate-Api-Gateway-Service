@@ -6,27 +6,26 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import java.util.List;
 
 public class EIAMClient extends WebServiceGatewaySupport {
-    public static final String CLIENT_NAME = "GGG";
 
-    public QueryUsersResponse queryUser(String uuid, String idpSource) {
+    public QueryUsersResponse queryUser(String uuid, String idpSource, String clientName) {
         return (QueryUsersResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getQueryUsers(uuid, idpSource));
+                .marshalSendAndReceive(getQueryUsers(uuid, idpSource, clientName));
     }
 
-    public QueryClientsResponse queryClient() {
+    public QueryClientsResponse queryClient(String clientName) {
         return (QueryClientsResponse) getWebServiceTemplate()
-                .marshalSendAndReceive(getQueryClients());
+                .marshalSendAndReceive(getQueryClients(clientName));
     }
 
-    private QueryUsers getQueryUsers(String uuid, String idpSource) {
+    private QueryUsers getQueryUsers(String uuid, String idpSource, String clientName) {
         var request = new QueryUsers();
-        request.setQuery(getUserQuery(uuid, idpSource));
+        request.setQuery(getUserQuery(uuid, idpSource, clientName));
         return request;
     }
 
-    private UserQuery getUserQuery(String uuid, String idpSource) {
+    private UserQuery getUserQuery(String uuid, String idpSource, String clientName) {
         var userQuery = new UserQuery();
-        userQuery.setClientName(CLIENT_NAME);
+        userQuery.setClientName(clientName);
         userQuery.setDetailLevels(getDetailLevels());
         userQuery.setUser(getUser(uuid, idpSource));
         return userQuery;
@@ -56,21 +55,21 @@ public class EIAMClient extends WebServiceGatewaySupport {
         return detailLevels;
     }
 
-    private QueryClients getQueryClients() {
+    private QueryClients getQueryClients(String clientName) {
         var request = new QueryClients();
-        request.setQuery(getClientQuery());
+        request.setQuery(getClientQuery(clientName));
         return request;
     }
 
-    private ClientQuery getClientQuery() {
+    private ClientQuery getClientQuery(String clientName) {
         var clientQuery = new ClientQuery();
-        clientQuery.setClient(getClient());
+        clientQuery.setClient(getClient(clientName));
         return clientQuery;
     }
 
-    private Client getClient() {
+    private Client getClient(String clientName) {
         Client client = new Client();
-        client.setName(CLIENT_NAME);
+        client.setName(clientName);
         return client;
     }
 }
