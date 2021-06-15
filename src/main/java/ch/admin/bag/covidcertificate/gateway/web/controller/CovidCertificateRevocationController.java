@@ -1,15 +1,12 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
-import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
-import ch.admin.bag.covidcertificate.gateway.service.BearerTokenValidationService;
+import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateRevocationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
-import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationDto;
-import io.micrometer.core.instrument.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.DUPLICATE_UVCI;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_UVCI;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
@@ -40,12 +38,9 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 public class CovidCertificateRevocationController {
 
     private final CovidCertificateRevocationService service;
-
-    private final BearerTokenValidationService bearerTokenValidationService;
-
+    private final AuthorizationService authorizationService;
     private final KpiDataService kpiDataService;
 
-    private final IdentityAuthorizationClient identityAuthorizationClient;
 
     @PostMapping
     @PreAuthorize("hasRole('bag-cc-certificatecreator')")
@@ -78,7 +73,7 @@ public class CovidCertificateRevocationController {
     )
     public ResponseEntity<HttpStatus> create(@RequestBody RevocationDto revocationDto) throws InvalidBearerTokenException {
         log.info("Call of Revoke for covid certificate");
-        String userExtId = validateAndGetId(revocationDto);
+        String userExtId = authorizationService.validateAndGetId(revocationDto);
 
         service.createRevocation(revocationDto);
 
@@ -86,16 +81,5 @@ public class CovidCertificateRevocationController {
         log.info("kpi: {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_REVOKE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_UUID_KEY, userExtId));
         kpiDataService.saveKpiData(timestamp, KPI_REVOKE_CERTIFICATE_TYPE, userExtId);
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    private String validateAndGetId(RevocationDto revocationDto) throws InvalidBearerTokenException {
-        if (revocationDto.getIdentity() != null && StringUtils.isEmpty(revocationDto.getOtp())) {
-            identityAuthorizationClient.authorize(revocationDto.getIdentity().getUuid(), revocationDto.getIdentity().getIdpSource());
-            return revocationDto.getIdentity().getUuid();
-        } else if (revocationDto.getOtp() != null && revocationDto.getIdentity() == null) {
-            return bearerTokenValidationService.validate(revocationDto.getOtp());
-        } else {
-            throw new CreateCertificateException(INVALID_AUTHORIZATION_COMBINATION);
-        }
     }
 }

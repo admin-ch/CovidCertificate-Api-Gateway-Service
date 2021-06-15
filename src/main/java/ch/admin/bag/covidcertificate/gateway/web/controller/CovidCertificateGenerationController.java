@@ -1,9 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
-import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
-import ch.admin.bag.covidcertificate.gateway.service.BearerTokenValidationService;
+import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
@@ -37,12 +36,9 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 public class CovidCertificateGenerationController {
 
     private final CovidCertificateGenerationService generationService;
-
-    private final BearerTokenValidationService bearerTokenValidationService;
-
+    private final AuthorizationService authorizationService;
     private final KpiDataService kpiDataService;
 
-    private final IdentityAuthorizationClient identityAuthorizationClient;
 
     @PostMapping("/vaccination")
     @Operation(operationId = "createVaccinationCertificate",
@@ -78,7 +74,7 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for vaccination certificate");
-        String userExtId = validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto);
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
@@ -121,7 +117,7 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for test certificate");
-        String userExtId = validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto);
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
@@ -161,24 +157,12 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody RecoveryCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery certificate");
-        String userExtId = validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto);
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_RECOVERY, userExtId, createDto.getAddress());
         return covidCertificate;
-    }
-
-    private String validateAndGetId(CertificateCreateDto createDto) throws InvalidBearerTokenException {
-        if (createDto.getIdentity() != null && StringUtils.isEmpty(createDto.getOtp())) {
-            log.info("Identity available: login with eiam");
-            identityAuthorizationClient.authorize(createDto.getIdentity().getUuid(), createDto.getIdentity().getIdpSource());
-            return createDto.getIdentity().getUuid();
-        } else if (createDto.getOtp() != null && createDto.getIdentity() == null) {
-            return bearerTokenValidationService.validate(createDto.getOtp());
-        } else {
-            throw new CreateCertificateException(INVALID_AUTHORIZATION_COMBINATION);
-        }
     }
 
     private void logKpi(String type, String userExtId, CovidCertificateAddressDto addressDto) {

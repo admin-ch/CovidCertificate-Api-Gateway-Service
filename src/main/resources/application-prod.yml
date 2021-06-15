@@ -31,3 +31,5 @@ eiam-admin-service:
   keystore: ${vcap.services.cc-eiam-admin-service.credentials.keystore}
   keystore-password: ${vcap.services.cc-eiam-admin-service.credentials.keystore-password}
   truststore-password: ${vcap.services.cc-eiam-admin-service.credentials.truststore-password}
+
+allowed-common-names: 0128-hin-PROD

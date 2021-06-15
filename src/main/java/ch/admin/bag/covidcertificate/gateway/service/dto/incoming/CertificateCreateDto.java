@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-public abstract class CertificateCreateDto {
+public abstract class CertificateCreateDto implements DtoWithAuthorization {
     @JsonUnwrapped
     private CovidCertificatePersonDto personData;
     @Schema(example = "de", description = "language for the PDF (together with english). Accepted languages are: de, it, fr, rm")
