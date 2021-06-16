@@ -74,10 +74,16 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + SIGNATURE_PARSE_MESSAGE + "}";
 
     public static final int INVALID_BEARER_CODE = 492;
-    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing OTP";
+    public static final String INVALID_BEARER_MESSAGE = "Invalid OTP";
     public static final RestError INVALID_BEARER = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_BEARER_JSON = ERROR_CODE_KEY + INVALID_BEARER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_BEARER_MESSAGE + "}";
+
+    public static final int MISSING_BEARER_CODE = 493;
+    public static final String MISSING_BEARER_MESSAGE = "Missing OTP";
+    public static final RestError MISSING_BEARER = new RestError(MISSING_BEARER_CODE, MISSING_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String MISSING_BEARER_JSON = ERROR_CODE_KEY + MISSING_BEARER_CODE + ","
+            + ERROR_MESSAGE_KEY + MISSING_BEARER_MESSAGE + "}";
 
     public static final int INVALID_IDENTITY_USER_CODE = 494;
     public static final String INVALID_IDENTITY_USER_MESSAGE = "Invalid identity user";

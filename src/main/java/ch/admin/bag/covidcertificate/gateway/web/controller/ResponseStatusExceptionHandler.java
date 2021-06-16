@@ -31,6 +31,7 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
                 mediaType = "application/json",
                 examples = {
                         @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
+                        @ExampleObject(name = "MISSING_BEARER_JSON", value = MISSING_BEARER_JSON),
                         @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
                         @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON),
                         @ExampleObject(name = "INVALID_IDENTITY_USER", value = INVALID_IDENTITY_USER_JSON),

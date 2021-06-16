@@ -15,8 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_OTP_LENGTH;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
 @Component
 @Slf4j
@@ -53,6 +52,11 @@ public class BearerTokenValidationService {
 
     public String validate(String token) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
+
+        if (token == null) {
+            log.warn("Token is missing");
+            throw new InvalidBearerTokenException(MISSING_BEARER);
+        }
 
         if (!token.startsWith("eyJ")) {
             log.warn("Token has invalid start characters");
