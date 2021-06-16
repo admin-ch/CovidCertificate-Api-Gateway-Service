@@ -32,3 +32,5 @@ eiam-admin-service:
   keystore: "REPLACE"
   keystore-password: "REPLACE"
   truststore-password: "REPLACE"
+
+allowed-common-names-for-identity: local-identity-cn

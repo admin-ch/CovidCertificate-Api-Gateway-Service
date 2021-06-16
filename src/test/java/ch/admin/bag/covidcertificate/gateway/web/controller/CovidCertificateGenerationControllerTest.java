@@ -1,8 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
-import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.service.BearerTokenValidationService;
+import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
+import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.AuthorizationCodeCreateDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.*;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,11 +41,9 @@ class CovidCertificateGenerationControllerTest {
     @Mock
     private CovidCertificateGenerationService generationService;
     @Mock
-    private BearerTokenValidationService tokenValidationService;
-    @Mock
     private KpiDataService kpiDataService;
     @Mock
-    private IdentityAuthorizationClient identityAuthorizationClient;
+    private AuthorizationService authorizationService;
 
     @InjectMocks
     private CovidCertificateGenerationController controller;
@@ -101,7 +100,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.vaccineCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
@@ -116,7 +115,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.vaccineCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
@@ -134,15 +133,14 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
-            verify(tokenValidationService, never()).validate(any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
 
         @Test
-        void returns403__withNoAuthorization() throws Exception {
-            ReflectionTestUtils.setField(this.vaccineCreateDto, "otp", null);
+        void returns403__withAuthorizationError() throws Exception {
+            when(authorizationService.validateAndGetId(any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
@@ -150,27 +148,9 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.vaccineCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
-        }
-
-        @Test
-        void returns403__withBothAuthorizations() throws Exception {
-            var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(this.vaccineCreateDto, "identity", identityDto);
-
-            mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(this.vaccineCreateDto)))
-                    .andExpect(status().isForbidden());
-
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
+            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
     }
 
@@ -193,7 +173,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.testCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
         }
@@ -208,7 +188,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.testCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
@@ -226,15 +206,14 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
-            verify(tokenValidationService, never()).validate(any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
         }
 
         @Test
-        void returns403__withNoAuthorization() throws Exception {
-            ReflectionTestUtils.setField(this.testCreateDto, "otp", null);
+        void returns403__withAuthorizationError() throws Exception {
+            when(authorizationService.validateAndGetId(any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
@@ -242,27 +221,9 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.testCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
-        }
-
-        @Test
-        void returns403__withBothAuthorizations() throws Exception {
-            var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(this.testCreateDto, "identity", identityDto);
-
-            mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(this.testCreateDto)))
-                    .andExpect(status().isForbidden());
-
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
+            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
     }
 
@@ -285,7 +246,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.recoveryCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
@@ -300,7 +261,7 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(tokenValidationService, times(1)).validate(eq(this.recoveryCreateDto.getOtp()));
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
@@ -318,15 +279,14 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isOk());
 
-            verify(identityAuthorizationClient, times(1)).authorize(eq(identityDto.getUuid()), eq(identityDto.getIdpSource()));
-            verify(tokenValidationService, never()).validate(any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
         }
 
         @Test
-        void returns403__withNoAuthorization() throws Exception {
-            ReflectionTestUtils.setField(this.recoveryCreateDto, "otp", null);
+        void returns403__withAuthorizationError() throws Exception {
+            when(authorizationService.validateAndGetId(any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
@@ -334,27 +294,9 @@ class CovidCertificateGenerationControllerTest {
                     .content(mapper.writeValueAsString(this.recoveryCreateDto)))
                     .andExpect(status().isForbidden());
 
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
-        }
-
-        @Test
-        void returns403__withBothAuthorizations() throws Exception {
-            var identityDto = fixture.create(IdentityDto.class);
-            ReflectionTestUtils.setField(this.recoveryCreateDto, "identity", identityDto);
-
-            mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(this.recoveryCreateDto)))
-                    .andExpect(status().isForbidden());
-
-            verify(tokenValidationService, never()).validate(any());
-            verify(identityAuthorizationClient, never()).authorize(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
         }
     }
 }
