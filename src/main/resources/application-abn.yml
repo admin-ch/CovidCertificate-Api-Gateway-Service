@@ -32,4 +32,4 @@ eiam-admin-service:
   keystore-password: ${vcap.services.cc-eiam-admin-service.credentials.keystore-password}
   truststore-password: ${vcap.services.cc-eiam-admin-service.credentials.truststore-password}
 
-allowed-common-names-for-identity: a0128-hin-TEST, ZH-spital-A-t.bit.admin.ch
+allowed-common-names-for-identity: ${vcap.services.cc-api-gateway-service-allowed-cn-identity.credentials.cn}
