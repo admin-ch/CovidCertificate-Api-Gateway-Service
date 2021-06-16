@@ -39,7 +39,7 @@ class AuthorizationServiceTest {
 
     @Test
     void verifiesCommonName__ifInAllowedList() {
-        ReflectionTestUtils.setField(authorizationService, "allowedCommonNames", allowedCommonNames);
+        ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("test-cn");
 
         var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization));
@@ -48,8 +48,8 @@ class AuthorizationServiceTest {
     }
 
     @Test
-    void verifiesOtp__ifInNotAllowedList() throws InvalidBearerTokenException {
-        ReflectionTestUtils.setField(authorizationService, "allowedCommonNames", allowedCommonNames);
+    void verifiesOtp__ifNotInAllowedList() throws InvalidBearerTokenException {
+        ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("not-in-allowed");
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization));
@@ -57,16 +57,15 @@ class AuthorizationServiceTest {
     }
 
     @Test
-    void throwsException__ifIdentityDtoIsNullAndInAllowedList() {
-        ReflectionTestUtils.setField(authorizationService, "allowedCommonNames", allowedCommonNames);
+    void checksOtp__ifIdentityDtoIsNullAndInAllowedList() throws InvalidBearerTokenException {
+        ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("test-cn");
 
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
 
-        var exception = assertThrows(InvalidBearerTokenException.class, () -> authorizationService.validateAndGetId(otherDtoWithAuth));
+        assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth));
         verify(identityAuthorizationClient, never()).authorize(any(), any());
-        assertEquals(INVALID_IDENTITY_USER_CODE, exception.getError().getErrorCode());
-        assertEquals(INVALID_IDENTITY_USER_MESSAGE, exception.getError().getErrorMessage());
+        verify(bearerTokenValidationService, never()).validate(this.dtoWithAuthorization.getOtp());
     }
 
     private void setCnNameInContext(String cnValue) {

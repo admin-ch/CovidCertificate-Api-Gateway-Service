@@ -11,30 +11,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthorizationService {
 
-    @Value("#{'${allowed-common-names}'.split(',')}")
-    private List<String> allowedCommonNames;
+    @Value("#{'${allowed-common-names-for-identity}'.split(',')}")
+    private List<String> allowedCommonNamesForIdentity;
 
     private final BearerTokenValidationService bearerTokenValidationService;
     private final IdentityAuthorizationClient identityAuthorizationClient;
 
     public String validateAndGetId(DtoWithAuthorization dtoWithAuthorization) throws InvalidBearerTokenException {
         var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
-        if (allowedCommonNames.contains(commonName)) {
+        if (allowedCommonNamesForIdentity.contains(commonName)) {
             if (dtoWithAuthorization.getIdentity() != null) {
                 identityAuthorizationClient.authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
                 return dtoWithAuthorization.getIdentity().getUuid();
             }
-            throw new InvalidBearerTokenException(INVALID_IDENTITY_USER);
-        } else {
-            return bearerTokenValidationService.validate(dtoWithAuthorization.getOtp());
         }
+        return bearerTokenValidationService.validate(dtoWithAuthorization.getOtp());
     }
 
 }

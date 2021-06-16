@@ -18,5 +18,6 @@ public abstract class CertificateCreateDto implements DtoWithAuthorization {
             "The first line of the address is automatically filled with the givenName and familyName from the name attribute."
     )
     private CovidCertificateAddressDto address;
+    @Schema(hidden = true)
     private IdentityDto identity;
 }
