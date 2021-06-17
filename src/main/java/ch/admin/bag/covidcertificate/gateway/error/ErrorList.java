@@ -23,9 +23,9 @@ public class ErrorList {
     public static final String INVALID_COUNTRY_OF_VACCINATION = ERROR_CODE_KEY + 457 + ","
             + ERROR_MESSAGE_KEY + "Invalid country of vaccination}";
     public static final String INVALID_GIVEN_NAME = ERROR_CODE_KEY + 458 + ","
-            + ERROR_MESSAGE_KEY + "Invalid given name! Must not exceed 50 chars}";
+            + ERROR_MESSAGE_KEY + "Invalid given name! Must not exceed 80 chars}";
     public static final String INVALID_FAMILY_NAME = ERROR_CODE_KEY + 459 + ","
-            + ERROR_MESSAGE_KEY + "Invalid family name! Must not exceed 50 chars}";
+            + ERROR_MESSAGE_KEY + "Invalid family name! Must not exceed 80 chars}";
     public static final String INVALID_MEMBER_STATE_OF_TEST = ERROR_CODE_KEY + 461 + ","
             + ERROR_MESSAGE_KEY + "Invalid member state of test}";
     public static final String INVALID_TYP_OF_TEST = ERROR_CODE_KEY + 462 + ","
