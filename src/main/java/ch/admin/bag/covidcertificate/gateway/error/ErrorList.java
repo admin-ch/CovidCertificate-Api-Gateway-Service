@@ -59,6 +59,10 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + INVALID_RECOVERY_INFO_MESSAGE + "}";
     public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 474 + ","
             + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
+    public static final String INVALID_STANDARDISED_GIVEN_NAME = ERROR_CODE_KEY + 475 + ","
+            + ERROR_MESSAGE_KEY + "Invalid given name! The standardised given name exceeds 80 chars}";
+    public static final String INVALID_STANDARDISED_FAMILY_NAME = ERROR_CODE_KEY + 476 + ","
+            + ERROR_MESSAGE_KEY + "Invalid family name! The standardised family name exceeds 80 chars}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
