@@ -16,8 +16,7 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDEN
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultIdentityAuthorizationClientTest {
@@ -91,6 +90,30 @@ class DefaultIdentityAuthorizationClientTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> client.authorize(uuid, ipdSource));
         assertEquals(runtimeException, exception);
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifUuidIsEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize("", ipdSource));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifIdpSourceIsEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize(uuid, ""));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifIdpSourceAndUuidAreEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize("", ""));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
     }
 
     private QueryUsersResponse getQueryUsersResponse(String extId) {
