@@ -10,8 +10,6 @@ public class ErrorList {
     private static final String ERROR_MESSAGE_KEY = " \"errorMessage\": ";
 
     // Validation
-    public static final String NO_VACCINATION_DATA = ERROR_CODE_KEY + 451 + ","
-            + ERROR_MESSAGE_KEY + "No vaccination data was specified}";
     public static final String NO_PERSON_DATA = ERROR_CODE_KEY + 452 + ","
             + ERROR_MESSAGE_KEY + "No person data was specified}";
     public static final String INVALID_DATE_OF_BIRTH = ERROR_CODE_KEY + 453 + ","
@@ -28,8 +26,6 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Invalid given name! Must not exceed 50 chars}";
     public static final String INVALID_FAMILY_NAME = ERROR_CODE_KEY + 459 + ","
             + ERROR_MESSAGE_KEY + "Invalid family name! Must not exceed 50 chars}";
-    public static final String NO_TEST_DATA = ERROR_CODE_KEY + 460 + ","
-            + ERROR_MESSAGE_KEY + "No test data was specified}";
     public static final String INVALID_MEMBER_STATE_OF_TEST = ERROR_CODE_KEY + 461 + ","
             + ERROR_MESSAGE_KEY + "Invalid member state of test}";
     public static final String INVALID_TYP_OF_TEST = ERROR_CODE_KEY + 462 + ","
@@ -38,8 +34,6 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "Invalid testing center or facility}";
     public static final String INVALID_SAMPLE_OR_RESULT_DATE_TIME = ERROR_CODE_KEY + 464 + ","
             + ERROR_MESSAGE_KEY + "Invalid sample or result date time! Sample date must be before current date and before result date}";
-    public static final String NO_RECOVERY_DATA = ERROR_CODE_KEY + 465 + ","
-            + ERROR_MESSAGE_KEY + "No recovery data specified}";
     public static final String INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT = ERROR_CODE_KEY + 466 + ","
             + ERROR_MESSAGE_KEY + "Invalid date of first positive test result}";
     public static final String INVALID_COUNTRY_OF_TEST = ERROR_CODE_KEY + 467 + ","
@@ -48,17 +42,17 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + "The given language does not match any of the supported languages: de, it, fr!}";
     public static final String INVALID_UVCI = ERROR_CODE_KEY + 470 + ","
             + ERROR_MESSAGE_KEY + "Invalid UVCI format.}";
-    public static final int INVALID_VACCINATION_INFO_CODE = 471;
+    public static final int INVALID_VACCINATION_INFO_CODE = 451;
     public static final String INVALID_VACCINATION_INFO_MESSAGE = "Invalid vaccination info! Exactly one element is expected in the array.";
     public static final RestError INVALID_VACCINATION_INFO = new RestError(INVALID_VACCINATION_INFO_CODE, INVALID_VACCINATION_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_VACCINATION_INFO_JSON = ERROR_CODE_KEY + INVALID_VACCINATION_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_VACCINATION_INFO_MESSAGE + "}";
-    public static final int INVALID_TEST_INFO_CODE = 472;
+    public static final int INVALID_TEST_INFO_CODE = 460;
     public static final String INVALID_TEST_INFO_MESSAGE = "Invalid test info! Exactly one element is expected in the array.";
-    public static final RestError INVALID_TEST_INFO = new RestError(INVALID_TEST_INFO_CODE, "Invalid test info! Exactly one element is expected in the array.", HttpStatus.BAD_REQUEST);
+    public static final RestError INVALID_TEST_INFO = new RestError(INVALID_TEST_INFO_CODE, INVALID_TEST_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_TEST_INFO_JSON = ERROR_CODE_KEY + INVALID_TEST_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_TEST_INFO_MESSAGE + "}";
-    public static final int INVALID_RECOVERY_INFO_CODE = 473;
+    public static final int INVALID_RECOVERY_INFO_CODE = 465;
     public static final String INVALID_RECOVERY_INFO_MESSAGE = "Invalid recovery info! Exactly one element is expected in the array.";
     public static final RestError INVALID_RECOVERY_INFO = new RestError(INVALID_RECOVERY_INFO_CODE, INVALID_RECOVERY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_RECOVERY_INFO_JSON = ERROR_CODE_KEY + INVALID_RECOVERY_INFO_CODE + ","
@@ -80,16 +74,16 @@ public class ErrorList {
             + ERROR_MESSAGE_KEY + SIGNATURE_PARSE_MESSAGE + "}";
 
     public static final int INVALID_BEARER_CODE = 492;
-    public static final String INVALID_BEARER_MESSAGE = "Invalid or missing OTP";
+    public static final String INVALID_BEARER_MESSAGE = "Invalid OTP";
     public static final RestError INVALID_BEARER = new RestError(INVALID_BEARER_CODE, INVALID_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_BEARER_JSON = ERROR_CODE_KEY + INVALID_BEARER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_BEARER_MESSAGE + "}";
 
-    public static final int INVALID_AUTHORIZATION_COMBINATION_CODE = 493;
-    public static final String INVALID_AUTHORIZATION_COMBINATION_MESSAGE = "Invalid authorization combination of OTP and identity";
-    public static final RestError INVALID_AUTHORIZATION_COMBINATION = new RestError(INVALID_AUTHORIZATION_COMBINATION_CODE, INVALID_AUTHORIZATION_COMBINATION_MESSAGE, HttpStatus.FORBIDDEN);
-    public static final String INVALID_AUTHORIZATION_COMBINATION_JSON = ERROR_CODE_KEY + INVALID_AUTHORIZATION_COMBINATION_CODE + ","
-            + ERROR_MESSAGE_KEY + INVALID_AUTHORIZATION_COMBINATION_MESSAGE + "}";
+    public static final int MISSING_BEARER_CODE = 493;
+    public static final String MISSING_BEARER_MESSAGE = "Missing OTP";
+    public static final RestError MISSING_BEARER = new RestError(MISSING_BEARER_CODE, MISSING_BEARER_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String MISSING_BEARER_JSON = ERROR_CODE_KEY + MISSING_BEARER_CODE + ","
+            + ERROR_MESSAGE_KEY + MISSING_BEARER_MESSAGE + "}";
 
     public static final int INVALID_IDENTITY_USER_CODE = 494;
     public static final String INVALID_IDENTITY_USER_MESSAGE = "Invalid identity user";
@@ -97,11 +91,17 @@ public class ErrorList {
     public static final String INVALID_IDENTITY_USER_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_MESSAGE + "}";
 
-    public static final int INVALID_IDENTITY_USER_ROLE_CODE = 494;
+    public static final int INVALID_IDENTITY_USER_ROLE_CODE = 495;
     public static final String INVALID_IDENTITY_USER_ROLE_MESSAGE = "Invalid identity user role";
     public static final RestError INVALID_IDENTITY_USER_ROLE = new RestError(INVALID_IDENTITY_USER_ROLE_CODE, INVALID_IDENTITY_USER_ROLE_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_IDENTITY_USER_ROLE_JSON = ERROR_CODE_KEY + INVALID_IDENTITY_USER_ROLE_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_IDENTITY_USER_ROLE_MESSAGE + "}";
+
+    public static final int INVALID_OTP_LENGTH_CODE = 496;
+    public static final String INVALID_OTP_LENGTH_MESSAGE = "Invalid OTP length";
+    public static final RestError INVALID_OTP_LENGTH = new RestError(INVALID_OTP_LENGTH_CODE, INVALID_OTP_LENGTH_MESSAGE, HttpStatus.FORBIDDEN);
+    public static final String INVALID_OTP_LENGTH_JSON = ERROR_CODE_KEY + INVALID_OTP_LENGTH_CODE + ","
+            + ERROR_MESSAGE_KEY + INVALID_OTP_LENGTH_MESSAGE + "}";
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","

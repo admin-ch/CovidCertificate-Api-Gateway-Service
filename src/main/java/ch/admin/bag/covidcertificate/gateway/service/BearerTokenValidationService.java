@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
 @Component
 @Slf4j
@@ -53,6 +53,16 @@ public class BearerTokenValidationService {
     public String validate(String token) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
+        if (token == null) {
+            log.warn("Token is missing");
+            throw new InvalidBearerTokenException(MISSING_BEARER);
+        }
+
+        if (!token.startsWith("eyJ")) {
+            log.warn("Token has invalid start characters");
+            throw new InvalidBearerTokenException(INVALID_OTP_LENGTH);
+        }
+
         try {
 
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
@@ -75,8 +85,13 @@ public class BearerTokenValidationService {
             log.warn("Token expired", e);
             throw new InvalidBearerTokenException(INVALID_BEARER);
         } catch (SignatureException e) {
-            log.warn("Signature invalid", e);
-            throw new InvalidBearerTokenException(INVALID_BEARER);
+            if (e.getMessage().toLowerCase().contains("signature length not correct")) {
+                log.warn("Invalid signature length", e);
+                throw new InvalidBearerTokenException(INVALID_OTP_LENGTH);
+            } else {
+                log.warn("Signature invalid", e);
+                throw new InvalidBearerTokenException(INVALID_BEARER);
+            }
         } catch (UnsupportedJwtException e) {
             log.warn("Token is not signed", e);
             throw new InvalidBearerTokenException(INVALID_BEARER);

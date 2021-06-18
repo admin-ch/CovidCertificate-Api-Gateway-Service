@@ -16,6 +16,8 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 @Configuration
 @Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 public class EIAMConfig {
+    public static final String CLIENT_NAME = "GGG";
+
     private static final String CONTEXT_PATH = "ch.admin.bag.covidcertificate.gateway.eiam.adminservice";
     private static final String KEYSTORE_TYPE = "pkcs12";
     private static final String TRUSTSTORE_TYPE = "jks";

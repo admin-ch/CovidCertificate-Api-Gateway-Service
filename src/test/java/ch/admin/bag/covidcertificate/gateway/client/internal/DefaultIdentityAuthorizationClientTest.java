@@ -16,16 +16,15 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDEN
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultIdentityAuthorizationClientTest {
+class DefaultIdentityAuthorizationClientTest {
     private final JFixture jFixture = new JFixture();
 
     String uuid;
     String ipdSource;
-
+    
     @Mock
     public EIAMClient eiamClient;
     @InjectMocks
@@ -38,31 +37,31 @@ public class DefaultIdentityAuthorizationClientTest {
     }
 
     @Test
-    void givenUserExists_whenAauthorize_thenOk() {
+    void givenUserExists_whenAuthorize_thenOk() {
         // given
-        when(eiamClient.queryUser(any(String.class), any(String.class)))
+        when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(getQueryUsersResponse("9500.GGG-Covidcertificate.CertificateCreator"));
         // when
         client.authorize(uuid, ipdSource);
         // then
-        verify(eiamClient).queryUser(any(String.class), any(String.class));
+        verify(eiamClient).queryUser(any(String.class), any(String.class), any(String.class));
     }
 
     @Test
     void givenSuperUserExists_whenAuthorize_thenOk() {
         // given
-        when(eiamClient.queryUser(any(String.class), any(String.class)))
+        when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(getQueryUsersResponse("9500.GGG-Covidcertificate.SuperUserCC"));
         // when
         client.authorize(uuid, ipdSource);
         // then
-        verify(eiamClient).queryUser(any(String.class), any(String.class));
+        verify(eiamClient).queryUser(any(String.class), any(String.class), any(String.class));
     }
 
     @Test
-    void givenUserNotExists_whenAauthorize_thenThrowsException() {
+    void givenUserNotExists_whenAuthorize_thenThrowsException() {
         // given
-        when(eiamClient.queryUser(any(String.class), any(String.class)))
+        when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(new QueryUsersResponse());
         // when then
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
@@ -71,14 +70,50 @@ public class DefaultIdentityAuthorizationClientTest {
     }
 
     @Test
-    void givenUserExistsButHasNotRequiredRole_whenAauthorize_thenThrowsException() {
+    void givenUserExistsButHasNotRequiredRole_whenAuthorize_thenThrowsException() {
         // given
-        when(eiamClient.queryUser(any(String.class), any(String.class)))
+        when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(getQueryUsersResponse(jFixture.create(String.class)));
         // when then
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
                 () -> client.authorize(uuid, ipdSource));
         assertEquals(INVALID_IDENTITY_USER_ROLE, exception.getError());
+    }
+
+    @Test
+    void givenExceptionIsThrown_whenAuthorize_thenThrowsException() {
+        // given
+        var runtimeException = new RuntimeException();
+        when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
+                .thenThrow(runtimeException);
+        // when then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> client.authorize(uuid, ipdSource));
+        assertEquals(runtimeException, exception);
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifUuidIsEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize("", ipdSource));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifIdpSourceIsEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize(uuid, ""));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void throwsExceptionOnAuthorize__ifIdpSourceAndUuidAreEmptyString() {
+        CreateCertificateException exception = assertThrows(CreateCertificateException.class,
+                () -> client.authorize("", ""));
+        assertEquals(INVALID_IDENTITY_USER, exception.getError());
+        verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
     }
 
     private QueryUsersResponse getQueryUsersResponse(String extId) {
