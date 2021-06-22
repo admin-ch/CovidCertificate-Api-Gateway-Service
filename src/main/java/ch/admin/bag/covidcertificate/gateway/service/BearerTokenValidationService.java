@@ -79,7 +79,7 @@ public class BearerTokenValidationService {
             log.debug("Found Claims in JWT scope {}, userExtId {}, idpSource {}", scope, userExtId, idpSource);
 
             String jti = claimsJws.getBody().getId();
-            if (otpRevocationService.isRevoked(jti)) {
+            if (isRevoked(jti)) {
                 log.warn("Call with revoked otp with jti {}", jti);
                 throw new InvalidBearerTokenException(INVALID_BEARER);
             }
@@ -125,4 +125,9 @@ public class BearerTokenValidationService {
         }
     }
 
+    private boolean isRevoked(String jti) {
+        return otpRevocationService.getOtpRevocations()
+                .stream()
+                .anyMatch(otpRevocation -> otpRevocation.getJti().equals(jti));
+    }
 }

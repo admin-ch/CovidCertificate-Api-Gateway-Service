@@ -46,7 +46,7 @@ public class CustomTokenProviderUtil {
         }
     }
 
-    public String createToken(String userExtId, String idpSource) {
+    public String createToken(String userExtId, String idpSource, String jti) {
         log.info("CreateToken with userExtId {} and idpSource {}", userExtId, idpSource);
 
         if (userExtId == null || idpSource == null) {
@@ -57,7 +57,7 @@ public class CustomTokenProviderUtil {
         final Date now = new Date(nowMillis);
 
         final JwtBuilder builder = Jwts.builder()
-                .setId(UUID.randomUUID().toString())
+                .setId(jti)
                 .setIssuer(issuer)
                 .setIssuedAt(now)
                 .setNotBefore(now)
@@ -70,6 +70,10 @@ public class CustomTokenProviderUtil {
 
         builder.setExpiration(new Date(nowMillis + tokenValidity));
         return builder.compact();
+    }
+
+    public String createToken(String userExtId, String idpSource) {
+        return createToken(userExtId, idpSource, UUID.randomUUID().toString());
     }
 
     public String createTokenNotSigned(String userExtId, String idpSource) {
