@@ -25,6 +25,7 @@ ha-authcode-generation-service:
 cc-api-gateway-service:
   jwt:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
+  cache-duration: 3600000
 
 eiam-admin-service:
   url: ${vcap.services.cc-eiam-admin-service.credentials.url}
