@@ -70,7 +70,9 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_VACCINATION_INFO", value = INVALID_VACCINATION_INFO_JSON),
-                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )
@@ -115,7 +117,9 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_TEST_INFO", value = INVALID_TEST_INFO_JSON),
-                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )
@@ -158,6 +162,8 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON),
                             @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )
