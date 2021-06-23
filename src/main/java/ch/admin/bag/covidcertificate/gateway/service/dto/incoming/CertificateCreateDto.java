@@ -21,5 +21,5 @@ public abstract class CertificateCreateDto implements DtoWithAuthorization {
     @Schema(hidden = true)
     private IdentityDto identity;
     @Schema(description = "Code to deliver the certificate directly to the app. Can not be combined with address.", maxLength = 9, minLength = 9, allowableValues = {"alphanumeric String"})
-    private String inAppDeliveryCode;
+    private String appCode;
 }
