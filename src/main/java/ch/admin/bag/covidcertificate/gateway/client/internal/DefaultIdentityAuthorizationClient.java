@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
 
     @Override
     public void authorize(String uuid, String idpSource) {
+        if (!StringUtils.hasText(uuid) || !StringUtils.hasText(idpSource)) {
+            log.info("User not valid {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
+            throw new CreateCertificateException(INVALID_IDENTITY_USER);
+        }
+
         QueryUsersResponse response = queryUser(uuid, idpSource);
         if (checkUserExists(response)) {
             log.info("User does not exist in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));

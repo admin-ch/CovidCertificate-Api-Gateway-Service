@@ -3,12 +3,16 @@ package ch.admin.bag.covidcertificate.gateway;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Objects;
 
 @Slf4j
 @SpringBootApplication
+@EnableCaching
+@EnableScheduling
 public class CcApiGatewayServiceApplication {
 
     public static void main(String[] args) {
