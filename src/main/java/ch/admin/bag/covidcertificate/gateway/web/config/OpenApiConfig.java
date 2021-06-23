@@ -17,7 +17,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Covid Certificate API Gateway Service")
                         .description("Rest API for Covid Certificate API Gateway Service.")
-                        .version("0.0.1")
+                        .version("2.0.0")
                         .license(new License().name("Apache 2.0"))
                 );
     }
