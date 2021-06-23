@@ -6,9 +6,7 @@ import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
-import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
-import io.micrometer.core.instrument.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -66,9 +64,13 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_VACCINATION_DATE", value = INVALID_VACCINATION_DATE),
                             @ExampleObject(name = "INVALID_COUNTRY_OF_VACCINATION", value = INVALID_COUNTRY_OF_VACCINATION),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_GIVEN_NAME", value = INVALID_STANDARDISED_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_VACCINATION_INFO", value = INVALID_VACCINATION_INFO_JSON),
-                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )
@@ -104,14 +106,18 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "NO_PERSON_DATA", value = NO_PERSON_DATA),
                             @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_GIVEN_NAME", value = INVALID_STANDARDISED_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_MEMBER_STATE_OF_TEST", value = INVALID_MEMBER_STATE_OF_TEST),
                             @ExampleObject(name = "INVALID_TYP_OF_TEST", value = INVALID_TYP_OF_TEST),
                             @ExampleObject(name = "INVALID_TEST_CENTER", value = INVALID_TEST_CENTER),
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_TEST_INFO", value = INVALID_TEST_INFO_JSON),
-                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS)
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )
@@ -146,12 +152,16 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "NO_PERSON_DATA", value = NO_PERSON_DATA),
                             @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
                             @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_GIVEN_NAME", value = INVALID_STANDARDISED_GIVEN_NAME),
                             @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
                             @ExampleObject(name = "INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT", value = INVALID_DATE_OF_FIRST_POSITIVE_TEST_RESULT),
                             @ExampleObject(name = "INVALID_COUNTRY_OF_TEST", value = INVALID_COUNTRY_OF_TEST),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON),
                             @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_IN_APP_CODE", value = INVALID_IN_APP_CODE),
                     }
             )
     )

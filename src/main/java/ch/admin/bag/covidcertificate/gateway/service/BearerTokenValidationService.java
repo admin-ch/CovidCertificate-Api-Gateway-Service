@@ -3,6 +3,7 @@ package ch.admin.bag.covidcertificate.gateway.service;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class BearerTokenValidationService {
 
     private static final String COVID_CERT_CREATION = "covidcertcreation";
@@ -32,6 +34,8 @@ public class BearerTokenValidationService {
     private String publicKey;
 
     private JwtParser jwtParser;
+
+    private final OtpRevocationService otpRevocationService;
 
     @PostConstruct
     public void init() throws NoSuchAlgorithmException {
@@ -74,6 +78,12 @@ public class BearerTokenValidationService {
 
             log.debug("Found Claims in JWT scope {}, userExtId {}, idpSource {}", scope, userExtId, idpSource);
 
+            String jti = claimsJws.getBody().getId();
+            if (isRevoked(jti)) {
+                log.warn("Call with revoked otp with jti {}", jti);
+                throw new InvalidBearerTokenException(INVALID_BEARER);
+            }
+
             validateScope(scope);
             validateClaim(userExtId, USER_EXT_ID_CLAIM_KEY);
             validateClaim(idpSource, IDP_SOURCE_CLAIM_KEY);
@@ -115,4 +125,9 @@ public class BearerTokenValidationService {
         }
     }
 
+    private boolean isRevoked(String jti) {
+        return otpRevocationService.getOtpRevocations()
+                .stream()
+                .anyMatch(otpRevocation -> otpRevocation.getJti().equals(jti));
+    }
 }
