@@ -20,6 +20,6 @@ public abstract class CertificateCreateDto implements DtoWithAuthorization {
     private CovidCertificateAddressDto address;
     @Schema(hidden = true)
     private IdentityDto identity;
-    @Schema(description = "Code to deliver the certificate directly to the app. Can not be combined with address.", maxLength = 9, minLength = 9, allowableValues = {"alphanumeric String"})
+    @Schema(description = "Code to deliver the certificate directly to the app. Can not be combined with address.", maxLength = 9, minLength = 9)
     private String appCode;
 }
