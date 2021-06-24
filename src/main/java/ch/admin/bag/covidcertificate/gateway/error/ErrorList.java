@@ -57,16 +57,12 @@ public class ErrorList {
     public static final RestError INVALID_RECOVERY_INFO = new RestError(INVALID_RECOVERY_INFO_CODE, INVALID_RECOVERY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_RECOVERY_INFO_JSON = ERROR_CODE_KEY + INVALID_RECOVERY_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_RECOVERY_INFO_MESSAGE + "}";
-    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 474 + ","
-            + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
-    public static final String DUPLICATE_DELIVERY_METHOD = ERROR_CODE_KEY + 475 + ","
-            + ERROR_MESSAGE_KEY + "Delivery method can either be InApp or Mail, but not both.}";
-    public static final String INVALID_IN_APP_CODE = ERROR_CODE_KEY + 476 + ","
-            + ERROR_MESSAGE_KEY + "InApp-Code is invalid.}";
-    public static final String INVALID_STANDARDISED_GIVEN_NAME = ERROR_CODE_KEY + 477 + ","
-            + ERROR_MESSAGE_KEY + "Invalid given name! The standardised given name exceeds 80 chars}";
-    public static final String INVALID_STANDARDISED_FAMILY_NAME = ERROR_CODE_KEY + 478 + ","
-            + ERROR_MESSAGE_KEY + "Invalid family name! The standardised family name exceeds 80 chars}";
+    public static final String INVALID_ADDRESS = ERROR_CODE_KEY + 474 + "," + ERROR_MESSAGE_KEY + "Paper-based delivery requires a valid address.}";
+    public static final String DUPLICATE_DELIVERY_METHOD = ERROR_CODE_KEY + 475 + "," + ERROR_MESSAGE_KEY + "Delivery method can either be InApp or Mail, but not both.}";
+    public static final String UNKNOWN_APP_CODE = ERROR_CODE_KEY + 476 + "," + ERROR_MESSAGE_KEY + "Unknown or invalid app code.}";
+    public static final String INVALID_STANDARDISED_GIVEN_NAME = ERROR_CODE_KEY + 477 + "," + ERROR_MESSAGE_KEY + "Invalid given name! The standardised given name exceeds 80 chars}";
+    public static final String INVALID_STANDARDISED_FAMILY_NAME = ERROR_CODE_KEY + 478 + "," + ERROR_MESSAGE_KEY + "Invalid family name! The standardised family name exceeds 80 chars}";
+    public static final String INVALID_APP_CODE = ERROR_CODE_KEY + 479 + "," + ERROR_MESSAGE_KEY + "App code is in an invalid format.}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
@@ -114,4 +110,9 @@ public class ErrorList {
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
             + ERROR_MESSAGE_KEY + "Duplicate UVCI.}";
+
+    // Server Error
+    public static final String PRINTING_FAILED = ERROR_CODE_KEY + 556 + ","  + ERROR_MESSAGE_KEY + "Printing failed due to a technical error.}";
+    public static final String WRITING_RETURN_CSV_FAILED = ERROR_CODE_KEY + 557 + ","  + ERROR_MESSAGE_KEY + "Writing CSV failed.}";
+    public static final String APP_DELIVERY_FAILED = ERROR_CODE_KEY + 558 + ","  + ERROR_MESSAGE_KEY + "App delivery failed due to a technical error.}";
 }
