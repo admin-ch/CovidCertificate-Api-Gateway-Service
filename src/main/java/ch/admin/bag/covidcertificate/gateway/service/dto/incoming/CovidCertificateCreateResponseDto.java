@@ -2,11 +2,8 @@ package ch.admin.bag.covidcertificate.gateway.service.dto.incoming;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
 @Getter
 @ToString
