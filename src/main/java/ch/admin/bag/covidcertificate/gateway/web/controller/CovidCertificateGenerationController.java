@@ -73,16 +73,6 @@ public class CovidCertificateGenerationController {
                     }
             )
     )
-    @ApiResponse(responseCode = "500",
-            content = @Content(
-                    schema = @Schema(implementation = RestError.class),
-                    mediaType = "application/json",
-                    examples = {
-                            @ExampleObject(name = "PRINTING_FAILED", value = PRINTING_FAILED),
-                            @ExampleObject(name = "WRITING_RETURN_CSV_FAILED", value = WRITING_RETURN_CSV_FAILED),
-                    }
-            )
-    )
     public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for vaccination certificate");
         String userExtId = authorizationService.validateAndGetId(createDto);
@@ -130,16 +120,6 @@ public class CovidCertificateGenerationController {
                     }
             )
     )
-    @ApiResponse(responseCode = "500",
-            content = @Content(
-                    schema = @Schema(implementation = RestError.class),
-                    mediaType = "application/json",
-                    examples = {
-                            @ExampleObject(name = "PRINTING_FAILED", value = PRINTING_FAILED),
-                            @ExampleObject(name = "WRITING_RETURN_CSV_FAILED", value = WRITING_RETURN_CSV_FAILED),
-                    }
-            )
-    )
     public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto) throws InvalidBearerTokenException {
         log.info("Call of Create for test certificate");
         String userExtId = authorizationService.validateAndGetId(createDto);
@@ -181,16 +161,6 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                             @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
                             @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
-                    }
-            )
-    )
-    @ApiResponse(responseCode = "500",
-            content = @Content(
-                    schema = @Schema(implementation = RestError.class),
-                    mediaType = "application/json",
-                    examples = {
-                            @ExampleObject(name = "PRINTING_FAILED", value = PRINTING_FAILED),
-                            @ExampleObject(name = "WRITING_RETURN_CSV_FAILED", value = WRITING_RETURN_CSV_FAILED),
                     }
             )
     )

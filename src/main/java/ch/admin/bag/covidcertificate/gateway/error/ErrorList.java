@@ -110,9 +110,4 @@ public class ErrorList {
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
             + ERROR_MESSAGE_KEY + "Duplicate UVCI.}";
-
-    // Server Error
-    public static final String PRINTING_FAILED = ERROR_CODE_KEY + 556 + ","  + ERROR_MESSAGE_KEY + "Printing failed due to a technical error.}";
-    public static final String WRITING_RETURN_CSV_FAILED = ERROR_CODE_KEY + 557 + ","  + ERROR_MESSAGE_KEY + "Writing CSV failed.}";
-    public static final String APP_DELIVERY_FAILED = ERROR_CODE_KEY + 558 + ","  + ERROR_MESSAGE_KEY + "App delivery failed due to a technical error.}";
 }
