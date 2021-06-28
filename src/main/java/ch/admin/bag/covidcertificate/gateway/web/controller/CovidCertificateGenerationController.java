@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,7 +80,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto.getAddress());
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto);
         return covidCertificate;
     }
 
@@ -126,7 +127,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_TEST, userExtId, createDto.getAddress());
+        logKpi(KPI_TYPE_TEST, userExtId, createDto);
         return covidCertificate;
     }
 
@@ -170,17 +171,21 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto.getAddress());
+        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto);
         return covidCertificate;
     }
 
-    private void logKpi(String type, String userExtId, CovidCertificateAddressDto addressDto) {
+    private void logKpi(String type, String userExtId, CertificateCreateDto createDto) {
         LocalDateTime timestamp = LocalDateTime.now();
         kpiDataService.saveKpiData(timestamp, type, userExtId);
-        if (addressDto != null && addressDto.getCantonCodeSender() != null) {
+        if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
             log.info("kpi: {} {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
-                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId), kv(KPI_CANTON, addressDto.getCantonCodeSender()));
-            kpiDataService.saveKpiData(timestamp, KPI_CANTON, addressDto.getCantonCodeSender());
+                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId), kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender()));
+            kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender());
+        } else if (StringUtils.hasText(createDto.getAppCode())) {
+            log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
+                    kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY), kv(KPI_UUID_KEY, userExtId));
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId);
         } else {
             log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
                     kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
