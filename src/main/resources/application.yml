@@ -83,8 +83,8 @@ management:
 
 cc-api-gateway-service:
   rest:
-    connectTimeoutSeconds: 10
-    readTimeoutSeconds: 10
+    connectTimeoutSeconds: 5
+    readTimeoutSeconds: 5
   allowed-origin: "*"
   monitor:
     prometheus:
