@@ -11,5 +11,6 @@ public class RevocationDto implements DtoWithAuthorization {
     @Schema(example = "urn:uvci:01:CH:97DAB5E31B589AF3CAE2F53F", description = "UVCI of certificate to be revoked.")
     private String uvci;
     private String otp;
+    @Schema(hidden = true)
     private IdentityDto identity;
 }
