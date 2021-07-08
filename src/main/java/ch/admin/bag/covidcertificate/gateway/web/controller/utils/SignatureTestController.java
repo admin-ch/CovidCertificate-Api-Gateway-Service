@@ -30,6 +30,7 @@ import java.util.Map;
 public class SignatureTestController {
 
     private static final String PRIVATE_CERT_PATH = "/home/dev/private-cert.pem";
+//    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/a0115-irfBIT-PROD.key";
 
     /**
      * For testing purposes only. Creates a signature for the sent body.

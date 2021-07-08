@@ -10,16 +10,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 
@@ -61,7 +56,7 @@ public class ResponseStatusExceptionHandler {
     protected ResponseEntity<RestError> notReadableRequestPayload(HttpMessageNotReadableException ex) {
         RestError error;
         try {
-            var rootException = (InvalidFormatException)ex.getCause();
+            var rootException = (InvalidFormatException) ex.getCause();
             assert rootException != null;
             var errorMessage = "Unable to parse " + rootException.getValue() + " to " + rootException.getTargetType();
             log.warn("HttpMessage with invalid format received: ", rootException);
@@ -78,9 +73,9 @@ public class ResponseStatusExceptionHandler {
         log.error("Exception during processing", e);
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    
+
     private ResponseEntity<RestError> handleError(RestError restError) {
-        log.error("Error {}", restError);
+        log.warn("Error {}", restError);
         return new ResponseEntity<>(restError, restError.getHttpStatus());
     }
 }
