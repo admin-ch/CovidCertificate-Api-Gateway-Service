@@ -21,4 +21,10 @@ public class Constants {
     public static final String KPI_TYPE_RECOVERY = "r";
     public static final String KPI_CANTON = "p";
     public static final String KPI_TYPE_INAPP_DELIVERY = "ad";
+
+    public static final String SEC_KPI_EXT_ID = "extId";
+    public static final String SEC_KPI_IP_ADDRESS = "ip";
+    public static final String SEC_KPI_IDP_SOURCE = "idp";
+    public static final String SEC_KPI_OTP_JWT_ID = "jwtId";
+    public static final String SEC_KPI_OTP_TYPE = "otpType";
 }

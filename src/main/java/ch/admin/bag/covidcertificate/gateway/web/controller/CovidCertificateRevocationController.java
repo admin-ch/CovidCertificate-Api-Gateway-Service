@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
@@ -71,9 +72,9 @@ public class CovidCertificateRevocationController {
                     examples = {@ExampleObject(name = "DUPLICATE_UVCI", value = DUPLICATE_UVCI)}
             )
     )
-    public ResponseEntity<HttpStatus> create(@RequestBody RevocationDto revocationDto) throws InvalidBearerTokenException {
+    public ResponseEntity<HttpStatus> create(@RequestBody RevocationDto revocationDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Revoke for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationDto);
+        String userExtId = authorizationService.validateAndGetId(revocationDto, request.getRemoteAddr());
 
         service.createRevocation(revocationDto);
 
