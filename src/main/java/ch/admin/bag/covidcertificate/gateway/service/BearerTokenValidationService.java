@@ -15,8 +15,11 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.LocalDateTime;
 
+import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
+import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Component
 @Slf4j
@@ -29,13 +32,11 @@ public class BearerTokenValidationService {
     private static final String IDP_SOURCE_CLAIM_KEY = "idpsource";
     private static final String TYP_CLAIM_KEY = "typ";
     private static final String AUTH_MACHINE_JWT = "authmachine+jwt";
-
+    private static final String OTP_CLAIM_KEY = "otp";
+    private final OtpRevocationService otpRevocationService;
     @Value("${cc-api-gateway-service.jwt.publicKey}")
     private String publicKey;
-
     private JwtParser jwtParser;
-
-    private final OtpRevocationService otpRevocationService;
 
     @PostConstruct
     public void init() throws NoSuchAlgorithmException {
@@ -54,7 +55,7 @@ public class BearerTokenValidationService {
 
     }
 
-    public String validate(String token) throws InvalidBearerTokenException {
+    public String validate(String token, String ipAddress) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
         if (token == null) {
@@ -88,6 +89,8 @@ public class BearerTokenValidationService {
             validateClaim(userExtId, USER_EXT_ID_CLAIM_KEY);
             validateClaim(idpSource, IDP_SOURCE_CLAIM_KEY);
             validateClaim(typ, AUTH_MACHINE_JWT);
+
+            logSecKPI(ipAddress, claimsJws, userExtId, idpSource, jti);
 
             return userExtId;
 
@@ -129,5 +132,16 @@ public class BearerTokenValidationService {
         return otpRevocationService.getOtpRevocations()
                 .stream()
                 .anyMatch(otpRevocation -> otpRevocation.getJti().equals(jti));
+    }
+
+    private void logSecKPI(String ipAddress, Jws<Claims> claimsJws, String userExtId, String idpSource, String jti) {
+        log.info("sec-kpi: {} {} {} {} {} {} {}",
+                kv(KPI_TIMESTAMP_KEY, LocalDateTime.now().format(LOG_FORMAT)),
+                kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
+                kv(SEC_KPI_OTP_JWT_ID, jti),
+                kv(SEC_KPI_OTP_TYPE, claimsJws.getBody().get(OTP_CLAIM_KEY, String.class)),
+                kv(SEC_KPI_IP_ADDRESS, ipAddress),
+                kv(SEC_KPI_EXT_ID, userExtId),
+                kv(SEC_KPI_IDP_SOURCE, idpSource));
     }
 }

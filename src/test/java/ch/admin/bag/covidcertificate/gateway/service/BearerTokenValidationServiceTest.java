@@ -1,9 +1,12 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
+import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.domain.OtpRevocation;
 import ch.admin.bag.covidcertificate.gateway.util.CustomTokenProviderUtil;
+import com.flextrade.jfixture.JFixture;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -18,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 class BearerTokenValidationServiceTest {
+    static final JFixture fixure = new JFixture();
 
     private static OtpRevocationService otpRevocationService;
     private static OtpRevocation otpRevocation;
@@ -27,12 +31,19 @@ class BearerTokenValidationServiceTest {
 
     private final String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm7g5sfd8MtTfUh29hlW6q+pZCZPY8McM0JbF1ZwXZ80Zx2gNDAiUTQrY1cuH9KpgB0JOITMyR6y+e7N4QFlaiHejwULPe+CUJOlgiTd/wqT64JDWXon8OjqZqpXE3es7ubtDG1LOjIeNo9UZcqzvzRcqi+RIPYQ+WHB7fexn1fp7FSb0YEuMDHLuqLmiFKw7elmf6OwguL9J2XhEJXl9oLYDKjkkH1lmoLtWcDUOR4OEDT+SMrDGQu8c7M73Ze1vyzD3wLrmVDoNACTLAMJmU4b8ZP/aONUpyZenneKpWeLjhGXwXmeXtIhJMKwBcEp7MkB9CFt1q/1LJAawIP8fawIDAQAB";
 
+    String ipAddress;
+
     @BeforeAll
     static void setUp() {
         otpRevocation = mock(OtpRevocation.class);
         otpRevocationService = mock(OtpRevocationService.class);
         when(otpRevocation.getJti()).thenReturn(revokedJti);
         when(otpRevocationService.getOtpRevocations()).thenReturn(List.of(otpRevocation));
+    }
+
+    @BeforeEach
+    void initialize() {
+        this.ipAddress = fixure.create(String.class);
     }
 
     @Test
@@ -48,7 +59,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        service.validate(token);
+        service.validate(token, ipAddress);
     }
 
     @Test
@@ -66,7 +77,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
     }
 
     @Test
@@ -83,11 +94,11 @@ class BearerTokenValidationServiceTest {
 
         String tokenNoExtId = customTokenProviderUtil.createToken("", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoExtId));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoExtId, ipAddress));
 
         String tokenNoIdpSource = customTokenProviderUtil.createToken("test", "");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoIdpSource));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoIdpSource, ipAddress));
     }
 
     @Test
@@ -104,7 +115,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
     }
 
     @Test
@@ -121,7 +132,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createTokenNotSigned("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
     }
 
     @Test
@@ -137,13 +148,13 @@ class BearerTokenValidationServiceTest {
         String token = customTokenProviderUtil.createToken("test", "test");
 
         final String tokenTruncatedEnd = token.substring(0, token.length() - 1);
-        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedEnd));
+        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedEnd, ipAddress));
         var restError = exception.getError();
         assertEquals(INVALID_OTP_LENGTH_MESSAGE, restError.getErrorMessage());
         assertEquals(INVALID_OTP_LENGTH_CODE, restError.getErrorCode());
 
         final String tokenTruncatedStart = token.substring(1);
-        exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedStart));
+        exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedStart, ipAddress));
         restError = exception.getError();
         assertEquals(INVALID_OTP_LENGTH_MESSAGE, restError.getErrorMessage());
         assertEquals(INVALID_OTP_LENGTH_CODE, restError.getErrorCode());
@@ -161,7 +172,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test", revokedJti);
 
-        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(token));
+        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
         assertEquals(INVALID_BEARER, exception.getError());
     }
 }

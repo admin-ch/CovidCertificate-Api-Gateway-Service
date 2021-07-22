@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
@@ -74,9 +75,9 @@ public class CovidCertificateGenerationController {
                     }
             )
     )
-    public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto) throws InvalidBearerTokenException {
+    public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for vaccination certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
@@ -121,9 +122,9 @@ public class CovidCertificateGenerationController {
                     }
             )
     )
-    public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto) throws InvalidBearerTokenException {
+    public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for test certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
@@ -165,9 +166,9 @@ public class CovidCertificateGenerationController {
                     }
             )
     )
-    public CovidCertificateCreateResponseDto create(@RequestBody RecoveryCertificateCreateDto createDto) throws InvalidBearerTokenException {
+    public CovidCertificateCreateResponseDto create(@RequestBody RecoveryCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto);
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);

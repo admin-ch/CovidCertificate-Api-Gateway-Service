@@ -28,6 +28,7 @@ class AuthorizationServiceTest {
     DtoWithAuthorization dtoWithAuthorization;
     AuthorizationService authorizationService;
     List<String> allowedCommonNames = Arrays.asList("test-cn");
+    String ipAddress;
 
     @BeforeEach
     void initialize() {
@@ -35,6 +36,7 @@ class AuthorizationServiceTest {
         this.identityAuthorizationClient = mock(IdentityAuthorizationClient.class);
         this.dtoWithAuthorization = this.getDtoWithAuthorization(false, false);
         this.authorizationService = new AuthorizationService(bearerTokenValidationService, identityAuthorizationClient);
+        this.ipAddress = fixure.create(String.class);
     }
 
     @Test
@@ -42,7 +44,7 @@ class AuthorizationServiceTest {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("test-cn");
 
-        var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization));
+        var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress));
         verify(identityAuthorizationClient, times(1)).authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
         assertEquals(dtoWithAuthorization.getIdentity().getUuid(), uuid);
     }
@@ -52,8 +54,8 @@ class AuthorizationServiceTest {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("not-in-allowed");
 
-        assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization));
-        verify(bearerTokenValidationService, times(1)).validate(this.dtoWithAuthorization.getOtp());
+        assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress));
+        verify(bearerTokenValidationService, times(1)).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
     }
 
     @Test
@@ -63,9 +65,9 @@ class AuthorizationServiceTest {
 
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
 
-        assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth));
+        assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth, ipAddress));
         verify(identityAuthorizationClient, never()).authorize(any(), any());
-        verify(bearerTokenValidationService, never()).validate(this.dtoWithAuthorization.getOtp());
+        verify(bearerTokenValidationService, never()).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
     }
 
     private void setCnNameInContext(String cnValue) {

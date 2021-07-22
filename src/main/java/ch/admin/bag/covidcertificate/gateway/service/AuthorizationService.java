@@ -16,13 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthorizationService {
 
+    private final BearerTokenValidationService bearerTokenValidationService;
+    private final IdentityAuthorizationClient identityAuthorizationClient;
     @Value("#{'${allowed-common-names-for-identity}'.split(',')}")
     private List<String> allowedCommonNamesForIdentity;
 
-    private final BearerTokenValidationService bearerTokenValidationService;
-    private final IdentityAuthorizationClient identityAuthorizationClient;
-
-    public String validateAndGetId(DtoWithAuthorization dtoWithAuthorization) throws InvalidBearerTokenException {
+    public String validateAndGetId(DtoWithAuthorization dtoWithAuthorization, String ipAddress) throws InvalidBearerTokenException {
         var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
         if (allowedCommonNamesForIdentity.contains(commonName)) {
             if (dtoWithAuthorization.getIdentity() != null) {
@@ -30,7 +29,7 @@ public class AuthorizationService {
                 return dtoWithAuthorization.getIdentity().getUuid();
             }
         }
-        return bearerTokenValidationService.validate(dtoWithAuthorization.getOtp());
+        return bearerTokenValidationService.validate(dtoWithAuthorization.getOtp(), ipAddress);
     }
 
 }
