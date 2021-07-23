@@ -28,6 +28,8 @@ server:
 spring:
   application:
     name: cc-api-gateway-service
+  codec:
+    max-in-memory-size: 500000
   datasource:
     url: jdbc:postgresql://localhost:3121/cc-api-gateway
     # Only for local development
@@ -83,8 +85,8 @@ management:
 
 cc-api-gateway-service:
   rest:
-    connectTimeoutSeconds: 5
-    readTimeoutSeconds: 5
+    connectTimeoutSeconds: 10
+    readTimeoutSeconds: 10
   allowed-origin: "*"
   monitor:
     prometheus:
