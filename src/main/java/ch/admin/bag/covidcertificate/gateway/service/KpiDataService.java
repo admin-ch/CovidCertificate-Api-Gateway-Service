@@ -24,4 +24,8 @@ public class KpiDataService {
         );
         logRepository.save(kpiData);
     }
+
+    public void saveKpiData(LocalDateTime timestamp, String type, String value) {
+        saveKpiData(timestamp, type, value, null);
+    }
 }
