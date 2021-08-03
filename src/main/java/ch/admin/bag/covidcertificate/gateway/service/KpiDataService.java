@@ -15,11 +15,12 @@ public class KpiDataService {
 
     private final KpiDataRepository logRepository;
 
-    public void saveKpiData(LocalDateTime timestamp, String type, String value) {
+    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci) {
         KpiData kpiData = new KpiData(
                 timestamp,
                 type,
-                value
+                value,
+                uvci
         );
         logRepository.save(kpiData);
     }
