@@ -63,6 +63,6 @@ public class CustomHeaderAuthenticationFilter extends OncePerRequestFilter {
     private void logKpi(String commonName) {
         LocalDateTime timestamp = LocalDateTime.now();
         log.info("kpi: {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CERT_KEY, commonName));
-        kpiDataService.saveKpiData(timestamp, KPI_COMMON_NAME_TYPE, commonName,null);
+        kpiDataService.saveKpiData(timestamp, KPI_COMMON_NAME_TYPE, commonName);
     }
 }
