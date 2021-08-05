@@ -86,10 +86,13 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "vaccination";
 
         private VaccinationCertificateCreateDto vaccineCreateDto;
+        private CovidCertificateCreateResponseDto vaccineCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.vaccineCreateDto = fixture.create(VaccinationCertificateCreateDto.class);
+            this.vaccineCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class))).thenReturn(vaccineCreateResponse);
         }
 
         @Test
@@ -102,7 +105,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
         }
 
         @Test
@@ -117,8 +120,8 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
         }
 
         @Test
@@ -135,7 +138,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
         }
 
         @Test
@@ -150,7 +153,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
         }
     }
 
@@ -159,10 +162,13 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "test";
 
         private TestCertificateCreateDto testCreateDto;
+        private CovidCertificateCreateResponseDto testCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.testCreateDto = fixture.create(TestCertificateCreateDto.class);
+            this.testCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class))).thenReturn(testCreateResponse);
         }
 
         @Test
@@ -175,7 +181,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
         }
 
         @Test
@@ -190,8 +196,8 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
         }
 
         @Test
@@ -208,7 +214,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
         }
 
         @Test
@@ -223,7 +229,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
         }
     }
 
@@ -232,10 +238,13 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "recovery";
 
         private RecoveryCertificateCreateDto recoveryCreateDto;
+        private CovidCertificateCreateResponseDto recoveryCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.recoveryCreateDto = fixture.create(RecoveryCertificateCreateDto.class);
+            this.recoveryCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class))).thenReturn(recoveryCreateResponse);
         }
 
         @Test
@@ -248,7 +257,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
         }
 
         @Test
@@ -263,8 +272,8 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
         }
 
         @Test
@@ -281,7 +290,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
         }
 
         @Test
@@ -296,7 +305,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
         }
     }
 }
