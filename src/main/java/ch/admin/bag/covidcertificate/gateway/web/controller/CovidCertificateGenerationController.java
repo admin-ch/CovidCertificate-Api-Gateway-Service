@@ -116,9 +116,9 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
                             @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
                             @ExampleObject(name = "INVALID_TEST_INFO", value = INVALID_TEST_INFO_JSON),
-                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                             @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
                             @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
+                            @ExampleObject(name = "INVALID_PRINT_FOR_TEST", value = INVALID_PRINT_FOR_TEST),
                     }
             )
     )
