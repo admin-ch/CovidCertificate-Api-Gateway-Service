@@ -19,6 +19,7 @@
         <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
         <logstash.version>6.6</logstash.version>
         <janino.version>3.1.4</janino.version>
+        <cc-backend-logging.version>1.0.0</cc-backend-logging.version>
         <springdoc.version>1.5.8</springdoc.version>
         <spring-cloud-starter-sleuth.version>3.0.3</spring-cloud-starter-sleuth.version>
         <jjwt.version>0.11.2</jjwt.version>
@@ -112,6 +113,12 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <version>${janino.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.admin.bag.covidcertificate</groupId>
+            <artifactId>cc-backend-logging</artifactId>
+            <version>${cc-backend-logging.version}</version>
         </dependency>
 
         <dependency>
