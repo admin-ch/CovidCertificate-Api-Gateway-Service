@@ -32,7 +32,7 @@ public class ValueSetsController {
 
     @PostMapping("/rapid-tests")
     @Operation(operationId = "getRapidTests",
-            summary = "Gets a list of all rapid tests.",
+            summary = "Gets a list of all rapid tests. *Only available for testing on ABN.",
             description = "Gets a list of all rapid tests based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
@@ -55,7 +55,7 @@ public class ValueSetsController {
 
     @PostMapping("/issuable-rapid-tests")
     @Operation(operationId = "getIssuableRapidTests",
-            summary = "Gets a list of all issuable rapid tests.",
+            summary = "Gets a list of all issuable rapid tests. *Only available for testing on ABN.",
             description = "Gets a list of all issuable rapid tests defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
@@ -78,7 +78,7 @@ public class ValueSetsController {
 
     @PostMapping("/vaccines")
     @Operation(operationId = "getVaccines",
-            summary = "Gets a list of all vaccines.",
+            summary = "Gets a list of all vaccines. *Only available for testing on ABN.",
             description = "Gets a list of all vaccines based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
@@ -101,7 +101,7 @@ public class ValueSetsController {
 
     @PostMapping("/issuable-vaccines")
     @Operation(operationId = "getIssuableVaccines",
-            summary = "Gets a list of all issuable vaccines.",
+            summary = "Gets a list of all issuable vaccines. *Only available for testing on ABN.",
             description = "Gets a list of all issuable vaccines defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
