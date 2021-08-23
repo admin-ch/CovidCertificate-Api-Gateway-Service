@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.antMatcher("/api/v1/covidcertificate/**")
+        http.antMatcher("/api/v1/**")
                 .csrf()
                 .disable()//csrf disabled for machine to machine api
                 .headers()
