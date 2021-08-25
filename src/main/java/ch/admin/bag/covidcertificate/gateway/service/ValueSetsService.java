@@ -26,13 +26,18 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class ValueSetsService {
 
+    public static final String RAPID_TESTS_PATH = "api/v1/valuesets/rapid-tests";
+    public static final String ISSUABLE_RAPID_TESTS_PATH = "api/v1/valuesets/issuable-rapid-tests";
+    public static final String VACCINES_PATH = "api/v1/valuesets/vaccines";
+    public static final String ISSUABLE_VACCINES_PATH = "api/v1/valuesets/issuable-vaccines";
+
     @Value("${cc-management-service.uri}")
     private String serviceUri;
 
     private final WebClient defaultWebClient;
 
     public List<RapidTestDto> getRapidTests() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/rapid-tests");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + RAPID_TESTS_PATH);
 
         String uri = builder.toUriString();
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
@@ -55,7 +60,7 @@ public class ValueSetsService {
     }
 
     public List<IssuableRapidTestDto> getIssuableRapidTests() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/issuable-rapid-tests");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_RAPID_TESTS_PATH);
 
         String uri = builder.toUriString();
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
@@ -78,7 +83,7 @@ public class ValueSetsService {
     }
 
     public List<VaccineDto> getVaccines() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/vaccines");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + VACCINES_PATH);
 
         String uri = builder.toUriString();
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
@@ -101,7 +106,7 @@ public class ValueSetsService {
     }
 
     public List<IssuableVaccineDto> getIssuableVaccines() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/issuable-vaccines");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_VACCINES_PATH);
 
         String uri = builder.toUriString();
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
