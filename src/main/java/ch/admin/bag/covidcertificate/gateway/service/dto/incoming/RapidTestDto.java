@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RapidTestDto extends IssuableRapidTestDto {
-    @Schema(type = "boolean")
+    @Schema(type = "boolean", example = "true", description = "If rapid test is accepted by the BAG and the EU.")
     private Boolean active;
 
     public RapidTestDto(String code, String display, Boolean active) {

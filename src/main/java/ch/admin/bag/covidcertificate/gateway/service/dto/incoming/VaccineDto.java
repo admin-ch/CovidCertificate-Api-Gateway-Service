@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VaccineDto extends IssuableVaccineDto {
-    @Schema(type = "boolean")
+    @Schema(type = "boolean", example = "true", description = "If vaccination is accepted by the BAG and the EU.")
     private Boolean active;
 
     public VaccineDto(String productCode, String productDisplay, String prophylaxisCode, String prophylaxisDisplay, String authHolderCode, String authHolderDisplay, Boolean active) {

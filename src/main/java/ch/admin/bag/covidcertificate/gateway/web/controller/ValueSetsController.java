@@ -55,7 +55,7 @@ public class ValueSetsController {
     @GetMapping("/issuable-rapid-tests")
     @Operation(operationId = "issuableRapidTests",
             summary = "Gets a list of all issuable rapid tests. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable rapid tests defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
+            description = "Gets a list of all issuable rapid tests accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
                             required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
@@ -99,7 +99,7 @@ public class ValueSetsController {
     @GetMapping("/issuable-vaccines")
     @Operation(operationId = "issuableVaccines",
             summary = "Gets a list of all issuable vaccines. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable vaccines defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
+            description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
                             required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
