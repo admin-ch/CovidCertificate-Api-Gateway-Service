@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class IssuableRapidTestDto {
-    @Schema(type = "string")
+    @Schema(type = "string", example = "1232", description = "Code of rapid test as string.")
     private String code;
-    @Schema(type = "string")
+    @Schema(type = "string", example = "Abbott Rapid Diagnostics, Panbio Covid-19 Ag Rapid Test", description = "Manufacturer and display name of rapid test as string.")
     private String display;
 }
