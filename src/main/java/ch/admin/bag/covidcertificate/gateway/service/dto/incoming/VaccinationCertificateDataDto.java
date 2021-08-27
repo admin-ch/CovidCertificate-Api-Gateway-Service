@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class VaccinationCertificateDataDto {
-    @Schema(example= "68267", description = "name of the medicinal product as registered in the country.")
+    @Schema(example= "EU/1/20/1507", description = "name of the medicinal product as registered in the country.")
     private String medicinalProductCode;
     @Schema(example= "2", description = "number in a series of doses.")
     private Integer numberOfDoses;
