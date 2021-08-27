@@ -33,15 +33,7 @@ public class ValueSetsController {
     @GetMapping("/rapid-tests")
     @Operation(operationId = "rapidTests",
             summary = "Gets a list of all rapid tests. *Only available for testing on ABN.",
-            description = "Gets a list of all rapid tests based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
-            parameters = {
-                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
-                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
-                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
-                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
-                            schema = @Schema(type = "string", format = "Base64")
-                    )
-            }
+            description = "Gets a list of all rapid tests based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RapidTestDto.class))))
     public List<RapidTestDto> rapidTests() {
@@ -55,15 +47,7 @@ public class ValueSetsController {
     @GetMapping("/issuable-rapid-tests")
     @Operation(operationId = "issuableRapidTests",
             summary = "Gets a list of all issuable rapid tests. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable rapid tests accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
-            parameters = {
-                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
-                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
-                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
-                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
-                            schema = @Schema(type = "string", format = "Base64")
-                    )
-            }
+            description = "Gets a list of all issuable rapid tests accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableRapidTestDto.class))))
     public List<IssuableRapidTestDto> issuableRapidTests() {
@@ -77,15 +61,7 @@ public class ValueSetsController {
     @GetMapping("/vaccines")
     @Operation(operationId = "vaccines",
             summary = "Gets a list of all vaccines. *Only available for testing on ABN.",
-            description = "Gets a list of all vaccines based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
-            parameters = {
-                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
-                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
-                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
-                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
-                            schema = @Schema(type = "string", format = "Base64")
-                    )
-            }
+            description = "Gets a list of all vaccines based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = VaccineDto.class))))
     public List<VaccineDto> vaccines() {
@@ -99,15 +75,7 @@ public class ValueSetsController {
     @GetMapping("/issuable-vaccines")
     @Operation(operationId = "issuableVaccines",
             summary = "Gets a list of all issuable vaccines. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
-            parameters = {
-                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
-                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
-                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
-                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
-                            schema = @Schema(type = "string", format = "Base64")
-                    )
-            }
+            description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableVaccineDto.class))))
     public List<IssuableVaccineDto> issuableVaccines() {
