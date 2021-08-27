@@ -28,14 +28,28 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.DUPLICATE_UVCI;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_UVCI;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/covidcertificate/revoke")
 @RequiredArgsConstructor
+@ApiResponse(
+        responseCode = "403",
+        content = @Content(
+                schema = @Schema(implementation = RestError.class),
+                mediaType = "application/json",
+                examples = {
+                        @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
+                        @ExampleObject(name = "MISSING_BEARER_JSON", value = MISSING_BEARER_JSON),
+                        @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
+                        @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER", value = INVALID_IDENTITY_USER_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER_ROLE", value = INVALID_IDENTITY_USER_ROLE_JSON),
+                        @ExampleObject(name = "INVALID_OTP_LENGTH", value = INVALID_OTP_LENGTH_JSON),
+                })
+)
 public class CovidCertificateRevocationController {
 
     private final CovidCertificateRevocationService service;
