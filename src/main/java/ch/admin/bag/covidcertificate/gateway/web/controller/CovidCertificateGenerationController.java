@@ -33,6 +33,21 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RestController
 @RequestMapping(value = "api/v1/covidcertificate")
 @RequiredArgsConstructor
+@ApiResponse(
+        responseCode = "403",
+        content = @Content(
+                schema = @Schema(implementation = RestError.class),
+                mediaType = "application/json",
+                examples = {
+                        @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
+                        @ExampleObject(name = "MISSING_BEARER_JSON", value = MISSING_BEARER_JSON),
+                        @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
+                        @ExampleObject(name = "SIGNATURE_PARSE_ERROR", value = SIGNATURE_PARSE_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER", value = INVALID_IDENTITY_USER_JSON),
+                        @ExampleObject(name = "INVALID_IDENTITY_USER_ROLE", value = INVALID_IDENTITY_USER_ROLE_JSON),
+                        @ExampleObject(name = "INVALID_OTP_LENGTH", value = INVALID_OTP_LENGTH_JSON),
+                })
+)
 public class CovidCertificateGenerationController {
 
     private final CovidCertificateGenerationService generationService;
