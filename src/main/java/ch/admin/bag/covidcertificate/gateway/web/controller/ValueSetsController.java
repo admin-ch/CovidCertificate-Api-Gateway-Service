@@ -2,6 +2,10 @@ package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.ValueSetsService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
@@ -18,11 +22,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -35,8 +39,8 @@ public class ValueSetsController {
     private final ValueSetsService valueSetsService;
     private final AuthorizationService authorizationService;
 
-    @PostMapping("/rapid-tests")
-    @Operation(operationId = "getRapidTests",
+    @GetMapping("/rapid-tests")
+    @Operation(operationId = "rapidTests",
             summary = "Gets a list of all rapid tests. *Only available for testing on ABN.",
             description = "Gets a list of all rapid tests based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
@@ -55,10 +59,10 @@ public class ValueSetsController {
         return valueSetsService.getRapidTests();
     }
 
-    @PostMapping("/issuable-rapid-tests")
-    @Operation(operationId = "getIssuableRapidTests",
+    @GetMapping("/issuable-rapid-tests")
+    @Operation(operationId = "issuableRapidTests",
             summary = "Gets a list of all issuable rapid tests. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable rapid tests defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
+            description = "Gets a list of all issuable rapid tests accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
                             required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
@@ -75,8 +79,8 @@ public class ValueSetsController {
         return valueSetsService.getIssuableRapidTests();
     }
 
-    @PostMapping("/vaccines")
-    @Operation(operationId = "getVaccines",
+    @GetMapping("/vaccines")
+    @Operation(operationId = "vaccines",
             summary = "Gets a list of all vaccines. *Only available for testing on ABN.",
             description = "Gets a list of all vaccines based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
@@ -95,10 +99,10 @@ public class ValueSetsController {
         return valueSetsService.getVaccines();
     }
 
-    @PostMapping("/issuable-vaccines")
-    @Operation(operationId = "getIssuableVaccines",
+    @GetMapping("/issuable-vaccines")
+    @Operation(operationId = "issuableVaccines",
             summary = "Gets a list of all issuable vaccines. *Only available for testing on ABN.",
-            description = "Gets a list of all issuable vaccines defined by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
+            description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body.",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
                             required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +

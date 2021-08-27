@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 public class TestCertificateDataDto {
     @Schema(example = "LP217198-3", description = "type of test. This field is only mandatory when it is a PCR test. If given with manufacturerCode as well, they must match otherwise there will be a 400 BAD REQUEST.")
     private String typeCode;
-    @Schema(example = "1065", description = "test manufacturer code. This should only be sent when it is not a PCR test, otherwise there will be a 400 BAD REQUEST.")
+    @Schema(example = "1232", description = "test manufacturer code. This should only be sent when it is not a PCR test, otherwise there will be a 400 BAD REQUEST.")
     private String manufacturerCode;
     @Schema(example = "2020-09-24T17:29:41Z", description = "date and time of the test sample collection. Format: ISO 8601 date incl. time.")
     private ZonedDateTime sampleDateTime;
