@@ -43,7 +43,7 @@ public class ValueSetsService {
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
         try {
             List<RapidTestDto> response = defaultWebClient
-                    .post()
+                    .get()
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<RapidTestDto>>() {})
@@ -66,7 +66,7 @@ public class ValueSetsService {
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
         try {
             List<IssuableRapidTestDto> response = defaultWebClient
-                    .post()
+                    .get()
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<IssuableRapidTestDto>>() {})
@@ -89,7 +89,7 @@ public class ValueSetsService {
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
         try {
             List<VaccineDto> response = defaultWebClient
-                    .post()
+                    .get()
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<VaccineDto>>() {})
@@ -112,7 +112,7 @@ public class ValueSetsService {
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
         try {
             List<IssuableVaccineDto> response = defaultWebClient
-                    .post()
+                    .get()
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<IssuableVaccineDto>>() {})
