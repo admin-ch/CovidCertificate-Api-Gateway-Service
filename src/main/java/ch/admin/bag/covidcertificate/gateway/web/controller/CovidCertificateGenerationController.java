@@ -97,9 +97,10 @@ public class CovidCertificateGenerationController {
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci());
-        log.info("fraud: risk=\"{}/{}\"",
-                createDto.getVaccinationInfo().get(0).getNumberOfDoses(),
-                createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses());
+        if (createDto.getVaccinationInfo().get(0).getNumberOfDoses()==1 &&
+                createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses()==1) {
+            log.info("fraud: risk=\"1/1\"");
+        }
         return covidCertificate;
     }
 
