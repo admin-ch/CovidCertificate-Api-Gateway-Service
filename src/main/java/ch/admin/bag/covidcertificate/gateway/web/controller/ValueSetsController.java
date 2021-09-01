@@ -1,14 +1,11 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
-import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
-import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
+import ch.admin.bag.covidcertificate.gateway.service.ValueSetsService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccineDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -28,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ValueSetsController {
 
-    private final AuthorizationService authorizationService;
+    private final ValueSetsService valueSetsService;
 
     @GetMapping("/rapid-tests")
     @Operation(operationId = "rapidTests",
@@ -38,10 +34,7 @@ public class ValueSetsController {
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RapidTestDto.class))))
     public List<RapidTestDto> rapidTests() {
         log.info("Call of rapidTests for value sets");
-        var rapidTests = new ArrayList<RapidTestDto>();
-        rapidTests.add(new RapidTestDto("1341", "Qingdao Hightop Biotech Co., Ltd, SARS-CoV-2 Antigen Rapid Test (Immunochromatography)", true));
-        rapidTests.add(new RapidTestDto("1065", "Becton Dickinson, BD Veritor? System for Rapid Detection of SARS CoV 2", true));
-        return rapidTests;
+        return valueSetsService.getRapidTests();
     }
 
     @GetMapping("/issuable-rapid-tests")
@@ -52,10 +45,7 @@ public class ValueSetsController {
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableRapidTestDto.class))))
     public List<IssuableRapidTestDto> issuableRapidTests() {
         log.info("Call of issuableRapidTests for value sets");
-        var issuableRapidTests = new ArrayList<IssuableRapidTestDto>();
-        issuableRapidTests.add(new IssuableRapidTestDto("1341", "Qingdao Hightop Biotech Co., Ltd, SARS-CoV-2 Antigen Rapid Test (Immunochromatography)"));
-        issuableRapidTests.add(new IssuableRapidTestDto("1065", "Becton Dickinson, BD Veritor? System for Rapid Detection of SARS CoV 2"));
-        return issuableRapidTests;
+        return valueSetsService.getIssuableRapidTests();
     }
 
     @GetMapping("/vaccines")
@@ -66,10 +56,7 @@ public class ValueSetsController {
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = VaccineDto.class))))
     public List<VaccineDto> vaccines() {
         log.info("Call of vaccines for value sets");
-        var vaccines = new ArrayList<VaccineDto>();
-        vaccines.add(new VaccineDto("EU/1/20/1528", "Comirnaty", "1119349007", "SARS-CoV-2 mRNA vaccine", "ORG-100030215", "Biontech Manufacturing GmbH", true));
-        vaccines.add(new VaccineDto("EU/1/20/1507", "COVID-19 Vaccine Moderna", "1119349007", "SARS-CoV-2 mRNA vaccine", "ORG-100031184", "Moderna Biotech Spain S.L.", true));
-        return vaccines;
+        return valueSetsService.getVaccines();
     }
 
     @GetMapping("/issuable-vaccines")
@@ -80,9 +67,6 @@ public class ValueSetsController {
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableVaccineDto.class))))
     public List<IssuableVaccineDto> issuableVaccines() {
         log.info("Call of issuableVaccines for value sets");
-        var issuableVaccines = new ArrayList<IssuableVaccineDto>();
-        issuableVaccines.add(new IssuableVaccineDto("EU/1/20/1528", "Comirnaty", "1119349007", "SARS-CoV-2 mRNA vaccine", "ORG-100030215", "Biontech Manufacturing GmbH"));
-        issuableVaccines.add(new IssuableVaccineDto("EU/1/20/1507", "COVID-19 Vaccine Moderna", "1119349007", "SARS-CoV-2 mRNA vaccine", "ORG-100031184", "Moderna Biotech Spain S.L."));
-        return issuableVaccines;
+        return valueSetsService.getIssuableVaccines();
     }
 }
