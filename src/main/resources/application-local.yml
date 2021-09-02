@@ -15,7 +15,7 @@ spring:
             issuer-uri: "http://localhost:8180"
 
 
-ha-authcode-generation-service:
+cc-management-service:
   uri: http://localhost:8120/
 
   monitor:

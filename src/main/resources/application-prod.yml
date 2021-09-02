@@ -14,7 +14,7 @@ spring:
             issuer-uri: "https://identity.bit.admin.ch/realms/BAG-CovidCertificate"
 
 
-ha-authcode-generation-service:
+cc-management-service:
   uri: "https://cc-management-service.app.cfap02.atlantica.admin.ch/"
 
   monitor:

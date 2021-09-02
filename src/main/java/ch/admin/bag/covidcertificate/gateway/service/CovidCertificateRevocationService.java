@@ -20,7 +20,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class CovidCertificateRevocationService {
 
-    @Value("${ha-authcode-generation-service.uri}")
+    @Value("${cc-management-service.uri}")
     private String serviceUri;
 
     private final WebClient defaultWebClient;

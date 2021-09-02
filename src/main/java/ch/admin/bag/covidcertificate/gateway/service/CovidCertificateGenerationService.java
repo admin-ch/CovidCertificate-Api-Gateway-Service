@@ -20,7 +20,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class CovidCertificateGenerationService {
 
-    @Value("${ha-authcode-generation-service.uri}")
+    @Value("${cc-management-service.uri}")
     private String serviceUri;
 
     private final WebClient defaultWebClient;
@@ -51,7 +51,7 @@ public class CovidCertificateGenerationService {
                     .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null")))
                     .block();
 
-            log.trace("AuthCodeGenerationService Response: {}", response);
+            log.trace("CovidCertificateGenerationService Response: {}", response);
             return response;
 
         } catch (WebClientResponseException e) {

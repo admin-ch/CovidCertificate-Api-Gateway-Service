@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CcApiGatewayServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="cc-api-gateway-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.gateway.CcApiGatewayServiceApplication" />
+    <option name="ACTIVE_PROFILES" value="local,mock-identity-authorization" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
