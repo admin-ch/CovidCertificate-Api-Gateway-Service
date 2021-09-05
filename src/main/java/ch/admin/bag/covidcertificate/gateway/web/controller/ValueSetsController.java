@@ -28,7 +28,7 @@ public class ValueSetsController {
 
     @GetMapping("/rapid-tests")
     @Operation(operationId = "rapidTests",
-            summary = "Gets a list of all rapid tests. *Only available for testing on ABN.",
+            summary = "Gets a list of all rapid tests.",
             description = "Gets a list of all rapid tests based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RapidTestDto.class))))
@@ -39,7 +39,7 @@ public class ValueSetsController {
 
     @GetMapping("/issuable-rapid-tests")
     @Operation(operationId = "issuableRapidTests",
-            summary = "Gets a list of all issuable rapid tests. *Only available for testing on ABN.",
+            summary = "Gets a list of all issuable rapid tests.",
             description = "Gets a list of all issuable rapid tests accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableRapidTestDto.class))))
@@ -50,7 +50,7 @@ public class ValueSetsController {
 
     @GetMapping("/vaccines")
     @Operation(operationId = "vaccines",
-            summary = "Gets a list of all vaccines. *Only available for testing on ABN.",
+            summary = "Gets a list of all vaccines.",
             description = "Gets a list of all vaccines based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = VaccineDto.class))))
@@ -61,7 +61,7 @@ public class ValueSetsController {
 
     @GetMapping("/issuable-vaccines")
     @Operation(operationId = "issuableVaccines",
-            summary = "Gets a list of all issuable vaccines. *Only available for testing on ABN.",
+            summary = "Gets a list of all issuable vaccines.",
             description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body."
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableVaccineDto.class))))
