@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER_ROLE;
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -37,12 +35,12 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
 
-        QueryUsersResponse response = queryUser(uuid, idpSource);
-        if (checkUserExists(response)) {
+        QueryUsersResponse queryUsersResponse = queryUser(uuid, idpSource);
+        if (checkUserExists(queryUsersResponse)) {
             log.info("User does not exist in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
-        if (!hasUserRoleSuperUserOrCreator(response)) {
+        if (!hasUserRoleSuperUserOrCreator(queryUsersResponse)) {
             log.info("User does not have required role in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
         }
@@ -69,13 +67,10 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
 
     protected boolean hasUserRoleSuperUserOrCreator(QueryUsersResponse response) {
         try {
-            AtomicBoolean result = new AtomicBoolean(false);
-            response.getReturns().forEach(
-                    user -> user.getProfiles().stream().filter(
-                            profile -> profile.getState().equals(ProfileState.ACTIVE)).forEach(
-                                    profile -> result.set(profile.getAuthorizations().stream().anyMatch(
-                            this::isRoleSuperUserOrCreator))));
-            return result.get();
+            return response.getReturns().stream().anyMatch(
+                    user -> user.getProfiles().stream().anyMatch(
+                            profile -> profile.getState().equals(ProfileState.ACTIVE) &&
+                                    profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
         } catch (Exception e) {
             log.error("Error when checking eIAM user role exists.", e);
             throw e;
