@@ -4,6 +4,7 @@ import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMConfig;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Authorization;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.ProfileState;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.QueryUsersResponse;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
@@ -12,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER_ROLE;
@@ -24,7 +23,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 @RequiredArgsConstructor
 public class DefaultIdentityAuthorizationClient implements IdentityAuthorizationClient {
-    private static final String ROLE = "9500.GGG-Covidcertificate.CertificateCreator";
+    private static final String ROLE_CREATOR = "9500.GGG-Covidcertificate.CertificateCreator";
     private static final String ROLE_SUPERUSER = "9500.GGG-Covidcertificate.SuperUserCC";
 
     private final EIAMClient eiamClient;
@@ -36,12 +35,12 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
 
-        QueryUsersResponse response = queryUser(uuid, idpSource);
-        if (checkUserExists(response)) {
+        QueryUsersResponse queryUsersResponse = queryUser(uuid, idpSource);
+        if (checkUserExists(queryUsersResponse)) {
             log.info("User does not exist in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
-        if (!checkUserRoleExists(response)) {
+        if (!hasUserRoleSuperUserOrCreator(queryUsersResponse)) {
             log.info("User does not have required role in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
         }
@@ -66,16 +65,20 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         }
     }
 
-    private boolean checkUserRoleExists(QueryUsersResponse response) {
+    protected boolean hasUserRoleSuperUserOrCreator(QueryUsersResponse response) {
         try {
-            List<Authorization> authorizations = response.getReturns().get(0)
-                    .getProfiles().get(0)
-                    .getAuthorizations();
-            return (authorizations.stream().anyMatch(authorization ->
-                    authorization.getRole().getExtId().equals(ROLE) || authorization.getRole().getExtId().equals(ROLE_SUPERUSER)));
+            return response.getReturns().stream().anyMatch(
+                    user -> user.getProfiles().stream().anyMatch(
+                            profile -> profile.getState().equals(ProfileState.ACTIVE) &&
+                                    profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
         } catch (Exception e) {
             log.error("Error when checking eIAM user role exists.", e);
             throw e;
         }
+    }
+
+    private boolean isRoleSuperUserOrCreator(Authorization authorization) {
+        return authorization.getRole().getExtId().equals(ROLE_CREATOR) ||
+                authorization.getRole().getExtId().equals(ROLE_SUPERUSER);
     }
 }
