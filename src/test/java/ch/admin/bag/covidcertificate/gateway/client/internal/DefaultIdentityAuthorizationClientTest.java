@@ -122,6 +122,7 @@ class DefaultIdentityAuthorizationClientTest {
         var user = new User();
         var profiles = user.getProfiles();
         var profile = new Profile();
+        profile.setState(ProfileState.ACTIVE);
         var authorizations = profile.getAuthorizations();
         var authorization = new Authorization();
         var role = new Role();
