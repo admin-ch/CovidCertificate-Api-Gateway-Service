@@ -30,6 +30,13 @@ public class DefaultIdentityAuthorizationClientProfileTest {
     }
 
     @Test
+    void hasUserRoleSuperUserOrCreator_not_authorized_no_active() throws JAXBException, IOException {
+        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_no_active.xml");
+        boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
+        assertThat(isSuperUserOrCreator).isFalse();
+    }
+
+    @Test
     void hasUserRoleSuperUserOrCreator_not_authorized_two_active_ok() throws JAXBException, IOException {
         QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_two_active.xml");
         boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);

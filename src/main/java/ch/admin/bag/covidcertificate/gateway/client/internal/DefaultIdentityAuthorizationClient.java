@@ -44,6 +44,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
             log.info("User does not have required role in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
         }
+        log.info("Authorization for uuid {} from idpSource {} checked successfully.", uuid, idpSource);
     }
 
     private QueryUsersResponse queryUser(String uuid, String idpSource) {
