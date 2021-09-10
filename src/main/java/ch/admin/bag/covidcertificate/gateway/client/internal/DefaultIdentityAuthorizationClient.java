@@ -33,18 +33,24 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         if (!StringUtils.hasText(uuid) || !StringUtils.hasText(idpSource)) {
             log.info("User not valid {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
+        } else {
+            log.trace("User info is valid");
         }
 
         QueryUsersResponse queryUsersResponse = queryUser(uuid, idpSource);
         if (checkUserExists(queryUsersResponse)) {
             log.info("User does not exist in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
+        } else {
+            log.trace("User exists");
         }
         if (!hasUserRoleSuperUserOrCreator(queryUsersResponse)) {
             log.info("User does not have required role in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
             throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
+        } else {
+            log.trace("User has right roles");
         }
-        log.info("Authorization for uuid {} from idpSource {} checked successfully.", uuid, idpSource);
+        log.trace("Authorization checked successfully.");
     }
 
     private QueryUsersResponse queryUser(String uuid, String idpSource) {

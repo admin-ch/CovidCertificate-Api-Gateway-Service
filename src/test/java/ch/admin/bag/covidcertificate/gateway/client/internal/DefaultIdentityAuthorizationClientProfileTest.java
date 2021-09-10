@@ -23,15 +23,22 @@ public class DefaultIdentityAuthorizationClientProfileTest {
     }
 
     @Test
-    void hasUserRoleSuperUserOrCreator_not_authorized_ok() throws JAXBException, IOException {
-        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized.xml");
+    void hasUserRoleSuperUserOrCreator_not_authorized_first_active_ok() throws JAXBException, IOException {
+        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_first_active.xml");
+        boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
+        assertThat(isSuperUserOrCreator).isFalse();
+    }
+
+    @Test
+    void hasUserRoleSuperUserOrCreator_not_authorized_second_active_ok() throws JAXBException, IOException {
+        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_second_active.xml");
         boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
         assertThat(isSuperUserOrCreator).isFalse();
     }
 
     @Test
     void hasUserRoleSuperUserOrCreator_not_authorized_no_active() throws JAXBException, IOException {
-        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_no_active.xml");
+        QueryUsersResponse response = readExampleResponse("test_profile_not_authorized_none_active.xml");
         boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
         assertThat(isSuperUserOrCreator).isFalse();
     }
@@ -44,8 +51,15 @@ public class DefaultIdentityAuthorizationClientProfileTest {
     }
 
     @Test
-    void hasUserRoleSuperUserOrCreator_authorized_ok() throws JAXBException, IOException {
-        QueryUsersResponse response = readExampleResponse("test_profile_authorized.xml");
+    void hasUserRoleSuperUserOrCreator_authorized_first_active_ok() throws JAXBException, IOException {
+        QueryUsersResponse response = readExampleResponse("test_profile_authorized_first_active.xml");
+        boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
+        assertThat(isSuperUserOrCreator).isTrue();
+    }
+
+    @Test
+    void hasUserRoleSuperUserOrCreator_authorized_second_active_ok() throws JAXBException, IOException {
+        QueryUsersResponse response = readExampleResponse("test_profile_authorized_second_active.xml");
         boolean isSuperUserOrCreator = authorizationClient.hasUserRoleSuperUserOrCreator(response);
         assertThat(isSuperUserOrCreator).isTrue();
     }
