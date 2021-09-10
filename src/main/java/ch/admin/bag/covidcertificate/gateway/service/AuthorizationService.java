@@ -24,10 +24,14 @@ public class AuthorizationService {
     public String validateAndGetId(DtoWithAuthorization dtoWithAuthorization, String ipAddress) throws InvalidBearerTokenException {
         var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
         if (allowedCommonNamesForIdentity.contains(commonName)) {
+            log.trace("Common name is part of configured list");
             if (dtoWithAuthorization.getIdentity() != null) {
+                log.trace("Identity exists, checking authorisation");
                 identityAuthorizationClient.authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
                 return dtoWithAuthorization.getIdentity().getUuid();
             }
+        } else {
+            log.trace("Checking access via token.");
         }
         return bearerTokenValidationService.validate(dtoWithAuthorization.getOtp(), ipAddress);
     }
