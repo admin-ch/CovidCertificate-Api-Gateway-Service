@@ -64,6 +64,7 @@ public class ErrorList {
     public static final String INVALID_STANDARDISED_FAMILY_NAME = ERROR_CODE_KEY + 478 + "," + ERROR_MESSAGE_KEY + "Invalid family name! The standardised family name exceeds 80 chars}";
     public static final String INVALID_APP_CODE = ERROR_CODE_KEY + 479 + "," + ERROR_MESSAGE_KEY + "App code is in an invalid format.}";
     public static final String INVALID_PRINT_FOR_TEST = ERROR_CODE_KEY + 488 + "," + ERROR_MESSAGE_KEY + "Print is not available for test certificates}";
+    public static final String INVALID_DATE_OF_BIRTH_IN_FUTURE = ERROR_CODE_KEY + 489 + "," + ERROR_MESSAGE_KEY + "Invalid dateOfBirth! Date cannot be in the future}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
