@@ -105,7 +105,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString(), isNull());
         }
 
         @Test
@@ -120,8 +120,8 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString(), isNull());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString(), isNull());
         }
 
         @Test
@@ -138,7 +138,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(VaccinationCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION), any(), anyString(), isNull());
         }
 
         @Test
@@ -172,7 +172,7 @@ class CovidCertificateGenerationControllerTest {
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withOtp() throws Exception {
+        void createsTestCertificateSuccessfully__withOtp() throws Exception {
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -181,11 +181,11 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString(), isNull());
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withOtpAndAddress() throws Exception {
+        void createsTestCertificateSuccessfully__withOtpAndAddress() throws Exception {
             ReflectionTestUtils.setField(this.testCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
 
             mockMvc.perform(post(URL)
@@ -196,12 +196,12 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString(), isNull());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString(), isNull());
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withIdentity() throws Exception {
+        void createsTestCertificateSuccessfully__withIdentity() throws Exception {
             var identityDto = fixture.create(IdentityDto.class);
             ReflectionTestUtils.setField(this.testCreateDto, "identity", identityDto);
             ReflectionTestUtils.setField(this.testCreateDto, "otp", "");
@@ -214,7 +214,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(TestCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_TEST), any(), anyString(), isNull());
         }
 
         @Test
@@ -248,7 +248,7 @@ class CovidCertificateGenerationControllerTest {
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withOtp() throws Exception {
+        void createsRecoveryCertificateSuccessfully__withOtp() throws Exception {
             mockMvc.perform(post(URL)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -257,11 +257,11 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), isNull());
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withOtpAndAddress() throws Exception {
+        void createsRecoveryCertificateSuccessfully__withOtpAndAddress() throws Exception {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
 
             mockMvc.perform(post(URL)
@@ -272,12 +272,12 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), isNull());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString(), isNull());
         }
 
         @Test
-        void createsVaccineCertificateSuccessfully__withIdentity() throws Exception {
+        void createsRecoveryCertificateSuccessfully__withIdentity() throws Exception {
             var identityDto = fixture.create(IdentityDto.class);
             ReflectionTestUtils.setField(this.recoveryCreateDto, "identity", identityDto);
             ReflectionTestUtils.setField(this.recoveryCreateDto, "otp", "");
@@ -290,7 +290,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, times(1)).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), isNull());
         }
 
         @Test
