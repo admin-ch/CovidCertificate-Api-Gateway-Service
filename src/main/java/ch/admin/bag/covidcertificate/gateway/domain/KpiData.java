@@ -19,11 +19,13 @@ public class KpiData {
     String type;
     String value;
     String uvci;
+    String details;
 
-    public KpiData(LocalDateTime timestamp, String type, String value, String uvci) {
+    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details) {
         this.timestamp = timestamp;
         this.type = type;
         this.value = value;
         this.uvci = uvci;
+        this.details = details;
     }
 }
