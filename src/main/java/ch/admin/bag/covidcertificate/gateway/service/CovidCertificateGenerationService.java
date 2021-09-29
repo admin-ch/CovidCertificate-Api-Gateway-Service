@@ -4,9 +4,11 @@ import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
 import ch.admin.bag.covidcertificate.gateway.service.util.WebClientUtils;
+import ch.admin.bag.covidcertificate.gateway.web.config.CustomHeaderAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -39,9 +41,13 @@ public class CovidCertificateGenerationService {
 
     private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String url) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/covidcertificate/" + url);
-
         String uri = builder.toUriString();
         log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));
+
+        //TODO: Set the systemSource to ApiPlatform if the commonName matches with the configured commonName in the properties
+        //var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
+        createDto.setSystemSource(SystemSource.ApiGateway);
+
         try {
             CovidCertificateCreateResponseDto response = defaultWebClient.post()
                     .uri(uri)
