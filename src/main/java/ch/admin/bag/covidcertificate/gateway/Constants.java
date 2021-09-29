@@ -10,6 +10,8 @@ public class Constants {
     public static final String KPI_UUID_KEY = "uuid";
     public static final String KPI_TIMESTAMP_KEY = "ts";
     public static final String KPI_TYPE_KEY = "type";
+    public static final String KPI_COUNTRY = "country";
+    public static final String KPI_DETAILS_KEY = "details";
     public static final String KPI_CERT_KEY = "cert";
     public static final String KPI_CREATE_CERTIFICATE_TYPE = "cc";
     public static final String KPI_REVOKE_CERTIFICATE_TYPE = "re";

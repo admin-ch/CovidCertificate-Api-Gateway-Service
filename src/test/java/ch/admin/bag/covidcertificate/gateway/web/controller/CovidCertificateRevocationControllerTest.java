@@ -75,7 +75,7 @@ class CovidCertificateRevocationControllerTest {
 
         verify(authorizationService, times(1)).validateAndGetId(any(), any());
         verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString());
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
     }
 
     @Test
@@ -90,7 +90,7 @@ class CovidCertificateRevocationControllerTest {
 
         verify(authorizationService, times(1)).validateAndGetId(any(), any());
         verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString());
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
     }
 
     @Test
@@ -106,6 +106,6 @@ class CovidCertificateRevocationControllerTest {
 
         verify(authorizationService, times(1)).validateAndGetId(any(), any());
         verify(revocationService, never()).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString());
+        verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(),isNull(),isNull());
     }
 }

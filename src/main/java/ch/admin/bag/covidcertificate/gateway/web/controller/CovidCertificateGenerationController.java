@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
+import ch.admin.bag.covidcertificate.gateway.domain.TestType;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
@@ -97,7 +100,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci());
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
         if (createDto.getVaccinationInfo().get(0).getNumberOfDoses()==1 &&
                 createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses()==1) {
             log.info("fraud: {}", kv("risk", "1/1"));
@@ -149,7 +152,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_TEST, userExtId, createDto, covidCertificate.getUvci());
+        logTestCertificateGenerationKpi(createDto, userExtId, covidCertificate.getUvci());
         return covidCertificate;
     }
 
@@ -194,24 +197,56 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci());
+        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(), null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
         return covidCertificate;
     }
 
-    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci) {
+
+    public void logTestCertificateGenerationKpi(TestCertificateCreateDto createDto, String userExtId, String uvci) {
+        var typeCode = Arrays.stream(TestType.values())
+                .filter(testType -> Objects.equals(testType.typeCode, createDto.getTestInfo().get(0).getTypeCode()))
+                .findFirst();
+        String typeCodeDetailString = null;
+        if (typeCode.isPresent() && typeCode.get().equals(TestType.PCR)) {
+            typeCodeDetailString = "pcr";
+        } else if (typeCode.isPresent() && typeCode.get().equals(TestType.RAPID_TEST)) {
+            typeCodeDetailString = "rapid";
+        }
+        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, typeCodeDetailString, createDto.getTestInfo().get(0).getMemberStateOfTest());
+    }
+
+    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
         LocalDateTime timestamp = LocalDateTime.now();
-        kpiDataService.saveKpiData(timestamp, type, userExtId, uvci);
+        kpiDataService.saveKpiData(timestamp, type, userExtId, uvci, details, country);
+        var timestampKVPair = kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT));
+        var systemKVPair = kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API);
+        var typeKVPair = kv(KPI_TYPE_KEY, type);
+        var detailsKVPair = kv(KPI_DETAILS_KEY, details);
+        var kpiCountryKVPair = kv(KPI_COUNTRY, country);
+        var uuidKVPair = kv(KPI_UUID_KEY, userExtId);
+
         if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
-            log.info("kpi: {} {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
-                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId), kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender()));
-            kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci);
+            var cantonKVPair = kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender());
+            if(details == null){
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
+            }else{
+                log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair,  detailsKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
+            }
+            kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details, country);
         } else if (StringUtils.hasText(createDto.getAppCode())) {
-            log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
-                    kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY), kv(KPI_UUID_KEY, userExtId));
-            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci);
+            var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY);
+            if(details == null){
+                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, uuidKVPair, kpiCountryKVPair);
+            }else{
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
+            }
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci, details, country);
         } else {
-            log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API),
-                    kv(KPI_TYPE_KEY, type), kv(KPI_UUID_KEY, userExtId));
+            if(details == null){
+                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, kpiCountryKVPair);
+            }else{
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
+            }
         }
     }
 }
