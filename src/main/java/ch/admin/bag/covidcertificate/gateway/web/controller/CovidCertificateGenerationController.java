@@ -100,7 +100,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci());
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
         if (createDto.getVaccinationInfo().get(0).getNumberOfDoses()==1 &&
                 createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses()==1) {
             log.info("fraud: {}", kv("risk", "1/1"));
@@ -197,7 +197,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci());
+        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(), null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
         return covidCertificate;
     }
 
@@ -212,43 +212,40 @@ public class CovidCertificateGenerationController {
         } else if (typeCode.isPresent() && typeCode.get().equals(TestType.RAPID_TEST)) {
             typeCodeDetailString = "rapid";
         }
-        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, typeCodeDetailString);
+        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, typeCodeDetailString, createDto.getTestInfo().get(0).getMemberStateOfTest());
     }
 
-    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci) {
-        logKpi(type, userExtId, createDto, uvci, null);
-    }
-
-    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci, String details) {
+    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
         LocalDateTime timestamp = LocalDateTime.now();
-        kpiDataService.saveKpiData(timestamp, type, userExtId, uvci, details);
+        kpiDataService.saveKpiData(timestamp, type, userExtId, uvci, details, country);
         var timestampKVPair = kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT));
         var systemKVPair = kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API);
         var typeKVPair = kv(KPI_TYPE_KEY, type);
         var detailsKVPair = kv(KPI_DETAILS_KEY, details);
+        var kpiCountryKVPair = kv(KPI_COUNTRY, country);
         var uuidKVPair = kv(KPI_UUID_KEY, userExtId);
 
         if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
             var cantonKVPair = kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender());
             if(details == null){
-                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, cantonKVPair);
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
             }else{
-                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair,  detailsKVPair, uuidKVPair, cantonKVPair);
+                log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair,  detailsKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
             }
-            kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details);
+            kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details, country);
         } else if (StringUtils.hasText(createDto.getAppCode())) {
             var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY);
             if(details == null){
-                log.info("kpi: {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, uuidKVPair);
+                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, uuidKVPair, kpiCountryKVPair);
             }else{
-                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, detailsKVPair, uuidKVPair);
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
             }
-            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci, details);
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci, details, country);
         } else {
             if(details == null){
-                log.info("kpi: {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair);
+                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, kpiCountryKVPair);
             }else{
-                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair);
+                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
             }
         }
     }
