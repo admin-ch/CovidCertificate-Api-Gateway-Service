@@ -34,3 +34,4 @@ eiam-admin-service:
   truststore-password: ${vcap.services.cc-eiam-admin-service.credentials.truststore-password}
 
 allowed-common-names-for-identity: ${vcap.services.cc-api-gateway-service-allowed-cn-identity.credentials.cn}
+allowed-common-names-for-system-source: ${vcap.services.cc-api-gateway-service-allowed-cn-system-source.credentials.cn}
