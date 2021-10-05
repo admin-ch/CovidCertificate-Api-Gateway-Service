@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Service
@@ -24,6 +26,9 @@ public class CovidCertificateGenerationService {
 
     @Value("${cc-management-service.uri}")
     private String serviceUri;
+
+    @Value("#{'${allowed-common-names-for-system-source}'.split(',')}")
+    private List<String> allowedCommonNamesForSystemSource;
 
     private final WebClient defaultWebClient;
 
@@ -40,13 +45,20 @@ public class CovidCertificateGenerationService {
     }
 
     private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String url) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/covidcertificate/" + url);
-        String uri = builder.toUriString();
+        final var uri = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/covidcertificate/" + url).toUriString();
         log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));
 
-        //TODO: Set the systemSource to ApiPlatform if the commonName matches with the configured commonName in the properties
-        //var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
-        createDto.setSystemSource(SystemSource.ApiGateway);
+        if (createDto.getSystemSource() != null) {
+            log.debug("SystemSource set in request. Checking CommonName...");
+            var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
+            if (allowedCommonNamesForSystemSource.contains(commonName) && SystemSource.ApiPlatform.equals(createDto.getSystemSource())) {
+                log.debug("SystemSource set to ApiPlatform by {}", commonName);
+            } else {
+                createDto.setSystemSource(SystemSource.ApiGateway);
+            }
+        } else {
+            createDto.setSystemSource(SystemSource.ApiGateway);
+        }
 
         try {
             CovidCertificateCreateResponseDto response = defaultWebClient.post()
