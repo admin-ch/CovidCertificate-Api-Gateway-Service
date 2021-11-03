@@ -21,6 +21,7 @@ public class Constants {
     public static final String KPI_TYPE_VACCINATION = "v";
     public static final String KPI_TYPE_TEST = "t";
     public static final String KPI_TYPE_RECOVERY = "r";
+    public static final String KPI_TYPE_ANTIBODY = "a";
     public static final String KPI_CANTON = "p";
     public static final String KPI_TYPE_INAPP_DELIVERY = "ad";
 
@@ -29,4 +30,6 @@ public class Constants {
     public static final String SEC_KPI_IDP_SOURCE = "idp";
     public static final String SEC_KPI_OTP_JWT_ID = "jwtId";
     public static final String SEC_KPI_OTP_TYPE = "otpType";
+
+    public static final String ISO_3166_1_ALPHA_2_CODE_SWITZERLAND = "CH";
 }
