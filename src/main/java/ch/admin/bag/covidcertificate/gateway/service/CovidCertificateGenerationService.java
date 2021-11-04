@@ -44,6 +44,10 @@ public class CovidCertificateGenerationService {
         return createCovidCertificate(createDto, "vaccination");
     }
 
+    public CovidCertificateCreateResponseDto createCovidCertificate(AntibodyCertificateCreateDto createDto) {
+        return createCovidCertificate(createDto, "antibody");
+    }
+
     private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String url) {
         final var uri = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/covidcertificate/" + url).toUriString();
         log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));

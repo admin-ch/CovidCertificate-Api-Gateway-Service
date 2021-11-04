@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
+import ch.admin.bag.covidcertificate.gateway.Constants;
 import ch.admin.bag.covidcertificate.gateway.domain.TestType;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
@@ -198,6 +199,50 @@ public class CovidCertificateGenerationController {
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
         logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(), null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
+        return covidCertificate;
+    }
+
+    @PostMapping("/antibody")
+    @Operation(operationId = "createAntibodyCertificate",
+            summary = "Creates an antibody certificate for the given data.",
+            description = "Creates an antibody certificate as a QR-Code and PDF. Performs an integrity check for each request based on headers and body.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
+                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
+                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
+                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
+                            schema = @Schema(type = "string", format = "Base64")
+                    )
+            })
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CovidCertificateCreateResponseDto.class)))
+    @ApiResponse(responseCode = "400",
+            content = @Content(
+                    schema = @Schema(implementation = RestError.class),
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "NO_PERSON_DATA", value = NO_PERSON_DATA),
+                            @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
+                            @ExampleObject(name = "INVALID_DATE_OF_BIRTH_IN_FUTURE", value = INVALID_DATE_OF_BIRTH_IN_FUTURE),
+                            @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_GIVEN_NAME", value = INVALID_STANDARDISED_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_SAMPLE_OR_RESULT_DATE_TIME", value = INVALID_SAMPLE_OR_RESULT_DATE_TIME),
+                            @ExampleObject(name = "INVALID_LANGUAGE", value = INVALID_LANGUAGE),
+                            @ExampleObject(name = "INVALID_ANTIBODY_INFO", value = INVALID_ANTIBODY_INFO_JSON),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
+                    }
+            )
+    )
+    public CovidCertificateCreateResponseDto create(@RequestBody AntibodyCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
+        log.info("Call of Create for recovery certificate");
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        createDto.validate();
+
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
+        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
