@@ -65,6 +65,10 @@ public class ErrorList {
     public static final String INVALID_APP_CODE = ERROR_CODE_KEY + 479 + "," + ERROR_MESSAGE_KEY + "App code is in an invalid format.}";
     public static final String INVALID_PRINT_FOR_TEST = ERROR_CODE_KEY + 488 + "," + ERROR_MESSAGE_KEY + "Print is not available for test certificates}";
     public static final String INVALID_DATE_OF_BIRTH_IN_FUTURE = ERROR_CODE_KEY + 489 + "," + ERROR_MESSAGE_KEY + "Invalid dateOfBirth! Date cannot be in the future}";
+    public static final int INVALID_ANTIBODY_INFO_CODE = 497;
+    public static final String INVALID_ANTIBODY_INFO_MESSAGE = "Invalid antibody info! Exactly one element is expected in the array.";
+    public static final RestError INVALID_ANTIBODY_INFO = new RestError(INVALID_ANTIBODY_INFO_CODE, INVALID_ANTIBODY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String INVALID_ANTIBODY_INFO_JSON = ERROR_CODE_KEY + INVALID_ANTIBODY_INFO_CODE + "," + ERROR_MESSAGE_KEY + INVALID_ANTIBODY_INFO_MESSAGE + "}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
