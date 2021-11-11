@@ -2,6 +2,8 @@ package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.dto.ReadValueSetsException;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodeDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
@@ -30,6 +32,7 @@ public class ValueSetsService {
     public static final String ISSUABLE_RAPID_TESTS_PATH = "api/v1/valuesets/issuable-rapid-tests";
     public static final String VACCINES_PATH = "api/v1/valuesets/vaccines";
     public static final String ISSUABLE_VACCINES_PATH = "api/v1/valuesets/issuable-vaccines";
+    public static final String COUNTRY_CODE_PATH = "api/v1/valuesets/countries";
 
     @Value("${cc-management-service.uri}")
     private String serviceUri;
@@ -116,6 +119,53 @@ public class ValueSetsService {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<IssuableVaccineDto>>() {})
+                    .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null")))
+                    .block();
+
+            log.trace("ValueSetsService Response: {}", response);
+            return response;
+
+        } catch (WebClientResponseException e) {
+            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
+            throw new ReadValueSetsException(errorResponse);
+        }
+    }
+
+    public CountryCodesDto getCountryCodes(){
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + COUNTRY_CODE_PATH);
+
+        String uri = builder.toUriString();
+        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        try {
+            CountryCodesDto response = defaultWebClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<CountryCodesDto>() {})
+                    .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null")))
+                    .block();
+
+            log.trace("ValueSetsService Response: {}", response);
+            return response;
+
+        } catch (WebClientResponseException e) {
+            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
+            throw new ReadValueSetsException(errorResponse);
+        }
+    }
+
+    public List<CountryCodeDto> getCountryCodesByLanguage(String language){
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + COUNTRY_CODE_PATH + "/" + language);
+
+        String uri = builder.toUriString();
+        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        try {
+            List<CountryCodeDto> response = defaultWebClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<CountryCodeDto>>() {})
                     .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null")))
                     .block();
 
