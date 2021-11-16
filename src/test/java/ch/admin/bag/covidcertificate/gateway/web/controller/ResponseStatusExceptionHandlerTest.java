@@ -25,7 +25,7 @@ class ResponseStatusExceptionHandlerTest {
     private TestResponseStatusExceptionHandlerWrapper testExceptionHanlder = new TestResponseStatusExceptionHandlerWrapper();
 
     @Test
-    public void createCertificateConflictReturnsRestError__withCreateCertificateException() {
+    void createCertificateConflictReturnsRestError__withCreateCertificateException() {
         var exception = mock(CreateCertificateException.class);
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
@@ -37,7 +37,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void createCertificateConflictReturnsRestError__withRevokeCertificateException() {
+    void createCertificateConflictReturnsRestError__withRevokeCertificateException() {
         var exception = mock(RevokeCertificateException.class);
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
@@ -49,7 +49,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void invalidBearerReturnsRestError() {
+    void invalidBearerReturnsRestError() {
         var exception = mock(InvalidBearerTokenException.class);
         var restError = new RestError(492, "test", HttpStatus.FORBIDDEN);
         when(exception.getError()).thenReturn(restError);
@@ -61,7 +61,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void notReadableHandlerReturnsInvalidValueMessage__ifInvalidFormatException() {
+    void notReadableHandlerReturnsInvalidValueMessage__ifInvalidFormatException() {
         final var testValue = "--VALUE--";
         var exception = mock(HttpMessageNotReadableException.class);
         var causedByException = new InvalidFormatException(mock(JsonParser.class), "", testValue, String.class);
@@ -74,7 +74,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void notReadableHandlerReturnsUnreadableMessage__ifNotInvalidFormatException() {
+    void notReadableHandlerReturnsUnreadableMessage__ifNotInvalidFormatException() {
         var exception = mock(HttpMessageNotReadableException.class);
         when(exception.getCause()).thenReturn(new RuntimeException());
 
@@ -85,7 +85,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void readValueSetsExceptionReturnRestError() {
+    void readValueSetsExceptionReturnRestError() {
         var exception = mock(ReadValueSetsException.class);
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
@@ -99,7 +99,7 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
-    public void returns500__onAnyException() {
+    void returns500__onAnyException() {
         var exception = mock(Exception.class);
         var responseEntity = this.testExceptionHanlder.handleException(exception);
         assertEquals(responseEntity.getStatusCode(),HttpStatus.INTERNAL_SERVER_ERROR);
