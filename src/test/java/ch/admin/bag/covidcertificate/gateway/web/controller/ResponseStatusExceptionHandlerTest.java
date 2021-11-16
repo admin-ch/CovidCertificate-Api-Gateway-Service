@@ -3,6 +3,7 @@ package ch.admin.bag.covidcertificate.gateway.web.controller;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
+import ch.admin.bag.covidcertificate.gateway.service.dto.ReadValueSetsException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -84,6 +85,20 @@ class ResponseStatusExceptionHandlerTest {
     }
 
     @Test
+    public void readValueSetsExceptionReturnRestError() {
+        var exception = mock(ReadValueSetsException.class);
+        var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
+        when(exception.getError()).thenReturn(restError);
+
+        var responseEntity = this.testExceptionHanlder.readValueSetsException(exception);
+        assertEquals(restError.getErrorCode(), Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
+        assertEquals(restError.getErrorMessage(), Objects.requireNonNull(responseEntity.getBody()).getErrorMessage());
+        assertEquals(restError.getHttpStatus(), Objects.requireNonNull(responseEntity.getStatusCode()));
+
+
+    }
+
+    @Test
     public void returns500__onAnyException() {
         var exception = mock(Exception.class);
         var responseEntity = this.testExceptionHanlder.handleException(exception);
@@ -107,6 +122,10 @@ class ResponseStatusExceptionHandlerTest {
 
         public ResponseEntity<RestError> notReadableRequestPayload(HttpMessageNotReadableException ex) {
             return responseStatusExceptionHandler.notReadableRequestPayload(ex);
+        }
+
+        public ResponseEntity<RestError> readValueSetsException(ReadValueSetsException ex) {
+            return responseStatusExceptionHandler.handleReadValueSetsException(ex);
         }
 
         public ResponseEntity<Object> handleException(Exception e) {

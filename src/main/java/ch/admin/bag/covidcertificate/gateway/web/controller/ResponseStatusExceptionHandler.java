@@ -3,6 +3,7 @@ package ch.admin.bag.covidcertificate.gateway.web.controller;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
+import ch.admin.bag.covidcertificate.gateway.service.dto.ReadValueSetsException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,11 @@ public class ResponseStatusExceptionHandler {
             error = new RestError(HttpStatus.BAD_REQUEST.value(), "Http message not readable", HttpStatus.BAD_REQUEST);
         }
         return handleError(error);
+    }
+
+    @ExceptionHandler(value = {ReadValueSetsException.class})
+    protected ResponseEntity<RestError> handleReadValueSetsException(ReadValueSetsException ex) {
+        return handleError(ex.getError());
     }
 
     @ExceptionHandler(value = {Exception.class})
