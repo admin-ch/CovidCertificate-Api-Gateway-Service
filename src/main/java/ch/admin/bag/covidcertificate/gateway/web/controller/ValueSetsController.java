@@ -1,6 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.service.ValueSetsService;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodeDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -68,5 +71,27 @@ public class ValueSetsController {
     public List<IssuableVaccineDto> issuableVaccines() {
         log.info("Call of issuableVaccines for value sets");
         return valueSetsService.getIssuableVaccines();
+    }
+
+    @GetMapping("/countries")
+    @Operation(operationId = "countryCodes",
+            summary = "Gets a list of all countryCodes for every language.",
+            description = "Gets a list of all countryCodes for every supported language. Performs an integrity check for each request based on headers and body."
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CountryCodesDto.class))))
+    public CountryCodesDto countryCodes() {
+        log.info("Call of getCountryCodes for value sets");
+        return valueSetsService.getCountryCodes();
+    }
+
+    @GetMapping("/countries/{language}")
+    @Operation(operationId = "countryCodesByLanguage",
+            summary = "Gets a list of all countryCodes for a specific language.",
+            description = "Gets a list of all countryCodes for a specific supported language. Performs an integrity check for each request based on headers and body."
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CountryCodeDto.class))))
+    public List<CountryCodeDto> countryCodeByLanguage(@PathVariable final String language) {
+        log.info("Call of getCountryCodesByLanguage for value sets");
+        return valueSetsService.getCountryCodesByLanguage(language);
     }
 }

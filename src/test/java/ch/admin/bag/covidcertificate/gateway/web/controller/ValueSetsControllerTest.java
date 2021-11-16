@@ -1,6 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.service.ValueSetsService;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodeDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -145,6 +148,51 @@ public class ValueSetsControllerTest {
                                       .andExpect(status().isOk());
 
             verify(valueSetsService, times(1)).getIssuableVaccines();
+        }
+    }
+
+    @Nested
+    class CountryCodeByValueSetTests {
+        private static final String URL = BASE_URL + "/countries";
+
+        private CountryCodesDto countryCodesDto;
+
+        @BeforeEach()
+        void initialize() {
+            this.countryCodesDto = fixture.create(CountryCodesDto.class);
+            when(valueSetsService.getCountryCodes()).thenReturn(countryCodesDto);
+        }
+
+        @Test
+        void getCountryCodes_Success() throws Exception {
+            mockMvc.perform(get(URL).accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());
+
+            verify(valueSetsService, times(1)).getCountryCodes();
+        }
+    }
+
+    @Nested
+    class CountryCodesByLanguageValueSetTests {
+        private static final String URL = BASE_URL + "/countries";
+
+        private List<CountryCodeDto> countryCodeDtoList;
+
+        @BeforeEach()
+        void initialize() {
+            CountryCodeDto countryCodeDto = fixture.create(CountryCodeDto.class);
+            this.countryCodeDtoList = List.of(countryCodeDto);
+            when(valueSetsService.getCountryCodesByLanguage(anyString())).thenReturn(countryCodeDtoList);
+        }
+
+        @Test
+        void getCountryCodes_Success() throws Exception {
+            mockMvc.perform(get(URL + "/de").accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());
+
+            verify(valueSetsService, times(1)).getCountryCodesByLanguage(anyString());
         }
     }
 }
