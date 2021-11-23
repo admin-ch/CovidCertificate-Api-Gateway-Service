@@ -109,6 +109,57 @@ public class CovidCertificateGenerationController {
         return covidCertificate;
     }
 
+    @PostMapping("/vaccination-tourist")
+    @Operation(operationId = "createVaccinationTouristCertificate",
+            summary = "Creates a WHO vaccination-tourist certificate for the given data.",
+            description = "Creates a WHO vaccination-tourist certificate as an QR-Code and PDF. Performs an integrity check for each request based on headers and body.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
+                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
+                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
+                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
+                            schema = @Schema(type = "string", format = "Base64")
+                    )
+            }
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CovidCertificateCreateResponseDto.class)))
+    @ApiResponse(responseCode = "400",
+            content = @Content(
+                    schema = @Schema(implementation = RestError.class),
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "NO_PERSON_DATA", value = NO_PERSON_DATA),
+                            @ExampleObject(name = "INVALID_DATE_OF_BIRTH", value = INVALID_DATE_OF_BIRTH),
+                            @ExampleObject(name = "INVALID_DATE_OF_BIRTH_IN_FUTURE", value = INVALID_DATE_OF_BIRTH_IN_FUTURE),
+                            @ExampleObject(name = "INVALID_MEDICINAL_PRODUCT", value = INVALID_MEDICINAL_PRODUCT),
+                            @ExampleObject(name = "INVALID_DOSES", value = INVALID_DOSES),
+                            @ExampleObject(name = "INVALID_VACCINATION_DATE", value = INVALID_VACCINATION_DATE),
+                            @ExampleObject(name = "INVALID_COUNTRY_OF_VACCINATION", value = INVALID_COUNTRY_OF_VACCINATION),
+                            @ExampleObject(name = "INVALID_GIVEN_NAME", value = INVALID_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_GIVEN_NAME", value = INVALID_STANDARDISED_GIVEN_NAME),
+                            @ExampleObject(name = "INVALID_FAMILY_NAME", value = INVALID_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_STANDARDISED_FAMILY_NAME", value = INVALID_STANDARDISED_FAMILY_NAME),
+                            @ExampleObject(name = "INVALID_VACCINATION_INFO", value = INVALID_VACCINATION_INFO_JSON),
+                            @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
+                            @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
+                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
+                    }
+            )
+    )
+    public CovidCertificateCreateResponseDto create(@RequestBody VaccinationTouristCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
+        log.info("Call of Create for WHO vaccination-tourist certificate");
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        createDto.validate();
+
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination());
+        if (createDto.getVaccinationTouristInfo().get(0).getNumberOfDoses()==1 &&
+                createDto.getVaccinationTouristInfo().get(0).getTotalNumberOfDoses()==1) {
+            log.info("fraud: {}", kv("risk", "1/1"));
+        }
+        return covidCertificate;
+    }
+
     @PostMapping("/test")
     @Operation(operationId = "createTestCertificate",
             summary = "Creates a test certificate for the given data.",

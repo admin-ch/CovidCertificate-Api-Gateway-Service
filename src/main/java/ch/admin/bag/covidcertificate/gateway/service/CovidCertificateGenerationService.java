@@ -44,6 +44,10 @@ public class CovidCertificateGenerationService {
         return createCovidCertificate(createDto, "vaccination");
     }
 
+    public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationTouristCertificateCreateDto createDto) {
+        return createCovidCertificate(createDto, "vaccination-tourist");
+    }
+
     public CovidCertificateCreateResponseDto createCovidCertificate(AntibodyCertificateCreateDto createDto) {
         return createCovidCertificate(createDto, "antibody");
     }
