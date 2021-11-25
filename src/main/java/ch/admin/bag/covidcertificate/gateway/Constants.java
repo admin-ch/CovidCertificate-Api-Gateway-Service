@@ -19,6 +19,7 @@ public class Constants {
     public static final String KPI_SYSTEM_API = "api";
     public static final DateTimeFormatter LOG_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     public static final String KPI_TYPE_VACCINATION = "v";
+    public static final String KPI_TYPE_VACCINATION_TOURIST = "vt";
     public static final String KPI_TYPE_TEST = "t";
     public static final String KPI_TYPE_RECOVERY = "r";
     public static final String KPI_TYPE_ANTIBODY = "a";
