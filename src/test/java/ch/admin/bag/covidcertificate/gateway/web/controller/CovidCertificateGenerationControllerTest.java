@@ -54,6 +54,7 @@ class CovidCertificateGenerationControllerTest {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         customizeVaccinationCertificateCreateDto(fixture);
+        customizeVaccinationTouristCertificateCreateDto(fixture);
         customizeTestCertificateCreateDto(fixture);
         customizeRecoveryCertificateCreateDto(fixture);
     }
@@ -154,6 +155,67 @@ class CovidCertificateGenerationControllerTest {
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), anyString(), anyString());
+        }
+    }
+
+    @Nested
+    class CreateVaccineTouristCertificateTests {
+        private static final String URL = BASE_URL + "vaccination-tourist";
+
+        private VaccinationTouristCertificateCreateDto vaccineTouristCreateDto;
+        private CovidCertificateCreateResponseDto vaccineTouristCreateResponse;
+
+        @BeforeEach()
+        void initialize() {
+            this.vaccineTouristCreateDto = fixture.create(VaccinationTouristCertificateCreateDto.class);
+            this.vaccineTouristCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class))).thenReturn(vaccineTouristCreateResponse);
+        }
+
+        @Test
+        void createsVaccineTouristCertificateSuccessfully__withOtp() throws Exception {
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.vaccineTouristCreateDto)))
+                    .andExpect(status().isOk());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(generationService, times(1)).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class));
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION_TOURIST), any(), anyString(), anyString(), anyString());
+        }
+
+        @Test
+        void createsVaccineTouristCertificateSuccessfully__withOtpAndAddress() throws Exception {
+            ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.vaccineTouristCreateDto)))
+                    .andExpect(status().isOk());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(generationService, times(1)).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class));
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION_TOURIST), any(), anyString(), anyString(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), anyString(), anyString(), anyString());
+        }
+
+        @Test
+        void createsVaccineTouristCertificateSuccessfully__withIdentity() throws Exception {
+            var identityDto = fixture.create(IdentityDto.class);
+            ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "identity", identityDto);
+            ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "otp", "");
+
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(this.vaccineTouristCreateDto)))
+                    .andExpect(status().isOk());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(generationService, times(1)).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class));
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_VACCINATION_TOURIST), any(), anyString(), anyString(), anyString());
         }
     }
 
