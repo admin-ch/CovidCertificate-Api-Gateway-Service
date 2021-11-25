@@ -87,12 +87,11 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "vaccination";
 
         private VaccinationCertificateCreateDto vaccineCreateDto;
-        private CovidCertificateCreateResponseDto vaccineCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.vaccineCreateDto = fixture.create(VaccinationCertificateCreateDto.class);
-            this.vaccineCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            CovidCertificateCreateResponseDto vaccineCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
             when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class))).thenReturn(vaccineCreateResponse);
         }
 
@@ -163,12 +162,11 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "vaccination-tourist";
 
         private VaccinationTouristCertificateCreateDto vaccineTouristCreateDto;
-        private CovidCertificateCreateResponseDto vaccineTouristCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.vaccineTouristCreateDto = fixture.create(VaccinationTouristCertificateCreateDto.class);
-            this.vaccineTouristCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            CovidCertificateCreateResponseDto vaccineTouristCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
             when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class))).thenReturn(vaccineTouristCreateResponse);
         }
 
@@ -224,12 +222,11 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "test";
 
         private TestCertificateCreateDto testCreateDto;
-        private CovidCertificateCreateResponseDto testCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.testCreateDto = fixture.create(TestCertificateCreateDto.class);
-            this.testCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            CovidCertificateCreateResponseDto testCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
             when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class))).thenReturn(testCreateResponse);
         }
 
@@ -300,12 +297,11 @@ class CovidCertificateGenerationControllerTest {
         private static final String URL = BASE_URL + "recovery";
 
         private RecoveryCertificateCreateDto recoveryCreateDto;
-        private CovidCertificateCreateResponseDto recoveryCreateResponse;
 
         @BeforeEach()
         void initialize() {
             this.recoveryCreateDto = fixture.create(RecoveryCertificateCreateDto.class);
-            this.recoveryCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
+            CovidCertificateCreateResponseDto recoveryCreateResponse = fixture.create(CovidCertificateCreateResponseDto.class);
             when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class))).thenReturn(recoveryCreateResponse);
         }
 
