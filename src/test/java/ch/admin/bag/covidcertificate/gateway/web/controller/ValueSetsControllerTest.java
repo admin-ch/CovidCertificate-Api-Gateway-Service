@@ -6,6 +6,7 @@ import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDt
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.SystemSource;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccineDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -138,7 +139,7 @@ public class ValueSetsControllerTest {
         void initialize() {
             IssuableVaccineDto issuableVaccineDto = fixture.create(IssuableVaccineDto.class);
             this.issuableVaccineDtoResponse = List.of(issuableVaccineDto);
-            when(valueSetsService.getIssuableVaccines()).thenReturn(issuableVaccineDtoResponse);
+            when(valueSetsService.getIssuableVaccines(SystemSource.ApiGateway)).thenReturn(issuableVaccineDtoResponse);
         }
 
         @Test
@@ -147,7 +148,7 @@ public class ValueSetsControllerTest {
                                                        .contentType(MediaType.APPLICATION_JSON))
                                       .andExpect(status().isOk());
 
-            verify(valueSetsService, times(1)).getIssuableVaccines();
+            verify(valueSetsService, times(1)).getIssuableVaccines(SystemSource.ApiGateway);
         }
     }
 

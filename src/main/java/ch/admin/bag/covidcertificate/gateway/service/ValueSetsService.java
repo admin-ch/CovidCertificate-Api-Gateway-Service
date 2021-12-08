@@ -7,6 +7,7 @@ import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDt
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.SystemSource;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.util.WebClientUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class ValueSetsService {
     public static final String VACCINES_PATH = "api/v1/valuesets/vaccines";
     public static final String ISSUABLE_VACCINES_PATH = "api/v1/valuesets/issuable-vaccines";
     public static final String COUNTRY_CODE_PATH = "api/v1/valuesets/countries";
+    public static final String PARAMETER_SYSTEM_SOURCE = "systemSource";
 
     @Value("${cc-management-service.uri}")
     private String serviceUri;
@@ -108,8 +110,13 @@ public class ValueSetsService {
         }
     }
 
-    public List<IssuableVaccineDto> getIssuableVaccines() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_VACCINES_PATH);
+    public List<IssuableVaccineDto> getIssuableVaccines(SystemSource systemSource) {
+        UriComponentsBuilder builder;
+        if(systemSource != null) {
+            builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_VACCINES_PATH + "/" + systemSource.name());
+        } else {
+            builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_VACCINES_PATH);
+        }
 
         String uri = builder.toUriString();
         log.debug("Call the ValueSetsService with url {}", kv("url", uri));
