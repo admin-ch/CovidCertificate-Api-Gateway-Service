@@ -6,6 +6,7 @@ import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CountryCodesDt
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableRapidTestDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IssuableVaccineDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RapidTestDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.SystemSource;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccineDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,8 +71,25 @@ public class ValueSetsController {
     )
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableVaccineDto.class))))
     public List<IssuableVaccineDto> issuableVaccines() {
-        log.info("Call of issuableVaccines for value sets");
-        return valueSetsService.getIssuableVaccines();
+        log.info("Call of issuableVaccines for value sets with systemSource {}", SystemSource.ApiGateway);
+        return valueSetsService.getIssuableVaccines(SystemSource.ApiGateway);
+    }
+
+    @GetMapping("/issuable-vaccines/{systemSource}")
+    @Operation(operationId = "issuableVaccines",
+               summary = "Gets a list of all issuable vaccines.",
+               description = "Gets a list of all issuable vaccines accepted by the BAG based on the official list of the EU. Performs an integrity check for each request based on headers and body."
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IssuableVaccineDto.class))))
+    public List<IssuableVaccineDto> issuableVaccines(@PathVariable String systemSource) {
+        final SystemSource localSystemSource;
+        if(StringUtils.hasText(systemSource)) {
+            localSystemSource = SystemSource.valueOf(systemSource);
+        } else {
+            localSystemSource = SystemSource.ApiGateway;
+        }
+        log.info("Call of issuableVaccines for value sets with systemSource {}", localSystemSource);
+        return valueSetsService.getIssuableVaccines(localSystemSource);
     }
 
     @GetMapping("/countries")
