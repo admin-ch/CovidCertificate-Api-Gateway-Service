@@ -28,7 +28,7 @@
         <spring-cloud-starter-sleuth.version>3.0.4</spring-cloud-starter-sleuth.version>
         <springdoc.version>1.5.13</springdoc.version>
 
-        <log4j2.version>2.15.0</log4j2.version>
+        <log4j2.version>2.16.0</log4j2.version>
 
         <sonar.exclusions>
             **/org/**/*.java,**/com/**/*.java,**/config/security/**/*.java
