@@ -1382,10 +1382,10 @@ class CovidCertificateGenerationControllerTest {
         }
     }
     
-    private <T extends CertificateCreateDto> T equalsSerialized(String bar) {
-        return argThat((T foo) -> {
+    private <T extends CertificateCreateDto> T equalsSerialized(String expected) {
+        return argThat((T certificateCreateDto) -> {
                     try {
-                        return mapper.writeValueAsString(foo).equalsIgnoreCase(bar);
+                        return mapper.writeValueAsString(certificateCreateDto).equalsIgnoreCase(expected);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                         fail();
