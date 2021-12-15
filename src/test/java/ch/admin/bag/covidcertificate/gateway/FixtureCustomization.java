@@ -78,4 +78,16 @@ public class FixtureCustomization {
         });
     }
 
+    public static void customizeAntibodyCertificateCreateDto(JFixture fixture) {
+        fixture.customise().lazyInstance(AntibodyCertificateCreateDto.class, () -> {
+            var helperFixture = new JFixture();
+            helperFixture.customise().repeatCount(1);
+            var recoveryCertificateCreateDto = helperFixture.create(AntibodyCertificateCreateDto.class);
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "language", "de");
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "personData", helperFixture.create(CovidCertificatePersonDto.class));
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "otp", fixture.create(String.class));
+            return recoveryCertificateCreateDto;
+        });
+    }
+
 }
