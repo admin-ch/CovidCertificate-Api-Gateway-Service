@@ -5,24 +5,30 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.6</version>
+        <version>2.6.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
     <artifactId>cc-api-gateway-service</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
     <name>cc-api-gateway-service</name>
     <description>CC-API-Gateway-Service</description>
 
     <properties>
         <java.version>11</java.version>
-        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
-        <logstash.version>6.6</logstash.version>
-        <janino.version>3.1.4</janino.version>
-        <cc-backend-logging.version>1.0.0</cc-backend-logging.version>
-        <springdoc.version>1.5.8</springdoc.version>
-        <spring-cloud-starter-sleuth.version>3.0.3</spring-cloud-starter-sleuth.version>
+
+        <cc-backend-logging.version>1.0.1</cc-backend-logging.version>
+        <com.squareup.okhttp3.version>4.9.3</com.squareup.okhttp3.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <janino.version>3.1.6</janino.version>
+        <jfixture-mockito.version>2.7.2</jfixture-mockito.version>
         <jjwt.version>0.11.2</jjwt.version>
+        <logstash.version>6.6</logstash.version>
+        <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
+        <spring-cloud-starter-sleuth.version>3.0.4</spring-cloud-starter-sleuth.version>
+        <springdoc.version>1.5.13</springdoc.version>
+
+        <log4j2.version>2.16.0</log4j2.version>
 
         <sonar.exclusions>
             **/org/**/*.java,**/com/**/*.java,**/config/security/**/*.java
@@ -158,7 +164,7 @@
         <dependency>
             <groupId>com.flextrade.jfixture</groupId>
             <artifactId>jfixture-mockito</artifactId>
-            <version>2.7.2</version>
+            <version>${jfixture-mockito.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -188,13 +194,13 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.0.1</version>
+            <version>${com.squareup.okhttp3.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>4.0.1</version>
+            <version>${com.squareup.okhttp3.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -240,7 +246,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.14.0</version>
+                <version>${maven-jaxb2-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
