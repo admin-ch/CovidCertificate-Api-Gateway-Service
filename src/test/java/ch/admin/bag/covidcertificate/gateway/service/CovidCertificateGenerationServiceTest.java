@@ -7,6 +7,7 @@ import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryCertif
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.SystemSource;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.TestCertificateCreateDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationTouristCertificateCreateDto;
 import ch.admin.bag.covidcertificate.gateway.web.config.CustomHeaderAuthenticationToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flextrade.jfixture.JFixture;
@@ -102,6 +103,25 @@ class CovidCertificateGenerationServiceTest {
 
         var createDto = fixture.create(VaccinationCertificateCreateDto.class);
         createDto.setSystemSource(SystemSource.ApiPlatform);
+        var response = generationService.createCovidCertificate(createDto);
+
+        String recordedRequest = mockManagementService.takeRequest().getBody().readString(Charset.defaultCharset());
+        assertTrue(recordedRequest.contains("\"systemSource\":\"ApiGateway\""));
+
+        assertArrayEquals(mockResponseDto.getPdf(), response.getPdf());
+        assertArrayEquals(mockResponseDto.getQrCode(), response.getQrCode());
+        assertEquals(mockResponseDto.getUvci(), response.getUvci());
+    }
+
+    @Test
+    void createsVaccinatioTouristCertificateSuccessfully() throws Exception {
+        setCommonName("cn-not-authorized");
+        var mockResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
+        mockManagementService.enqueue(new MockResponse()
+                .setBody(objectMapper.writeValueAsString(mockResponseDto))
+                .addHeader("Content-Type", "application/json"));
+
+        var createDto = fixture.create(VaccinationTouristCertificateCreateDto.class);
         var response = generationService.createCovidCertificate(createDto);
 
         String recordedRequest = mockManagementService.takeRequest().getBody().readString(Charset.defaultCharset());

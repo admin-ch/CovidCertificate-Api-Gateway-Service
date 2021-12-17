@@ -30,6 +30,30 @@ public class FixtureCustomization {
         });
     }
 
+    public static void customizeVaccinationTouristCertificateCreateDto(JFixture fixture) {
+        fixture.customise().lazyInstance(VaccinationTouristCertificateCreateDto.class, () -> {
+            var helperFixture = new JFixture();
+            helperFixture.customise().repeatCount(1);
+            customizeVaccinationTouristCertificateDataDto(helperFixture);
+            var vaccinationTouristCertificateCreateDto = helperFixture.create(VaccinationTouristCertificateCreateDto.class);
+            ReflectionTestUtils.setField(vaccinationTouristCertificateCreateDto, "language", "de");
+            ReflectionTestUtils.setField(vaccinationTouristCertificateCreateDto, "personData", helperFixture.create(CovidCertificatePersonDto.class));
+            ReflectionTestUtils.setField(vaccinationTouristCertificateCreateDto, "otp", fixture.create(String.class));
+            return vaccinationTouristCertificateCreateDto;
+        });
+    }
+
+    private static void customizeVaccinationTouristCertificateDataDto(JFixture fixture) {
+        fixture.customise().lazyInstance(VaccinationTouristCertificateDataDto.class, () -> {
+            var numberOfDoses = fixture.create(Integer.class) % 9 + 1;
+            var totalNumberOfDoses = numberOfDoses + (int) Math.ceil(Math.random() * (9 - numberOfDoses));
+            var vaccinationTouristCertificateCreateDto = new JFixture().create(VaccinationTouristCertificateDataDto.class);
+            ReflectionTestUtils.setField(vaccinationTouristCertificateCreateDto, "numberOfDoses", numberOfDoses);
+            ReflectionTestUtils.setField(vaccinationTouristCertificateCreateDto, "totalNumberOfDoses", totalNumberOfDoses);
+            return vaccinationTouristCertificateCreateDto;
+        });
+    }
+
     public static void customizeTestCertificateCreateDto(JFixture fixture) {
         fixture.customise().lazyInstance(TestCertificateCreateDto.class, () -> {
             var helperFixture = new JFixture();
@@ -47,6 +71,18 @@ public class FixtureCustomization {
             var helperFixture = new JFixture();
             helperFixture.customise().repeatCount(1);
             var recoveryCertificateCreateDto = helperFixture.create(RecoveryCertificateCreateDto.class);
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "language", "de");
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "personData", helperFixture.create(CovidCertificatePersonDto.class));
+            ReflectionTestUtils.setField(recoveryCertificateCreateDto, "otp", fixture.create(String.class));
+            return recoveryCertificateCreateDto;
+        });
+    }
+
+    public static void customizeAntibodyCertificateCreateDto(JFixture fixture) {
+        fixture.customise().lazyInstance(AntibodyCertificateCreateDto.class, () -> {
+            var helperFixture = new JFixture();
+            helperFixture.customise().repeatCount(1);
+            var recoveryCertificateCreateDto = helperFixture.create(AntibodyCertificateCreateDto.class);
             ReflectionTestUtils.setField(recoveryCertificateCreateDto, "language", "de");
             ReflectionTestUtils.setField(recoveryCertificateCreateDto, "personData", helperFixture.create(CovidCertificatePersonDto.class));
             ReflectionTestUtils.setField(recoveryCertificateCreateDto, "otp", fixture.create(String.class));
