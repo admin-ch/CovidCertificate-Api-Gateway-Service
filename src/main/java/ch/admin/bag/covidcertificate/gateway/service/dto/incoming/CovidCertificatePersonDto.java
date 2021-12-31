@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class CovidCertificatePersonDto {
     private CovidCertificatePersonNameDto name;
-    @Schema(example= "1964-03-14", description = "birthdate of the covid certificate owner. Format: ISO 8601 date without time.")
+    @Schema(example= "1985-09-20, 1985-09, 1985", description = "birthdate of the covid certificate owner. Format: ISO 8601 date without time OR YYYY-MM OR YYYY.")
     private String dateOfBirth;
 }
