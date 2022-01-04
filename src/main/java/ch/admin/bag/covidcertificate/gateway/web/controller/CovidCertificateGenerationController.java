@@ -289,7 +289,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_RECOVERY_INFO", value = INVALID_RECOVERY_INFO_JSON),
                             @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                             @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
-                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
+                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE)
                     }
             )
     )
@@ -333,7 +333,7 @@ public class CovidCertificateGenerationController {
                             @ExampleObject(name = "INVALID_ANTIBODY_INFO", value = INVALID_ANTIBODY_INFO_JSON),
                             @ExampleObject(name = "INVALID_ADDRESS", value = INVALID_ADDRESS),
                             @ExampleObject(name = "DUPLICATE_DELIVERY_METHOD", value = DUPLICATE_DELIVERY_METHOD),
-                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE),
+                            @ExampleObject(name = "INVALID_APP_CODE", value = INVALID_APP_CODE)
                     }
             )
     )
