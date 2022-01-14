@@ -78,6 +78,18 @@ public class FixtureCustomization {
         });
     }
 
+    public static void customizeRecoveryRatCertificateCreateDto(JFixture fixture) {
+        fixture.customise().lazyInstance(RecoveryRatCertificateCreateDto.class, () -> {
+            var helperFixture = new JFixture();
+            helperFixture.customise().repeatCount(1);
+            var recoveryRatCertificateCreateDto = helperFixture.create(RecoveryRatCertificateCreateDto.class);
+            ReflectionTestUtils.setField(recoveryRatCertificateCreateDto, "language", "de");
+            ReflectionTestUtils.setField(recoveryRatCertificateCreateDto, "personData", helperFixture.create(CovidCertificatePersonDto.class));
+            ReflectionTestUtils.setField(recoveryRatCertificateCreateDto, "otp", fixture.create(String.class));
+            return recoveryRatCertificateCreateDto;
+        });
+    }
+
     public static void customizeAntibodyCertificateCreateDto(JFixture fixture) {
         fixture.customise().lazyInstance(AntibodyCertificateCreateDto.class, () -> {
             var helperFixture = new JFixture();

@@ -22,6 +22,7 @@ public class Constants {
     public static final String KPI_TYPE_VACCINATION_TOURIST = "vt";
     public static final String KPI_TYPE_TEST = "t";
     public static final String KPI_TYPE_RECOVERY = "r";
+    public static final String KPI_TYPE_RECOVERY_RAT = "rr";
     public static final String KPI_TYPE_ANTIBODY = "a";
     public static final String KPI_CANTON = "p";
     public static final String KPI_TYPE_INAPP_DELIVERY = "ad";

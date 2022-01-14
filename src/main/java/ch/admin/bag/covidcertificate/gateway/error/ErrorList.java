@@ -70,6 +70,13 @@ public class ErrorList {
     public static final RestError INVALID_ANTIBODY_INFO = new RestError(INVALID_ANTIBODY_INFO_CODE, INVALID_ANTIBODY_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
     public static final String INVALID_ANTIBODY_INFO_JSON = ERROR_CODE_KEY + INVALID_ANTIBODY_INFO_CODE + "," + ERROR_MESSAGE_KEY + INVALID_ANTIBODY_INFO_MESSAGE + "}";
 
+
+    public static final int MISSING_RECOVERY_RAT_INFO_CODE = 432;
+    public static final String MISSING_RECOVERY_RAT_INFO_MESSAGE = "Property recoveryRatInfo is missing!";
+    public static final RestError MISSING_RECOVERY_RAT_INFO = new RestError(MISSING_RECOVERY_RAT_INFO_CODE, MISSING_RECOVERY_RAT_INFO_MESSAGE, HttpStatus.BAD_REQUEST);
+    public static final String MISSING_RECOVERY_RAT_INFO_JSON = ERROR_CODE_KEY + MISSING_RECOVERY_RAT_INFO_CODE + ","
+            + ERROR_MESSAGE_KEY + MISSING_RECOVERY_RAT_INFO_MESSAGE + "}";
+
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
     private static final String INVALID_SIGNATURE_MESSAGE = "Integrity check failed, the body hash does not match the hash in the header";
