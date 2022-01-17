@@ -19,10 +19,10 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.MISSING_RECO
 public class RecoveryRatCertificateCreateDto extends CertificateCreateDto {
     @Schema(hidden = true)
     private CovidCertificateAddressDto address;
-    private List<RecoveryRatCertificateDataDto> recoveryRatInfo ;
+    private List<RecoveryRatCertificateDataDto> testInfo;
 
     public void validate() {
-        if (recoveryRatInfo == null || recoveryRatInfo.size() != 1) {
+        if (testInfo == null || testInfo.size() != 1) {
             throw new CreateCertificateException(MISSING_RECOVERY_RAT_INFO);
         }
     }
