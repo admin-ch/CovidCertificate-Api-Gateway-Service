@@ -91,3 +91,8 @@ cc-api-gateway-service:
   monitor:
     prometheus:
       user: "prometheus"
+
+cc-management-service:
+  covidcertificate:
+    api:
+      v1-path: "api/v1/covidcertificate/"
