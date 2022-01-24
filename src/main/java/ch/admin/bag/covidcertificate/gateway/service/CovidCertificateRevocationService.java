@@ -1,8 +1,11 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
+import ch.admin.bag.covidcertificate.gateway.service.dto.CheckRevocationListResponseDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.RevocationListResponseDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationListDto;
 import ch.admin.bag.covidcertificate.gateway.service.util.WebClientUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +28,13 @@ public class CovidCertificateRevocationService {
 
     private final WebClient defaultWebClient;
 
-    public void createRevocation(RevocationDto revocationDto) {
+    private final SystemSourceService systemSourceService;
+
+    public void createRevocation(RevocationDto revocationDto, String userExtId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/revocation/");
+
+        revocationDto.setSystemSource(systemSourceService.getRelevantSystemSource(revocationDto.getSystemSource()));
+        revocationDto.setUserExtId(userExtId);
 
         String uri = builder.toUriString();
         log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
@@ -38,6 +46,54 @@ public class CovidCertificateRevocationService {
                     .bodyToMono(Void.class)
                     .block();
 
+        } catch (WebClientResponseException e) {
+            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
+            throw new RevokeCertificateException(errorResponse);
+        }
+    }
+
+    public CheckRevocationListResponseDto checkMassRevocation(RevocationListDto revocationListDto, String userExtId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/revocation/uvcilist/check");
+
+        revocationListDto.setSystemSource(systemSourceService.getRelevantSystemSource(revocationListDto.getSystemSource()));
+        revocationListDto.setUserExtId(userExtId);
+        String uri = builder.toUriString();
+
+        log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
+        try {
+            CheckRevocationListResponseDto response = defaultWebClient.post()
+                    .uri(uri)
+                    .body(Mono.just(revocationListDto), revocationListDto.getClass())
+                    .retrieve()
+                    .bodyToMono(CheckRevocationListResponseDto.class)
+                    .block();
+
+            log.trace("CovidCertificateGenerationService Response: {}", response);
+            return response;
+        } catch (WebClientResponseException e) {
+            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
+            throw new RevokeCertificateException(errorResponse);
+        }
+    }
+
+    public RevocationListResponseDto massRevocation(RevocationListDto revocationListDto, String userExtId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/revocation/uvcilist");
+
+        revocationListDto.setSystemSource(systemSourceService.getRelevantSystemSource(revocationListDto.getSystemSource()));
+        revocationListDto.setUserExtId(userExtId);
+        String uri = builder.toUriString();
+
+        log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
+        try {
+            RevocationListResponseDto response = defaultWebClient.post()
+                    .uri(uri)
+                    .body(Mono.just(revocationListDto), revocationListDto.getClass())
+                    .retrieve()
+                    .bodyToMono(RevocationListResponseDto.class)
+                    .block();
+
+            log.trace("CovidCertificateGenerationService Response: {}", response);
+            return response;
         } catch (WebClientResponseException e) {
             RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
             throw new RevokeCertificateException(errorResponse);

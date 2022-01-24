@@ -5,8 +5,10 @@ import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateRevocationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
-import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
+import ch.admin.bag.covidcertificate.gateway.service.dto.CheckRevocationListResponseDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.RevocationListResponseDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationListDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -25,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
@@ -52,9 +52,8 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 )
 public class CovidCertificateRevocationController {
 
-    private final CovidCertificateRevocationService service;
+    private final CovidCertificateRevocationService revocationService;
     private final AuthorizationService authorizationService;
-    private final KpiDataService kpiDataService;
 
 
     @PostMapping
@@ -90,11 +89,28 @@ public class CovidCertificateRevocationController {
         log.info("Call of Revoke for covid certificate");
         String userExtId = authorizationService.validateAndGetId(revocationDto, request.getRemoteAddr());
 
-        service.createRevocation(revocationDto);
+        revocationService.createRevocation(revocationDto, userExtId);
 
-        LocalDateTime timestamp = LocalDateTime.now();
-        log.info("kpi: {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_REVOKE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_UUID_KEY, userExtId));
-        kpiDataService.saveKpiData(timestamp, KPI_REVOKE_CERTIFICATE_TYPE, userExtId, revocationDto.getUvci(), null, null);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/mass-revocation-check")
+    @PreAuthorize("hasRole('bag-cc-superuser')")
+    // TODO: mapping
+    public CheckRevocationListResponseDto checkMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
+        log.info("Call of Check-Mass-Revocation for covid certificate");
+        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
+
+        return revocationService.checkMassRevocation(revocationListDto, userExtId);
+    }
+
+    @PostMapping("/mass-revocation")
+    @PreAuthorize("hasRole('bag-cc-superuser')")
+    // TODO: mapping
+    public RevocationListResponseDto createMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
+        log.info("Call of Mass-Revocation for covid certificate");
+        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
+
+        return revocationService.massRevocation(revocationListDto, userExtId);
     }
 }

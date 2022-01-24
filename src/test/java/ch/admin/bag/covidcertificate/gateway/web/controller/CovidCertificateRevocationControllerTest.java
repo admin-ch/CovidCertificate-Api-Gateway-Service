@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flextrade.jfixture.JFixture;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,14 +42,11 @@ class CovidCertificateRevocationControllerTest {
     private CovidCertificateRevocationService revocationService;
     @Mock
     private AuthorizationService authorizationService;
-    @Mock
-    private KpiDataService kpiDataService;
 
 
     @InjectMocks
     private CovidCertificateRevocationController controller;
 
-    private RevocationDto revocationDto;
     private MockMvc mockMvc;
 
     @BeforeAll
@@ -59,53 +57,62 @@ class CovidCertificateRevocationControllerTest {
 
     @BeforeEach
     void initialize() {
-        this.revocationDto = fixture.create(RevocationDto.class);
         this.mockMvc = standaloneSetup(controller, new ResponseStatusExceptionHandler()).build();
     }
 
-    @Test
-    void revokesCertificateSuccessfully__withOtp() throws Exception {
-        ReflectionTestUtils.setField(this.revocationDto, "identity", null);
+    @Nested
+    class POST_Create {
+        private RevocationDto revocationDto;
 
-        mockMvc.perform(post(URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(this.revocationDto)))
-                .andExpect(status().isCreated());
+        @BeforeEach
+        void initialize() {
+            this.revocationDto = fixture.create(RevocationDto.class);
+        }
 
-        verify(authorizationService, times(1)).validateAndGetId(any(), any());
-        verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
+        @Test
+        void revokesCertificateSuccessfully__withOtp() throws Exception {
+            ReflectionTestUtils.setField(this.revocationDto, "identity", null);
+
+            mockMvc.perform(post(URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(this.revocationDto)))
+                    .andExpect(status().isCreated());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(revocationService, times(1)).createRevocation(any(RevocationDto.class), eq(null));
+        }
+
+        @Test
+        void revokesCertificateSuccessfully__withIdentity() throws Exception {
+            ReflectionTestUtils.setField(this.revocationDto, "otp", null);
+
+            mockMvc.perform(post(URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(this.revocationDto)))
+                    .andExpect(status().isCreated());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(revocationService, times(1)).createRevocation(any(RevocationDto.class), eq(null));
+        }
+
+        @Test
+        void returns403__withAuthorizationError() throws Exception {
+            ReflectionTestUtils.setField(this.revocationDto, "otp", null);
+            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+
+            mockMvc.perform(post(URL)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(this.revocationDto)))
+                    .andExpect(status().isForbidden());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(revocationService, never()).createRevocation(any(RevocationDto.class), any(String.class));
+            verify(revocationService, never()).createRevocation(any(RevocationDto.class), eq(null));
+        }
     }
 
-    @Test
-    void revokesCertificateSuccessfully__withIdentity() throws Exception {
-        ReflectionTestUtils.setField(this.revocationDto, "otp", null);
 
-        mockMvc.perform(post(URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(this.revocationDto)))
-                .andExpect(status().isCreated());
-
-        verify(authorizationService, times(1)).validateAndGetId(any(), any());
-        verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
-    }
-
-    @Test
-    void returns403__withAuthorizationError() throws Exception {
-        ReflectionTestUtils.setField(this.revocationDto, "otp", null);
-        when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
-
-        mockMvc.perform(post(URL)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(this.revocationDto)))
-                .andExpect(status().isForbidden());
-
-        verify(authorizationService, times(1)).validateAndGetId(any(), any());
-        verify(revocationService, never()).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(),isNull(),isNull());
-    }
 }
