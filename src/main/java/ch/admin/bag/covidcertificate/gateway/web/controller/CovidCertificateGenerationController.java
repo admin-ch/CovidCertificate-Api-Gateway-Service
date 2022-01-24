@@ -343,8 +343,8 @@ public class CovidCertificateGenerationController {
         String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 

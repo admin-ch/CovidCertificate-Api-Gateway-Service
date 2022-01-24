@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,8 +32,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_INAPP_DELIVERY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.*;
 import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.*;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -132,13 +132,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -150,7 +150,7 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(generationService, times(1)).createCovidCertificate((VaccinationCertificateCreateDto) equalsSerialized(payload),  eq(null));
+            verify(generationService, times(1)).createCovidCertificate((VaccinationCertificateCreateDto) equalsSerialized(payload), eq(null));
         }
 
         @Test
@@ -180,7 +180,7 @@ class CovidCertificateGenerationControllerTest {
         void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
@@ -242,7 +242,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineCreateDto, "appCode", fixture.create(String.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
@@ -282,20 +282,20 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.vaccineCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class),  eq(null));
+            verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class), eq(null));
         }
 
         @Test
         void returnsGeneratedCertificate() throws Exception {
             var certificateResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class),  eq(null))).thenReturn(certificateResponseDto);
+            when(generationService.createCovidCertificate(any(VaccinationCertificateCreateDto.class), eq(null))).thenReturn(certificateResponseDto);
 
             var actual = postRequest(URL, this.vaccineCreateDto, status().isOk());
 
             assertEquals(mapper.writeValueAsString(certificateResponseDto), actual.getResponse().getContentAsString());
         }
     }
-    
+
     @Nested
     class CreateVaccineTouristCertificateTests {
         private static final String URL = BASE_URL + "vaccination-tourist";
@@ -330,13 +330,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -348,7 +348,7 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(generationService, times(1)).createCovidCertificate((VaccinationTouristCertificateCreateDto) equalsSerialized(payload),  eq(null));
+            verify(generationService, times(1)).createCovidCertificate((VaccinationTouristCertificateCreateDto) equalsSerialized(payload), eq(null));
         }
 
         @Test
@@ -378,7 +378,7 @@ class CovidCertificateGenerationControllerTest {
         void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
@@ -440,7 +440,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "appCode", fixture.create(String.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
@@ -479,20 +479,20 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.vaccineTouristCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class),  eq(null));
+            verify(generationService, never()).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class), eq(null));
         }
 
         @Test
         void returnsGeneratedCertificate() throws Exception {
             var certificateResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class),  eq(null))).thenReturn(certificateResponseDto);
+            when(generationService.createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class), eq(null))).thenReturn(certificateResponseDto);
 
             var actual = postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
             assertEquals(mapper.writeValueAsString(certificateResponseDto), actual.getResponse().getContentAsString());
         }
     }
-    
+
     @Nested
     class CreateTestCertificateTests {
         private static final String URL = BASE_URL + "test";
@@ -527,13 +527,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -545,7 +545,7 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(generationService, times(1)).createCovidCertificate((TestCertificateCreateDto) equalsSerialized(payload),  eq(null));
+            verify(generationService, times(1)).createCovidCertificate((TestCertificateCreateDto) equalsSerialized(payload), eq(null));
         }
 
         @Test
@@ -575,7 +575,7 @@ class CovidCertificateGenerationControllerTest {
         void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
             ReflectionTestUtils.setField(this.testCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
@@ -655,7 +655,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.testCreateDto, "appCode", fixture.create(String.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
@@ -713,13 +713,13 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.testCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class),  eq(null));
+            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null));
         }
 
         @Test
         void returnsGeneratedCertificate() throws Exception {
             var certificateResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class),  eq(null))).thenReturn(certificateResponseDto);
+            when(generationService.createCovidCertificate(any(TestCertificateCreateDto.class), eq(null))).thenReturn(certificateResponseDto);
 
             var actual = postRequest(URL, this.testCreateDto, status().isOk());
 
@@ -761,13 +761,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -779,7 +779,7 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-            verify(generationService, times(1)).createCovidCertificate((RecoveryCertificateCreateDto) equalsSerialized(payload),  eq(null));
+            verify(generationService, times(1)).createCovidCertificate((RecoveryCertificateCreateDto) equalsSerialized(payload), eq(null));
         }
 
         @Test
@@ -809,7 +809,7 @@ class CovidCertificateGenerationControllerTest {
         void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
@@ -863,7 +863,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "appCode", fixture.create(String.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class),  eq(null))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
@@ -878,7 +878,7 @@ class CovidCertificateGenerationControllerTest {
 
             verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq(recoveryCreateDto.getRecoveryInfo().get(0).getCountryOfTest()));
         }
-        
+
         @Test
         void shouldNotSavesInAppKpi_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "appCode", null);
@@ -894,7 +894,7 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.recoveryCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class),  eq(null));
+            verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null));
         }
 
         @Test
@@ -920,7 +920,8 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", null);
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", null);
             CovidCertificateCreateResponseDto createResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(createResponseDto);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), any(String.class))).thenReturn(createResponseDto);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null))).thenReturn(createResponseDto);
         }
 
         @Test
@@ -941,13 +942,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -959,58 +960,7 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-            verify(generationService, times(1)).createCovidCertificate((RecoveryRatCertificateCreateDto) equalsSerialized(payload));
-        }
-
-        @CsvSource({"false,false", "false,true", "true,false"})
-        @ParameterizedTest
-        void savesRecoveryRatKpi(boolean hasAddress, boolean hasAppCode) throws Exception {
-            var address = hasAddress ? fixture.create(CovidCertificateAddressDto.class) : null;
-            var appCode = hasAppCode ? fixture.create(String.class) : null;
-            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", address);
-            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", appCode);
-
-            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), anyString(), any(), anyString());
-        }
-
-        @Test
-        void savesRecoveryRatKpiWithCurrentTimestamp() throws Exception {
-            var now = LocalDateTime.now();
-            try (MockedStatic<LocalDateTime> localDateTimeMock = Mockito.mockStatic(LocalDateTime.class)) {
-                localDateTimeMock.when(LocalDateTime::now).thenReturn(now);
-
-                postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_RECOVERY_RAT), any(), anyString(), any(), anyString());
-            }
-        }
-
-        @Test
-        void savesRecoveryRatKpiWithUserId() throws Exception {
-            var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
-
-            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), eq(userExtId), anyString(), any(), anyString());
-        }
-
-        @Test
-        void savesRecoveryRatKpiWithGeneratedUvci() throws Exception {
-            var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
-
-            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), eq(certificate.getUvci()), any(), anyString());
-        }
-
-        @Test
-        void savesRecoveryKpiWithCorrectCountry() throws Exception {
-            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), any(), any(), eq("CH"));
+            verify(generationService, times(1)).createCovidCertificate((RecoveryRatCertificateCreateDto) equalsSerialized(payload), eq(null));
         }
 
         @Test
@@ -1040,7 +990,7 @@ class CovidCertificateGenerationControllerTest {
         void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
@@ -1094,7 +1044,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
             var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null))).thenReturn(certificate);
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
@@ -1125,14 +1075,14 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(RecoveryRatCertificateCreateDto.class));
+            verify(generationService, never()).createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), anyString(), anyString());
         }
 
         @Test
         void returnsGeneratedCertificate() throws Exception {
             var certificateResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
-            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificateResponseDto);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null))).thenReturn(certificateResponseDto);
 
             var actual = postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
@@ -1174,13 +1124,13 @@ class CovidCertificateGenerationControllerTest {
 
             var remoteAddress = fixture.create(String.class);
             mockMvc.perform(post(URL)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
-                    .with(request -> {
-                        request.setRemoteAddr(remoteAddress);
-                        return request;
-                    }))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload)
+                            .with(request -> {
+                                request.setRemoteAddr(remoteAddress);
+                                return request;
+                            }))
                     .andExpect(status().isOk());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
@@ -1307,7 +1257,7 @@ class CovidCertificateGenerationControllerTest {
             postRequest(URL, this.antibodyCreateDto, status().isForbidden());
 
             verify(authorizationService, times(1)).validateAndGetId(any(), any());
-            verify(generationService, never()).createCovidCertificate(any(AntibodyCertificateCreateDto.class),  eq(null));
+            verify(generationService, never()).createCovidCertificate(any(AntibodyCertificateCreateDto.class), eq(null));
         }
 
         @Test
@@ -1320,7 +1270,7 @@ class CovidCertificateGenerationControllerTest {
             assertEquals(mapper.writeValueAsString(certificateResponseDto), actual.getResponse().getContentAsString());
         }
     }
-    
+
     private <T extends CertificateCreateDto> T equalsSerialized(String expected) {
         return argThat((T certificateCreateDto) -> {
                     try {
@@ -1338,9 +1288,9 @@ class CovidCertificateGenerationControllerTest {
         var payload = mapper.writeValueAsString(createDto);
 
         return mockMvc.perform(post(url)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
                 .andExpect(matcher)
                 .andReturn();
     }
