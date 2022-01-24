@@ -25,7 +25,10 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 public class CovidCertificateGenerationService {
 
     @Value("${cc-management-service.uri}")
-    private String serviceUri;
+    private String serviceURL;
+
+    @Value("${cc-management-service.covidcertificate.api.v1-path}")
+    private String covidcertificateApiV1Path;
 
     private final WebClient defaultWebClient;
 
@@ -37,6 +40,10 @@ public class CovidCertificateGenerationService {
 
     public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryCertificateCreateDto createDto, String userExtId) {
         return createCovidCertificate(createDto, "recovery", userExtId);
+    }
+
+    public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryRatCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "recovery-rat", userExtId);
     }
 
     public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationCertificateCreateDto createDto, String userExtId) {
@@ -51,8 +58,8 @@ public class CovidCertificateGenerationService {
         return createCovidCertificate(createDto, "antibody", userExtId);
     }
 
-    private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String url, String userExtId) {
-        final var uri = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/covidcertificate/" + url).toUriString();
+    private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String resourcePath, String userExtId) {
+        final var uri = UriComponentsBuilder.fromHttpUrl(serviceURL + covidcertificateApiV1Path + resourcePath).toUriString();
         log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));
 
         createDto.setSystemSource(systemSourceService.getRelevantSystemSource(createDto.getSystemSource()));

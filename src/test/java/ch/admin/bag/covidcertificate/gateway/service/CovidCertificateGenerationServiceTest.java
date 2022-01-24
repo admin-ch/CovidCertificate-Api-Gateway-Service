@@ -42,7 +42,7 @@ class CovidCertificateGenerationServiceTest {
     void initialize() {
         Mockito.reset(systemSourceService);
         this.generationService = new CovidCertificateGenerationService(WebClient.create(), systemSourceService);
-        ReflectionTestUtils.setField(this.generationService, "serviceUri",
+        ReflectionTestUtils.setField(this.generationService, "serviceURL",
                 String.format("http://localhost:%s/", mockManagementService.getPort()));
     }
 

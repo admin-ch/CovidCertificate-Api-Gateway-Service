@@ -71,6 +71,7 @@ class CovidCertificateGenerationControllerTest {
         customizeVaccinationTouristCertificateCreateDto(fixture);
         customizeTestCertificateCreateDto(fixture);
         customizeRecoveryCertificateCreateDto(fixture);
+        customizeRecoveryRatCertificateCreateDto(fixture);
         customizeAntibodyCertificateCreateDto(fixture);
     }
 
@@ -902,6 +903,238 @@ class CovidCertificateGenerationControllerTest {
             when(generationService.createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null))).thenReturn(certificateResponseDto);
 
             var actual = postRequest(URL, this.recoveryCreateDto, status().isOk());
+
+            assertEquals(mapper.writeValueAsString(certificateResponseDto), actual.getResponse().getContentAsString());
+        }
+    }
+
+    @Nested
+    class CreateRecoveryRatCertificateTests {
+        private static final String URL = BASE_URL + "recovery-rat";
+
+        private RecoveryRatCertificateCreateDto recoveryRatCertificateCreateDto;
+
+        @BeforeEach()
+        void initialize() {
+            this.recoveryRatCertificateCreateDto = fixture.create(RecoveryRatCertificateCreateDto.class);
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", null);
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", null);
+            CovidCertificateCreateResponseDto createResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(createResponseDto);
+        }
+
+        @Test
+        void createsTestCertificateSuccessfully() throws Exception {
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+        }
+
+        @Test
+        void callsAuthorizationServiceWithGivenPayload() throws Exception {
+            var payload = mapper.writeValueAsString(this.recoveryRatCertificateCreateDto);
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+        }
+
+        @Test
+        void callsAuthorizationServiceWithRemoteAddressFromRequest() throws Exception {
+            var payload = mapper.writeValueAsString(this.recoveryRatCertificateCreateDto);
+
+            var remoteAddress = fixture.create(String.class);
+            mockMvc.perform(post(URL)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(payload)
+                    .with(request -> {
+                        request.setRemoteAddr(remoteAddress);
+                        return request;
+                    }))
+                    .andExpect(status().isOk());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+        }
+
+        @Test
+        void callsGenerationServiceWithGivenPayload() throws Exception {
+            var payload = mapper.writeValueAsString(this.recoveryRatCertificateCreateDto);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(generationService, times(1)).createCovidCertificate((RecoveryRatCertificateCreateDto) equalsSerialized(payload));
+        }
+
+        @CsvSource({"false,false", "false,true", "true,false"})
+        @ParameterizedTest
+        void savesRecoveryRatKpi(boolean hasAddress, boolean hasAppCode) throws Exception {
+            var address = hasAddress ? fixture.create(CovidCertificateAddressDto.class) : null;
+            var appCode = hasAppCode ? fixture.create(String.class) : null;
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", address);
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", appCode);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), anyString(), any(), anyString());
+        }
+
+        @Test
+        void savesRecoveryRatKpiWithCurrentTimestamp() throws Exception {
+            var now = LocalDateTime.now();
+            try (MockedStatic<LocalDateTime> localDateTimeMock = Mockito.mockStatic(LocalDateTime.class)) {
+                localDateTimeMock.when(LocalDateTime::now).thenReturn(now);
+
+                postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_RECOVERY_RAT), any(), anyString(), any(), anyString());
+            }
+        }
+
+        @Test
+        void savesRecoveryRatKpiWithUserId() throws Exception {
+            var userExtId = fixture.create(String.class);
+            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), eq(userExtId), anyString(), any(), anyString());
+        }
+
+        @Test
+        void savesRecoveryRatKpiWithGeneratedUvci() throws Exception {
+            var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), eq(certificate.getUvci()), any(), anyString());
+        }
+
+        @Test
+        void savesRecoveryKpiWithCorrectCountry() throws Exception {
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_RECOVERY_RAT), any(), any(), any(), eq("CH"));
+        }
+
+        @Test
+        void savesPrintKpiWithCurrentTimestamp_whenAddressIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+            var now = LocalDateTime.now();
+            try (MockedStatic<LocalDateTime> localDateTimeMock = Mockito.mockStatic(LocalDateTime.class)) {
+                localDateTimeMock.when(LocalDateTime::now).thenReturn(now);
+
+                postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_CANTON), any(), anyString(), any(), anyString());
+            }
+        }
+
+        @Test
+        void savesPrintKpiWithCantonSender_whenAddressIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+            var cantonSender = this.recoveryRatCertificateCreateDto.getAddress().getCantonCodeSender();
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), eq(cantonSender), anyString(), any(), anyString());
+        }
+
+        @Test
+        void savesPrintKpiWithGeneratedUvci_whenAddressIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+            var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), eq(certificate.getUvci()), any(), anyString());
+        }
+
+        @Test
+        void savesPrintKpiWithCorrectCountry_whenAddressIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", fixture.create(CovidCertificateAddressDto.class));
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_CANTON), any(), any(), any(), eq("CH"));
+        }
+
+
+        @Test
+        void shouldNotSavesPrintKpi_whenAddressIsNotSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "address", null);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_CANTON), any(), any(), any(), anyString());
+        }
+
+        @Test
+        void savesInAppKpiWithCurrentTimestamp_whenAppCodeIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
+            var now = LocalDateTime.now();
+            try (MockedStatic<LocalDateTime> localDateTimeMock = Mockito.mockStatic(LocalDateTime.class)) {
+                localDateTimeMock.when(LocalDateTime::now).thenReturn(now);
+
+                postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+            }
+        }
+
+        @Test
+        void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
+            var userExtId = fixture.create(String.class);
+            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+        }
+
+        @Test
+        void savesInAppKpiWithGeneratedUvci_whenAppCodeIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
+            var certificate = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificate);
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+        }
+
+        @Test
+        void savesInAppKpiWithCorrectCountry_whenAppCodeIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq("CH"));
+        }
+
+        @Test
+        void shouldNotSavesInAppKpi_whenAppCodeIsSet() throws Exception {
+            ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", null);
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
+
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+        }
+
+        @Test
+        void returns403_withAuthorizationError() throws Exception {
+            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+
+            postRequest(URL, this.recoveryRatCertificateCreateDto, status().isForbidden());
+
+            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(generationService, never()).createCovidCertificate(any(RecoveryRatCertificateCreateDto.class));
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), anyString(), anyString());
+        }
+
+        @Test
+        void returnsGeneratedCertificate() throws Exception {
+            var certificateResponseDto = fixture.create(CovidCertificateCreateResponseDto.class);
+            when(generationService.createCovidCertificate(any(RecoveryRatCertificateCreateDto.class))).thenReturn(certificateResponseDto);
+
+            var actual = postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
             assertEquals(mapper.writeValueAsString(certificateResponseDto), actual.getResponse().getContentAsString());
         }
