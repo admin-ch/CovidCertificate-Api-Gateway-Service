@@ -96,7 +96,28 @@ public class CovidCertificateRevocationController {
 
     @PostMapping("/mass-revocation-check")
     @PreAuthorize("hasRole('bag-cc-superuser')")
-    // TODO: mapping
+    @Operation(operationId = "certificateMassRevocationCheck",
+            summary = "Checks if the given UVCIs are valid for mass revocation.",
+            description = "Analyzes a list of UVCIs if they can be revoked on a mass revocation. Performs checks if the UVCI is well formatted, known and not yet revoked.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
+                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
+                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
+                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
+                            schema = @Schema(type = "string", format = "Base64")
+                    )
+            }
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CheckRevocationListResponseDto.class)))
+    @ApiResponse(responseCode = "400",
+            content = @Content(
+                    schema = @Schema(implementation = RestError.class),
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "INVALID_SIZE_OF_UVCI_LIST", value = INVALID_SIZE_OF_UVCI_LIST)
+                    }
+            )
+    )
     public CheckRevocationListResponseDto checkMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Check-Mass-Revocation for covid certificate");
         String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
@@ -106,7 +127,28 @@ public class CovidCertificateRevocationController {
 
     @PostMapping("/mass-revocation")
     @PreAuthorize("hasRole('bag-cc-superuser')")
-    // TODO: mapping
+    @Operation(operationId = "certificateMassRevocationCheck",
+            summary = "Executes a mass-revocation of the given UVCIs.",
+            description = "Revokes all revokable UVCIs of list of UVCIs. Performs checks if the UVCI is well formatted, known and not yet revoked.",
+            parameters = {
+                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
+                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
+                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
+                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
+                            schema = @Schema(type = "string", format = "Base64")
+                    )
+            }
+    )
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RevocationListResponseDto.class)))
+    @ApiResponse(responseCode = "400",
+            content = @Content(
+                    schema = @Schema(implementation = RestError.class),
+                    mediaType = "application/json",
+                    examples = {
+                            @ExampleObject(name = "INVALID_SIZE_OF_UVCI_LIST", value = INVALID_SIZE_OF_UVCI_LIST)
+                    }
+            )
+    )
     public RevocationListResponseDto createMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Mass-Revocation for covid certificate");
         String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
