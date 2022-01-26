@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.service.dto.incoming;
 
+import ch.admin.bag.covidcertificate.gateway.domain.Issuable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -20,4 +21,6 @@ public class IssuableVaccineDto {
     private String authHolderCode;
     @Schema(type = "string", example = "Moderna Biotech Spain S.L.", description = "Display name of authorization holder as string.")
     private String authHolderDisplay;
+    @Schema(type = "string", example = "CH_AND_ABROAD", description = "This attribute tells us if a vaccine is issuable in CH_ONLY, CH_AND_ABROAD or ABROAD_ONLY.")
+    private Issuable issuable;
 }
