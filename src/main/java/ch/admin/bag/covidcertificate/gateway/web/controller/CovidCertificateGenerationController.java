@@ -413,8 +413,6 @@ public class CovidCertificateGenerationController {
                     typeCodeDetailString = DETAILS_RAPID;
                     break;
             }
-        } else {
-            typeCodeDetailString = DETAILS_RAPID;
         }
         return typeCodeDetailString;
     }
