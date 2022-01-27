@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
@@ -106,6 +109,10 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
                 })
 )
 public class CovidCertificateGenerationController {
+
+    public static final String DETAILS_RAPID = "rapid";
+    public static final String DETAILS_ANTIBODY = "antibody";
+    public static final String DETAILS_PCR = "pcr";
 
     private final CovidCertificateGenerationService generationService;
     private final AuthorizationService authorizationService;
@@ -346,7 +353,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        logRecoveryRatCertificateGenerationKpi(createDto, userExtId, covidCertificate.getUvci());
         return covidCertificate;
     }
 
@@ -390,15 +397,36 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(), DETAILS_ANTIBODY, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
+    private String getDetails(Optional<TestType> typeCode) {
+        String typeCodeDetailString = null;
+        if (typeCode.isPresent()) {
+            TestType foundTestType = typeCode.get();
+            switch (foundTestType) {
+                case PCR:
+                    typeCodeDetailString = DETAILS_PCR;
+                    break;
+                case RAPID_TEST:
+                    typeCodeDetailString = DETAILS_RAPID;
+                    break;
+            }
+        } else {
+            typeCodeDetailString = DETAILS_RAPID;
+        }
+        return typeCodeDetailString;
+    }
 
     public void logTestCertificateGenerationKpi(TestCertificateCreateDto createDto, String userExtId, String uvci) {
         var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
-        String typeCodeDetailString = testType.map(TestType::getKpiValue).orElse(null);
-        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, typeCodeDetailString, createDto.getTestInfo().get(0).getMemberStateOfTest());
+        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, getDetails(testType), createDto.getTestInfo().get(0).getMemberStateOfTest());
+    }
+
+    public void logRecoveryRatCertificateGenerationKpi(RecoveryRatCertificateCreateDto createDto, String userExtId, String uvci) {
+        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
+        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, uvci, getDetails(testType), ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
     }
 
     private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
