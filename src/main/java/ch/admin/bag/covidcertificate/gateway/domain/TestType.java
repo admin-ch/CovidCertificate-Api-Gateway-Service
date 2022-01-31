@@ -18,6 +18,7 @@ public enum TestType {
     public String getKpiValue(){
         return this.kpiValue;
     }
+
     public static Optional<TestType> findByTypeCode(String thatTypeCode){
         return Arrays.stream(TestType.values())
                 .filter(testType -> testType.typeCode.equalsIgnoreCase(thatTypeCode))
