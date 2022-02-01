@@ -32,8 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
@@ -413,6 +411,8 @@ public class CovidCertificateGenerationController {
                     typeCodeDetailString = DETAILS_RAPID;
                     break;
             }
+        } else {
+            typeCodeDetailString = DETAILS_RAPID;
         }
         return typeCodeDetailString;
     }
