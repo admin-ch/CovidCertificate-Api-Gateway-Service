@@ -10,7 +10,7 @@
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
     <artifactId>cc-api-gateway-service</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.1</version>
     <name>cc-api-gateway-service</name>
     <description>CC-API-Gateway-Service</description>
 
