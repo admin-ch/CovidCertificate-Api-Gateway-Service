@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
@@ -336,7 +337,8 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
-        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), getDetails(testType), ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
@@ -382,6 +384,22 @@ public class CovidCertificateGenerationController {
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
         logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), DETAILS_ANTIBODY, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
+    }
+
+    private String getDetails(Optional<TestType> typeCode) {
+        String typeCodeDetailString = null;
+        if (typeCode.isPresent()) {
+            TestType foundTestType = typeCode.get();
+            switch (foundTestType) {
+                case PCR:
+                    typeCodeDetailString = DETAILS_PCR;
+                    break;
+                case RAPID_TEST:
+                    typeCodeDetailString = DETAILS_RAPID;
+                    break;
+            }
+        }
+        return typeCodeDetailString;
     }
 
     private void logDeliveryKpi(String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
