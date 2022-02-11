@@ -12,7 +12,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
@@ -30,6 +35,7 @@ import java.util.Map;
 public class SignatureTestController {
 
     private static final String PRIVATE_CERT_PATH = "/home/dev/private-cert.pem";
+//    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/ZH-spital-A-t.bit.admin.ch.key";
 //    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/a0115-irfBIT-PROD.key";
 
     /**
