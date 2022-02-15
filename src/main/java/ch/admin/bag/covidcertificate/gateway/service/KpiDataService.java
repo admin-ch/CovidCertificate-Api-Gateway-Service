@@ -15,6 +15,9 @@ public class KpiDataService {
 
     private final KpiDataRepository logRepository;
 
+    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci,
+            String details, String country) {
+        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country);
     public void saveKpiData(LocalDateTime timestamp, String type, String value) {
         saveKpiData(timestamp, type, value, null, null, null, false);
     }
@@ -28,6 +31,12 @@ public class KpiDataService {
 
     private void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country, boolean fraud) {
         KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, fraud);
+        logRepository.save(kpiData);
+    }
+
+    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci,
+            String details, String country, String inAppDeliveryCode) {
+        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, inAppDeliveryCode);
         logRepository.save(kpiData);
     }
 }
