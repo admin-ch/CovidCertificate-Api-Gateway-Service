@@ -66,6 +66,7 @@ class CovidCertificateRevocationControllerTest {
     @Test
     void revokesCertificateSuccessfully__withOtp() throws Exception {
         ReflectionTestUtils.setField(this.revocationDto, "identity", null);
+        ReflectionTestUtils.setField(this.revocationDto, "fraud", false);
 
         mockMvc.perform(post(URL)
                 .accept(MediaType.APPLICATION_JSON)
@@ -75,12 +76,29 @@ class CovidCertificateRevocationControllerTest {
 
         verify(authorizationService, times(1)).validateAndGetId(any(), any());
         verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(), eq(false));
+    }
+
+    @Test
+    void revokesFraudCertificateSuccessfully__withOtp() throws Exception {
+        ReflectionTestUtils.setField(this.revocationDto, "identity", null);
+        ReflectionTestUtils.setField(this.revocationDto, "fraud", true);
+
+        mockMvc.perform(post(URL)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(this.revocationDto)))
+                .andExpect(status().isCreated());
+
+        verify(authorizationService, times(1)).validateAndGetId(any(), any());
+        verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(), eq(true));
     }
 
     @Test
     void revokesCertificateSuccessfully__withIdentity() throws Exception {
         ReflectionTestUtils.setField(this.revocationDto, "otp", null);
+        ReflectionTestUtils.setField(this.revocationDto, "fraud", false);
 
         mockMvc.perform(post(URL)
                 .accept(MediaType.APPLICATION_JSON)
@@ -90,7 +108,23 @@ class CovidCertificateRevocationControllerTest {
 
         verify(authorizationService, times(1)).validateAndGetId(any(), any());
         verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
-        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(),isNull(),isNull());
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(), eq(false));
+    }
+
+    @Test
+    void revokesFraudCertificateSuccessfully__withIdentity() throws Exception {
+        ReflectionTestUtils.setField(this.revocationDto, "otp", null);
+        ReflectionTestUtils.setField(this.revocationDto, "fraud", true);
+
+        mockMvc.perform(post(URL)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(this.revocationDto)))
+                .andExpect(status().isCreated());
+
+        verify(authorizationService, times(1)).validateAndGetId(any(), any());
+        verify(revocationService, times(1)).createRevocation(any(RevocationDto.class));
+        verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_REVOKE_CERTIFICATE_TYPE), any(), anyString(), eq(true));
     }
 
     @Test

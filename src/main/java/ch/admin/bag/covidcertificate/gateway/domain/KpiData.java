@@ -21,13 +21,15 @@ public class KpiData {
     String uvci;
     String details;
     String country;
+    boolean fraud;
 
-    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country) {
+    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country, boolean fraud) {
         this.timestamp = timestamp;
         this.type = type;
         this.value = value;
         this.uvci = uvci;
         this.details = details;
         this.country = country;
+        this.fraud = fraud;
     }
 }
