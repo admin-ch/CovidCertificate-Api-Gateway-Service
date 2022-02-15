@@ -26,11 +26,12 @@ public class KpiData {
     String uvci;
     String details;
     String country;
+    boolean fraud;
     @Column(name = "in_app_delivery_code")
     String inAppDeliveryCode;
-    boolean fraud;
 
-    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country, boolean fraud) {
+    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country,
+                   boolean fraud, String inAppDeliveryCode) {
         this.timestamp = timestamp;
         this.type = type;
         this.value = value;
@@ -38,16 +39,6 @@ public class KpiData {
         this.details = details;
         this.country = country;
         this.fraud = fraud;
-    }
-
-    public KpiData(LocalDateTime timestamp, String type, String value, String uvci,
-            String details, String country, String inAppDeliveryCode) {
-        this.timestamp = timestamp;
-        this.type = type;
-        this.value = value;
-        this.uvci = uvci;
-        this.details = details;
-        this.country = country;
         this.inAppDeliveryCode = inAppDeliveryCode;
     }
 }

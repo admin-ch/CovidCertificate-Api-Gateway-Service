@@ -15,28 +15,25 @@ public class KpiDataService {
 
     private final KpiDataRepository logRepository;
 
-    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci,
-            String details, String country) {
-        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country);
     public void saveKpiData(LocalDateTime timestamp, String type, String value) {
-        saveKpiData(timestamp, type, value, null, null, null, false);
+        saveKpiData(timestamp, type, value, null, null, null, false, null);
     }
     public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, boolean fraud) {
-        saveKpiData(timestamp, type, value, uvci, null, null, fraud);
+        saveKpiData(timestamp, type, value, uvci, null, null, fraud, null);
     }
 
     public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country) {
-        saveKpiData(timestamp, type, value, uvci, details, country, false);
-    }
-
-    private void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country, boolean fraud) {
-        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, fraud);
-        logRepository.save(kpiData);
+        saveKpiData(timestamp, type, value, uvci, details, country, false, null);
     }
 
     public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci,
-            String details, String country, String inAppDeliveryCode) {
-        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, inAppDeliveryCode);
+                            String details, String country, String inAppDeliveryCode) {
+        saveKpiData(timestamp, type, value, uvci, details, country, false, inAppDeliveryCode);
+    }
+
+    private void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country,
+                             boolean fraud, String inAppDeliveryCode) {
+        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, fraud, inAppDeliveryCode);
         logRepository.save(kpiData);
     }
 }
