@@ -6,14 +6,27 @@ import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationS
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.KpiDataService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.AuthorizationCodeCreateDto;
-import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.AntibodyCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CovidCertificateAddressDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CovidCertificateCreateResponseDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryRatCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.TestCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.TestCertificateDataDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationTouristCertificateCreateDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flextrade.jfixture.JFixture;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -32,13 +45,31 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.*;
-import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.*;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_ANTIBODY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_IN_APP_DELIVERY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY_RAT;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_TEST;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_VACCINATION;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_VACCINATION_TOURIST;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeAntibodyCertificateCreateDto;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeRecoveryCertificateCreateDto;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeRecoveryRatCertificateCreateDto;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeTestCertificateCreateDto;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeVaccinationCertificateCreateDto;
+import static ch.admin.bag.covidcertificate.gateway.FixtureCustomization.customizeVaccinationTouristCertificateCreateDto;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -280,7 +311,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(
+                        eq(now), eq(KPI_TYPE_IN_APP_DELIVERY), any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -292,7 +324,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -303,7 +336,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @Test
@@ -311,7 +345,10 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.vaccineCreateDto, "appCode", fixture.create(String.class));
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), eq(this.vaccineCreateDto.getVaccinationInfo().get(0).getMedicinalProductCode()), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(),
+                    eq(this.vaccineCreateDto.getVaccinationInfo().get(0).getMedicinalProductCode()),
+                    anyString(), anyString());
         }
 
 
@@ -321,7 +358,9 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq(vaccineCreateDto.getVaccinationInfo().get(0).getCountryOfVaccination()));
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(),
+                    eq(vaccineCreateDto.getVaccinationInfo().get(0).getCountryOfVaccination()), anyString());
         }
 
         @Test
@@ -329,7 +368,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.vaccineCreateDto, "appCode", null);
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
@@ -537,7 +576,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(
+                        eq(now), eq(KPI_TYPE_IN_APP_DELIVERY), any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -549,7 +589,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -560,7 +601,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @Test
@@ -568,7 +610,10 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "appCode", fixture.create(String.class));
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), eq(this.vaccineTouristCreateDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode()), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(),
+                    eq(this.vaccineTouristCreateDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode()),
+                    anyString(), anyString());
         }
 
         @Test
@@ -577,7 +622,9 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq(vaccineTouristCreateDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination()));
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(),
+                    eq(vaccineTouristCreateDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination()), anyString());
         }
 
         @Test
@@ -585,7 +632,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "appCode", null);
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
@@ -827,7 +874,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.testCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(
+                        eq(now), eq(KPI_TYPE_IN_APP_DELIVERY), any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -839,7 +887,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -850,7 +899,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @EnumSource(value = TestType.class)
@@ -863,7 +913,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), eq(type.kpiValue), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), eq(type.kpiValue), anyString(), anyString());
         }
 
         @EnumSource(value = TestType.class)
@@ -876,7 +927,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), eq(type.kpiValue), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), eq(type.kpiValue), anyString(), anyString());
         }
 
         @Test
@@ -885,7 +937,9 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq(testCreateDto.getTestInfo().get(0).getMemberStateOfTest()));
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(),
+                    eq(testCreateDto.getTestInfo().get(0).getMemberStateOfTest()), anyString());
         }
 
 
@@ -894,7 +948,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.testCreateDto, "appCode", null);
             postRequest(URL, this.testCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
@@ -1086,7 +1140,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(
+                        eq(now), eq(KPI_TYPE_IN_APP_DELIVERY), any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -1098,7 +1153,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -1109,7 +1165,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @Test
@@ -1118,7 +1175,9 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq(recoveryCreateDto.getRecoveryInfo().get(0).getCountryOfTest()));
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(),
+                    eq(recoveryCreateDto.getRecoveryInfo().get(0).getCountryOfTest()), anyString());
         }
         
         @Test
@@ -1126,7 +1185,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "appCode", null);
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
@@ -1318,7 +1377,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(
+                        eq(now), eq(KPI_TYPE_IN_APP_DELIVERY), any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -1330,7 +1390,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY),
+                                                         eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -1341,7 +1402,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @Test
@@ -1350,7 +1412,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq("CH"));
+            verify(kpiDataService, times(1)).saveKpiData(
+                    any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), eq("CH"), anyString());
         }
 
         @Test
@@ -1358,7 +1421,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", null);
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
@@ -1550,7 +1613,8 @@ class CovidCertificateGenerationControllerTest {
 
                 postRequest(URL, this.antibodyCreateDto, status().isOk());
 
-                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_INAPP_DELIVERY), any(), anyString(), any(), anyString());
+                verify(kpiDataService, times(1)).saveKpiData(eq(now), eq(KPI_TYPE_IN_APP_DELIVERY),
+                                                             any(), anyString(), any(), anyString(), anyString());
             }
         }
 
@@ -1562,7 +1626,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.antibodyCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), eq(userExtId), anyString(), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY),
+                                                         eq(userExtId), anyString(), any(), anyString(), anyString());
         }
 
         @Test
@@ -1573,7 +1638,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.antibodyCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), eq(certificate.getUvci()), any(), anyString());
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY),
+                                                         any(), eq(certificate.getUvci()), any(), anyString(), anyString());
         }
 
         @Test
@@ -1582,7 +1648,8 @@ class CovidCertificateGenerationControllerTest {
 
             postRequest(URL, this.antibodyCreateDto, status().isOk());
 
-            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), eq("CH"));
+            verify(kpiDataService, times(1)).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY),
+                                                         any(), any(), any(), eq("CH"), anyString());
         }
 
         @Test
@@ -1590,7 +1657,7 @@ class CovidCertificateGenerationControllerTest {
             ReflectionTestUtils.setField(this.antibodyCreateDto, "appCode", null);
             postRequest(URL, this.antibodyCreateDto, status().isOk());
 
-            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_INAPP_DELIVERY), any(), any(), any(), anyString());
+            verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_IN_APP_DELIVERY), any(), any(), any(), anyString());
         }
 
         @Test
