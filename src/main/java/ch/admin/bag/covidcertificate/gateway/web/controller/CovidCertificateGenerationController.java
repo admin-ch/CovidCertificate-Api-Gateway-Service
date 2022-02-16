@@ -37,9 +37,12 @@ import java.util.Optional;
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_DETAILS_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_CODE_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_UVCI_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_SYSTEM_API;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TIMESTAMP_KEY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_INAPP_DELIVERY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_IN_APP_DELIVERY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.LOG_FORMAT;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.DUPLICATE_DELIVERY_METHOD;
@@ -398,6 +401,8 @@ public class CovidCertificateGenerationController {
                     typeCodeDetailString = DETAILS_RAPID;
                     break;
             }
+        } else {
+            typeCodeDetailString = DETAILS_RAPID;
         }
         return typeCodeDetailString;
     }
@@ -407,6 +412,7 @@ public class CovidCertificateGenerationController {
 
         var timestampKVPair = kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT));
         var systemKVPair = kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API);
+        var inAppDeliveryCode = createDto.getAppCode();
 
         if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
             var printDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_CANTON);
@@ -414,9 +420,12 @@ public class CovidCertificateGenerationController {
             log.info("kpi: {} {} {} {}", timestampKVPair, systemKVPair, printDeliveryTypeKVPair, cantonKVPair);
             kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details, country);
         } else if (StringUtils.hasText(createDto.getAppCode())) {
-            var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY);
-            log.info("kpi: {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair);
-            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci, details, country);
+            var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_IN_APP_DELIVERY);
+            var inAppDeliveryCodeKVPair = kv(KPI_IN_APP_DELIVERY_CODE_KEY, inAppDeliveryCode);
+            var inAppDeliveryUvciPair = kv(KPI_IN_APP_DELIVERY_UVCI_KEY, uvci);
+
+            log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_IN_APP_DELIVERY, userExtId, uvci, details, country, inAppDeliveryCode);
         }
     }
 }
