@@ -93,8 +93,9 @@ public class CovidCertificateRevocationController {
         service.createRevocation(revocationDto);
 
         LocalDateTime timestamp = LocalDateTime.now();
-        log.info("kpi: {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)), kv(KPI_REVOKE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_UUID_KEY, userExtId));
-        kpiDataService.saveKpiData(timestamp, KPI_REVOKE_CERTIFICATE_TYPE, userExtId, revocationDto.getUvci(), null, null);
+        log.info("kpi: {} {} {} {}", kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT)),
+                kv(KPI_REVOKE_CERTIFICATE_TYPE, KPI_SYSTEM_API), kv(KPI_UUID_KEY, userExtId), kv(KPI_FRAUD, revocationDto.isFraud()));
+        kpiDataService.saveKpiData(timestamp, KPI_REVOKE_CERTIFICATE_TYPE, userExtId, revocationDto.getUvci(), revocationDto.isFraud());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
