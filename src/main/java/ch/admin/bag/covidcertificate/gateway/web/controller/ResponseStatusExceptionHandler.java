@@ -3,6 +3,7 @@ package ch.admin.bag.covidcertificate.gateway.web.controller;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
+import ch.admin.bag.covidcertificate.gateway.service.dto.FeatureToggleException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.ReadValueSetsException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -13,7 +14,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice()
+@ControllerAdvice
 @Slf4j
 public class ResponseStatusExceptionHandler {
 
@@ -50,6 +51,11 @@ public class ResponseStatusExceptionHandler {
 
     @ExceptionHandler(value = {ReadValueSetsException.class})
     protected ResponseEntity<RestError> handleReadValueSetsException(ReadValueSetsException ex) {
+        return handleError(ex.getError());
+    }
+
+    @ExceptionHandler(value = {FeatureToggleException.class})
+    protected ResponseEntity<RestError> handleFeatureToggleException(FeatureToggleException ex) {
         return handleError(ex.getError());
     }
 
