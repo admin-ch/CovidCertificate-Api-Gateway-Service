@@ -12,6 +12,7 @@ public class Constants {
     public static final String KPI_TYPE_KEY = "type";
     public static final String KPI_COUNTRY = "country";
     public static final String KPI_DETAILS_KEY = "details";
+    public static final String KPI_FRAUD = "fraud";
     public static final String KPI_CERT_KEY = "cert";
     public static final String KPI_IN_APP_DELIVERY_CODE_KEY = "code";
     public static final String KPI_IN_APP_DELIVERY_UVCI_KEY = "uvci";
