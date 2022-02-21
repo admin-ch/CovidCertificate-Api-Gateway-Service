@@ -32,16 +32,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_COUNTRY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_DETAILS_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_CODE_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_UVCI_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_SYSTEM_API;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TIMESTAMP_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_ANTIBODY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_INAPP_DELIVERY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_IN_APP_DELIVERY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY_RAT;
@@ -92,10 +95,12 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 @ApiResponse(
         responseCode = "403",
+        description = "All certificate creation endpoints can be toggled, when an endpoint is disabled, the backend respond with a HTTP 403 Forbidden",
         content = @Content(
                 schema = @Schema(implementation = RestError.class),
                 mediaType = "application/json",
                 examples = {
+                        @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
                         @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
                         @ExampleObject(name = "MISSING_BEARER_JSON", value = MISSING_BEARER_JSON),
                         @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
@@ -106,6 +111,10 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
                 })
 )
 public class CovidCertificateGenerationController {
+
+    public static final String DETAILS_RAPID = "rapid";
+    public static final String DETAILS_ANTIBODY = "antibody";
+    public static final String DETAILS_PCR = "pcr";
 
     private final CovidCertificateGenerationService generationService;
     private final AuthorizationService authorizationService;
@@ -154,7 +163,9 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
+        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(),
+                createDto.getVaccinationInfo().get(0).getMedicinalProductCode(),
+                createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
         if (createDto.getVaccinationInfo().get(0).getNumberOfDoses() == 1 &&
                 createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses() == 1) {
             log.info("fraud: {}", kv("risk", "1/1"));
@@ -205,7 +216,9 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION_TOURIST, userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination());
+        logKpi(KPI_TYPE_VACCINATION_TOURIST, userExtId, createDto, covidCertificate.getUvci(),
+                createDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode(),
+                createDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination());
         if (createDto.getVaccinationTouristInfo().get(0).getNumberOfDoses() == 1 &&
                 createDto.getVaccinationTouristInfo().get(0).getTotalNumberOfDoses() == 1) {
             log.info("fraud: {}", kv("risk", "1/1"));
@@ -302,7 +315,8 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(), null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
+        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(),
+                null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
         return covidCertificate;
     }
 
@@ -346,7 +360,7 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        logRecoveryRatCertificateGenerationKpi(createDto, userExtId, covidCertificate.getUvci());
         return covidCertificate;
     }
 
@@ -390,18 +404,45 @@ public class CovidCertificateGenerationController {
         createDto.validate();
 
         CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(), null, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(),
+                DETAILS_ANTIBODY, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
+    private String getDetails(Optional<TestType> typeCode) {
+        String typeCodeDetailString = null;
+        if (typeCode.isPresent()) {
+            TestType foundTestType = typeCode.get();
+            switch (foundTestType) {
+                case PCR:
+                    typeCodeDetailString = DETAILS_PCR;
+                    break;
+                case RAPID_TEST:
+                    typeCodeDetailString = DETAILS_RAPID;
+                    break;
+            }
+        } else {
+            typeCodeDetailString = DETAILS_RAPID;
+        }
+        return typeCodeDetailString;
+    }
 
     public void logTestCertificateGenerationKpi(TestCertificateCreateDto createDto, String userExtId, String uvci) {
         var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
-        String typeCodeDetailString = testType.map(TestType::getKpiValue).orElse(null);
-        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci, typeCodeDetailString, createDto.getTestInfo().get(0).getMemberStateOfTest());
+        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci,
+                getDetails(testType),
+                createDto.getTestInfo().get(0).getMemberStateOfTest());
     }
 
-    private void logKpi(String type, String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
+    public void logRecoveryRatCertificateGenerationKpi(RecoveryRatCertificateCreateDto createDto, String userExtId, String uvci) {
+        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
+        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, uvci,
+                getDetails(testType),
+                ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+    }
+
+    private void logKpi(String type, String userExtId, CertificateCreateDto createDto,
+                        String uvci, String details, String country) {
         LocalDateTime timestamp = LocalDateTime.now();
         kpiDataService.saveKpiData(timestamp, type, userExtId, uvci, details, country);
         var timestampKVPair = kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT));
@@ -410,6 +451,7 @@ public class CovidCertificateGenerationController {
         var detailsKVPair = kv(KPI_DETAILS_KEY, details);
         var kpiCountryKVPair = kv(KPI_COUNTRY, country);
         var uuidKVPair = kv(KPI_UUID_KEY, userExtId);
+        var inAppDeliveryCode = createDto.getAppCode();
 
         if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
             var cantonKVPair = kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender());
@@ -419,14 +461,19 @@ public class CovidCertificateGenerationController {
                 log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
             }
             kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details, country);
-        } else if (StringUtils.hasText(createDto.getAppCode())) {
-            var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_INAPP_DELIVERY);
+        } else if (StringUtils.hasText(inAppDeliveryCode)) {
+            var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_IN_APP_DELIVERY);
+            var inAppDeliveryCodeKVPair = kv(KPI_IN_APP_DELIVERY_CODE_KEY, inAppDeliveryCode);
+            var inAppDeliveryUvciPair = kv(KPI_IN_APP_DELIVERY_UVCI_KEY, uvci);
             if (details == null) {
-                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, uuidKVPair, kpiCountryKVPair);
+                log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair,
+                        uuidKVPair, kpiCountryKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
             } else {
-                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
+                log.info("kpi: {} {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair,
+                        detailsKVPair, uuidKVPair, kpiCountryKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
             }
-            kpiDataService.saveKpiData(timestamp, KPI_TYPE_INAPP_DELIVERY, userExtId, uvci, details, country);
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_IN_APP_DELIVERY, userExtId, uvci,
+                    details, country, inAppDeliveryCode);
         } else {
             if (details == null) {
                 log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, kpiCountryKVPair);
