@@ -87,10 +87,12 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 @ApiResponse(
         responseCode = "403",
+        description = "All certificate creation endpoints can be toggled, when an endpoint is disabled, the backend respond with a HTTP 403 Forbidden",
         content = @Content(
                 schema = @Schema(implementation = RestError.class),
                 mediaType = "application/json",
                 examples = {
+                        @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
                         @ExampleObject(name = "INVALID_BEARER", value = INVALID_BEARER_JSON),
                         @ExampleObject(name = "MISSING_BEARER_JSON", value = MISSING_BEARER_JSON),
                         @ExampleObject(name = "INVALID_SIGNATURE", value = INVALID_SIGNATURE_JSON),
