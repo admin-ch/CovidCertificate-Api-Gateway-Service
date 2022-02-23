@@ -30,50 +30,40 @@ public class CovidCertificateGenerationService {
     @Value("${cc-management-service.covidcertificate.api.v1-path}")
     private String covidcertificateApiV1Path;
 
-    @Value("#{'${allowed-common-names-for-system-source}'.split(',')}")
-    private List<String> allowedCommonNamesForSystemSource;
-
     private final WebClient defaultWebClient;
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(TestCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "test");
+    private final SystemSourceService systemSourceService;
+
+    public CovidCertificateCreateResponseDto createCovidCertificate(TestCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "test", userExtId);
     }
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "recovery");
+    public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "recovery", userExtId);
     }
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryRatCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "recovery-rat");
+    public CovidCertificateCreateResponseDto createCovidCertificate(RecoveryRatCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "recovery-rat", userExtId);
     }
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "vaccination");
+    public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "vaccination", userExtId);
     }
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationTouristCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "vaccination-tourist");
+    public CovidCertificateCreateResponseDto createCovidCertificate(VaccinationTouristCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "vaccination-tourist", userExtId);
     }
 
-    public CovidCertificateCreateResponseDto createCovidCertificate(AntibodyCertificateCreateDto createDto) {
-        return createCovidCertificate(createDto, "antibody");
+    public CovidCertificateCreateResponseDto createCovidCertificate(AntibodyCertificateCreateDto createDto, String userExtId) {
+        return createCovidCertificate(createDto, "antibody", userExtId);
     }
 
-    private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String resourcePath) {
+    private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String resourcePath, String userExtId) {
         final var uri = UriComponentsBuilder.fromHttpUrl(serviceURL + covidcertificateApiV1Path + resourcePath).toUriString();
         log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));
 
-        if (createDto.getSystemSource() != null) {
-            log.debug("SystemSource set in request. Checking CommonName...");
-            var commonName = ((CustomHeaderAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getId();
-            if (allowedCommonNamesForSystemSource.contains(commonName) && SystemSource.ApiPlatform.equals(createDto.getSystemSource())) {
-                log.debug("SystemSource set to ApiPlatform by {}", commonName);
-            } else {
-                createDto.setSystemSource(SystemSource.ApiGateway);
-            }
-        } else {
-            createDto.setSystemSource(SystemSource.ApiGateway);
-        }
+        createDto.setSystemSource(systemSourceService.getRelevantSystemSource(createDto.getSystemSource()));
+        createDto.setUserExtId(userExtId);
 
         try {
             CovidCertificateCreateResponseDto response = defaultWebClient.post()

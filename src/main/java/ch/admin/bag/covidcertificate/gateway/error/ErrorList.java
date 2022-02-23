@@ -77,6 +77,10 @@ public class ErrorList {
     public static final String MISSING_RECOVERY_RAT_INFO_JSON = ERROR_CODE_KEY + MISSING_RECOVERY_RAT_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + MISSING_RECOVERY_RAT_INFO_MESSAGE + "}";
 
+    private static final int INVALID_SIZE_OF_UVCI_LIST_CODE = 472;
+    public static final String INVALID_SIZE_OF_UVCI_LIST = ERROR_CODE_KEY + INVALID_SIZE_OF_UVCI_LIST_CODE + ","
+            + ERROR_MESSAGE_KEY + "Size of uvci list is not valid. Max 100 uvcis allowed.}";
+
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
     private static final String INVALID_SIGNATURE_MESSAGE = "Integrity check failed, the body hash does not match the hash in the header";

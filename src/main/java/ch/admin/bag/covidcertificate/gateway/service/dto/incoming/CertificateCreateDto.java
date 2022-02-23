@@ -25,4 +25,7 @@ public abstract class CertificateCreateDto implements DtoWithAuthorization {
     @Schema(hidden = true)
     @Setter
     private SystemSource systemSource;
+    @Schema(hidden = true)
+    @Setter
+    private String userExtId;
 }
