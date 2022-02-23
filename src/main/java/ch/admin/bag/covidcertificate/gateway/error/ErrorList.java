@@ -79,7 +79,7 @@ public class ErrorList {
 
     private static final int INVALID_SIZE_OF_UVCI_LIST_CODE = 472;
     public static final String INVALID_SIZE_OF_UVCI_LIST = ERROR_CODE_KEY + INVALID_SIZE_OF_UVCI_LIST_CODE + ","
-            + ERROR_MESSAGE_KEY + "Size of uvci list is not valid.}";
+            + ERROR_MESSAGE_KEY + "Size of uvci list is not valid. Max 100 uvcis allowed.}";
 
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
