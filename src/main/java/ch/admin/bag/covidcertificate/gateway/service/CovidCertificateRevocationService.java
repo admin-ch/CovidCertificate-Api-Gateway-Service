@@ -37,7 +37,7 @@ public class CovidCertificateRevocationService {
         revocationDto.setUserExtId(userExtId);
 
         String uri = builder.toUriString();
-        log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
+        log.debug("Call the CovidCertificateRevocationService with {}", kv("url", uri));
         try {
             defaultWebClient.post()
                     .uri(uri)
@@ -59,7 +59,7 @@ public class CovidCertificateRevocationService {
         revocationListDto.setUserExtId(userExtId);
         String uri = builder.toUriString();
 
-        log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
+        log.debug("Call the CovidCertificateRevocationService with {}", kv("url", uri));
         try {
             CheckRevocationListResponseDto response = defaultWebClient.post()
                     .uri(uri)
@@ -83,7 +83,7 @@ public class CovidCertificateRevocationService {
         revocationListDto.setUserExtId(userExtId);
         String uri = builder.toUriString();
 
-        log.debug("Call the CovidCertificateRevocationService with url {}", kv("url", uri));
+        log.debug("Call the CovidCertificateRevocationService with {}", kv("url", uri));
         try {
             RevocationListResponseDto response = defaultWebClient.post()
                     .uri(uri)
