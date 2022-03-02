@@ -96,3 +96,8 @@ cc-management-service:
   covidcertificate:
     api:
       v1-path: "api/v1/covidcertificate/"
+  authorization:
+    api:
+      v1-path: "api/v1/authorization/"
+    data-sync:
+      cron: "0 * * * * *" ## Every minute // cron: "0 0 */1 * * ?" ## Every hour

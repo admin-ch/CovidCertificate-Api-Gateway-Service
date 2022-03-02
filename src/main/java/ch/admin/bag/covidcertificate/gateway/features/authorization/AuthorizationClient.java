@@ -1,0 +1,193 @@
+package ch.admin.bag.covidcertificate.gateway.features.authorization;
+
+import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.RoleDataDto;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.FunctionsDefinitionDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+@Profile("authorization")
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class AuthorizationClient {
+
+    private static final String AUTHORIZATION_DEFINITIONS_CACHE_NAME = "AUTHORIZATION_DEFINITIONS_CACHE_NAME";
+    private static final String AUTHORIZATION_ROLEMAP_CACHE_NAME = "AUTHORIZATION_ROLEMAP_CACHE_NAME";
+
+    private final WebClient defaultWebClient;
+
+    private final String definitionsResourcePath = "/definition/";
+    private final String servicePathVariable = "api-gateway";
+
+    private final String roleMappingResourcePath = "/role-mapping";
+
+    @Value("${cc-management-service.uri}")
+    private String managementServiceURL;
+
+    @Value("${cc-management-service.authorization.api.v1-path}")
+    private String authorizationApiV1Path;
+
+    private Map<String, String> roleMapping;
+    private FunctionsDefinitionDto functionsDefinitionDto;
+
+    @PostConstruct
+    private void init() {
+        this.fetchAndSaveAuthorizationData();
+    }
+
+    public boolean isAuthorized(List<String> rawRoles, String function) {
+        Set<String> grantedFunctions = this.getCurrent(rawRoles);
+        return grantedFunctions.contains(function);
+    }
+
+    /**
+     * Returns all permitted functions by given roles at given service.
+     * This permission is bound to time and may change during time.
+     *
+     * @param rawRoles the current roles of the user (either from eIAM or from Claim)
+     * @return list of permitted functions
+     */
+    private Set<String> getCurrent(List<String> rawRoles) {
+        Set<String> grantedFunctions = Collections.emptySet();
+        // map the raw roles to the configured roles
+        final Set<String> roles = rawRoles.stream()
+                .map(role -> roleMapping.get(role))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (roles.isEmpty()) {
+            log.info("no supported roles in '{}'", rawRoles);
+        } else {
+            // keep authorizations which are currently valid
+            List<FunctionsDefinitionDto.Function> functionsByPointInTime =
+                    filterByPointInTime(LocalDateTime.now(), this.functionsDefinitionDto.getFunctions());
+            // identify the functions granted to this time by given roles
+            grantedFunctions = functionsByPointInTime.stream()
+                    .filter(function -> isGranted(roles, function))
+                    .map(function -> function.getIdentifier())
+                    .collect(Collectors.toSet());
+        }
+
+        log.info("grants: " + grantedFunctions);
+        return grantedFunctions;
+    }
+
+    /**
+     * Returns <code>true</code> for given function IF:
+     * <ul>
+     *     <li>mandatory</li>
+     *     is valid when either is <code>null</code> or the given role is part of the user's roles
+     *     <li>one-of</li>
+     *     is valid when either is <code>null</code> or one of the given roles is part of the user's roles
+     * </ul>
+     * <li>
+     * The given function is only permitted when both conditions are valid.
+     *
+     * @param roles    the user's roles
+     * @param function the function to check
+     * @return <code>true</code> only if both mandatory and one-of are valid
+     */
+    private boolean isGranted(Set<String> roles, FunctionsDefinitionDto.Function function) {
+        String mandatory = function.getMandatory();
+        boolean mandatoryValid = mandatory == null || roles.contains(mandatory);
+        List<String> oneOf = function.getOneOf();
+        boolean oneOfValid = oneOf != null && !oneOf.isEmpty() && oneOf.stream().anyMatch(roles::contains);
+        return (mandatoryValid && oneOfValid);
+    }
+
+    private List<FunctionsDefinitionDto.Function> filterByPointInTime(LocalDateTime pointInTime, List<FunctionsDefinitionDto.Function> functions) {
+        List<FunctionsDefinitionDto.Function> result = Collections.emptyList();
+        if (functions != null && pointInTime != null) {
+            result = functions.stream()
+                    .parallel()
+                    .filter(function -> isBetween(pointInTime, function))
+                    .collect(Collectors.toList());
+        }
+        return result;
+    }
+
+    private boolean isBetween(LocalDateTime pointInTime, FunctionsDefinitionDto.Function function) {
+        boolean between = false;
+        if (function != null) {
+            boolean fromSmallerEquals = (function.getFrom() == null || function.getFrom().isBefore(pointInTime) || function.getFrom().isEqual(pointInTime));
+            boolean untilLargerEquals = (function.getUntil() == null || function.getUntil().isAfter(pointInTime) || function.getUntil().isEqual(pointInTime));
+            between = fromSmallerEquals && untilLargerEquals;
+        }
+        return between;
+    }
+
+
+    @Cacheable(AUTHORIZATION_DEFINITIONS_CACHE_NAME)
+    public FunctionsDefinitionDto fetchDefinitions() {
+        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + definitionsResourcePath + servicePathVariable).toUriString();
+
+        return defaultWebClient.get()
+                .uri(uri)
+                .retrieve()
+                .bodyToMono(FunctionsDefinitionDto.class)
+                .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
+                .block();
+    }
+
+    @Cacheable(AUTHORIZATION_ROLEMAP_CACHE_NAME)
+    public List<RoleDataDto> fetchRoleMap() {
+        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + roleMappingResourcePath).toUriString();
+
+        RoleDataDto[] response = defaultWebClient.get()
+                .uri(uri)
+                .retrieve()
+                .bodyToMono(RoleDataDto[].class)
+                .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
+                .block();
+
+        return Arrays.asList(response);
+    }
+
+    private void saveDefinitions(FunctionsDefinitionDto functionsDefinitionDto) {
+        this.functionsDefinitionDto = functionsDefinitionDto;
+    }
+
+    private void saveRoleMap(List<RoleDataDto> roleMap) {
+        roleMapping = new TreeMap<>();
+        for (RoleDataDto roleDataDto : roleMap) {
+            roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
+            roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
+        }
+    }
+
+    @Scheduled(fixedRateString = "${cc-management-service.authorization.data-sync.cron}")
+    @CacheEvict(value = {AUTHORIZATION_DEFINITIONS_CACHE_NAME, AUTHORIZATION_ROLEMAP_CACHE_NAME}, allEntries = true)
+    public void fetchAndSaveAuthorizationData() {
+
+        try {
+            FunctionsDefinitionDto functionsDefinitionDto = this.fetchDefinitions();
+            List<RoleDataDto> roleMap = this.fetchRoleMap();
+
+            // TODO: What to do when no data is fetched (empty on purpose), when valid data are cached and fetch+1 return empty data
+
+            this.saveDefinitions(functionsDefinitionDto);
+            this.saveRoleMap(roleMap);
+        } catch (IllegalStateException exception) {
+            log.error(exception.getMessage());
+        }
+    }
+}
