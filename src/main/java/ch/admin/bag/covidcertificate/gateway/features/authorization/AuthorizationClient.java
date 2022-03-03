@@ -52,7 +52,7 @@ public class AuthorizationClient {
 
     @PostConstruct
     private void init() {
-        this.fetchAndSaveAuthorizationData();
+        // this.fetchAndSaveAuthorizationData();
     }
 
     public boolean isAuthorized(List<String> rawRoles, String function) {
@@ -174,7 +174,7 @@ public class AuthorizationClient {
         }
     }
 
-    @Scheduled(fixedRateString = "${cc-management-service.authorization.data-sync.cron}")
+    @Scheduled(cron = "${cc-management-service.authorization.data-sync.cron}")
     @CacheEvict(value = {AUTHORIZATION_DEFINITIONS_CACHE_NAME, AUTHORIZATION_ROLEMAP_CACHE_NAME}, allEntries = true)
     public void fetchAndSaveAuthorizationData() {
 

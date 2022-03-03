@@ -1,5 +1,6 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
@@ -55,7 +56,7 @@ public class BearerTokenValidationService {
 
     }
 
-    public String validate(String token, String ipAddress) throws InvalidBearerTokenException {
+    public IdentityDto validate(String token, String ipAddress) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
         if (token == null) {
@@ -92,7 +93,7 @@ public class BearerTokenValidationService {
 
             logSecKPI(ipAddress, claimsJws, userExtId, idpSource, jti);
 
-            return userExtId;
+            return new IdentityDto(userExtId, idpSource);
 
         } catch (ExpiredJwtException e) {
             log.warn("Token expired", e);

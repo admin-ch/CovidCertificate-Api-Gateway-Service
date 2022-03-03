@@ -79,7 +79,7 @@ class CovidCertificateRevocationControllerTest {
                             .content(mapper.writeValueAsString(this.revocationDto)))
                     .andExpect(status().isCreated());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(revocationService, times(1)).createRevocation(any(RevocationDto.class), eq(null));
         }
 
@@ -93,14 +93,14 @@ class CovidCertificateRevocationControllerTest {
                             .content(mapper.writeValueAsString(this.revocationDto)))
                     .andExpect(status().isCreated());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(revocationService, times(1)).createRevocation(any(RevocationDto.class), eq(null));
         }
 
         @Test
         void returns403__withAuthorizationError() throws Exception {
             ReflectionTestUtils.setField(this.revocationDto, "otp", null);
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             mockMvc.perform(post(URL)
                             .accept(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ class CovidCertificateRevocationControllerTest {
                             .content(mapper.writeValueAsString(this.revocationDto)))
                     .andExpect(status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(revocationService, never()).createRevocation(any(RevocationDto.class), any(String.class));
             verify(revocationService, never()).createRevocation(any(RevocationDto.class), eq(null));
         }
