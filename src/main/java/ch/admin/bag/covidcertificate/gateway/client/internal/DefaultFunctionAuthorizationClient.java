@@ -60,7 +60,7 @@ public class DefaultFunctionAuthorizationClient implements FunctionAuthorization
                 List<String> roles = profile.getAuthorizations().stream()
                         .map(Authorization::getRole)
                         .collect(Collectors.toList()).stream()
-                        .map(Role::getName)
+                        .map(Role::getExtId)
                         .collect(Collectors.toList());
                 if (authorizationClient.isAuthorized(roles, function.getIdentifier())) {
                     return;

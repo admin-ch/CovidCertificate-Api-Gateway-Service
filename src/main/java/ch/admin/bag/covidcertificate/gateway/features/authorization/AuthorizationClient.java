@@ -1,7 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.features.authorization;
 
-import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.RoleDataDto;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.FunctionsDefinitionDto;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.RoleDataDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class AuthorizationClient {
     @Value("${cc-management-service.authorization.api.v1-path}")
     private String authorizationApiV1Path;
 
-    private Map<String, String> roleMapping;
+    private Map<String, String> roleMapping=new HashMap<>();
     private FunctionsDefinitionDto functionsDefinitionDto;
 
     @PostConstruct
@@ -140,12 +141,15 @@ public class AuthorizationClient {
     public FunctionsDefinitionDto fetchDefinitions() {
         final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + definitionsResourcePath + servicePathVariable).toUriString();
 
-        return defaultWebClient.get()
+        FunctionsDefinitionDto response = defaultWebClient
+                .get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(FunctionsDefinitionDto.class)
                 .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
                 .block();
+
+        return response;
     }
 
     @Cacheable(AUTHORIZATION_ROLEMAP_CACHE_NAME)
@@ -169,7 +173,6 @@ public class AuthorizationClient {
     private void saveRoleMap(List<RoleDataDto> roleMap) {
         roleMapping = new TreeMap<>();
         for (RoleDataDto roleDataDto : roleMap) {
-            roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
             roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
         }
     }

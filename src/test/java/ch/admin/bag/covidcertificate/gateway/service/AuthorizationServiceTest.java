@@ -2,17 +2,13 @@ package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.client.FunctionAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
-import ch.admin.bag.covidcertificate.gateway.features.authorization.AuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
 import ch.admin.bag.covidcertificate.gateway.web.config.CustomHeaderAuthenticationToken;
 import com.flextrade.jfixture.JFixture;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -22,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -44,22 +39,22 @@ class AuthorizationServiceTest {
     String ipAddress;
 
     @BeforeEach
-    void initialize() {
+    void initialize() throws InvalidBearerTokenException {
         this.bearerTokenValidationService = mock(BearerTokenValidationService.class);
         this.identityAuthorizationClient = mock(IdentityAuthorizationClient.class);
         this.functionAuthorizationClient = mock(FunctionAuthorizationClient.class);
         this.dtoWithAuthorization = this.getDtoWithAuthorization(false, false);
-
-        
 
         this.authorizationService = new AuthorizationService(bearerTokenValidationService, identityAuthorizationClient, functionAuthorizationClient);
         this.ipAddress = fixure.create(String.class);
     }
 
     @Test
-    void verifiesCommonName__ifInAllowedList() {
+    void verifiesCommonName__ifInAllowedList() throws InvalidBearerTokenException {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("test-cn");
+
+        this.dtoWithAuthorization = this.getDtoWithAuthorization(false, true);
 
         var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(identityAuthorizationClient, times(1)).authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
@@ -71,6 +66,9 @@ class AuthorizationServiceTest {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("not-in-allowed");
 
+        when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
+                .thenReturn(new IdentityDto(any(String.class), any(String.class)));
+
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(bearerTokenValidationService, times(1)).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
     }
@@ -81,6 +79,9 @@ class AuthorizationServiceTest {
         this.setCnNameInContext("test-cn");
 
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
+
+        when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
+                .thenReturn(new IdentityDto(any(String.class), any(String.class)));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(identityAuthorizationClient, never()).authorize(any(), any());
