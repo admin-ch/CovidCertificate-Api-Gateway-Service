@@ -94,6 +94,10 @@ public class CovidCertificateRevocationController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    /*
+    // TODO VACCINECER-2086: Enable Mass-revocation
+    // TODO: make sure PreAuthorize fits new authorization
+
     @PostMapping("/mass-revocation-check")
     @PreAuthorize("hasRole('bag-cc-superuser')")
     @Operation(operationId = "certificateMassRevocationCheck",
@@ -155,4 +159,6 @@ public class CovidCertificateRevocationController {
 
         return revocationService.massRevocation(revocationListDto, userExtId);
     }
+
+    */
 }
