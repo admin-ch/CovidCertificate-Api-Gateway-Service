@@ -53,7 +53,7 @@ public class AuthorizationClient {
 
     @PostConstruct
     private void init() {
-        // this.fetchAndSaveAuthorizationData();
+         this.fetchAndSaveAuthorizationData();
     }
 
     public boolean isAuthorized(List<String> rawRoles, String function) {
@@ -84,7 +84,7 @@ public class AuthorizationClient {
             // identify the functions granted to this time by given roles
             grantedFunctions = functionsByPointInTime.stream()
                     .filter(function -> isGranted(roles, function))
-                    .map(function -> function.getIdentifier())
+                    .map(FunctionsDefinitionDto.Function::getIdentifier)
                     .collect(Collectors.toSet());
         }
 

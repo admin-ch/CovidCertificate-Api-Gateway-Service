@@ -5,6 +5,7 @@ import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
+import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
 import ch.admin.bag.covidcertificate.gateway.web.config.CustomHeaderAuthenticationToken;
 import com.flextrade.jfixture.JFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -39,7 +43,7 @@ class AuthorizationServiceTest {
     String ipAddress;
 
     @BeforeEach
-    void initialize() throws InvalidBearerTokenException {
+    void initialize() {
         this.bearerTokenValidationService = mock(BearerTokenValidationService.class);
         this.identityAuthorizationClient = mock(IdentityAuthorizationClient.class);
         this.functionAuthorizationClient = mock(FunctionAuthorizationClient.class);
@@ -55,6 +59,11 @@ class AuthorizationServiceTest {
         this.setCnNameInContext("test-cn");
 
         this.dtoWithAuthorization = this.getDtoWithAuthorization(false, true);
+        UserAuthorizationData userAuthorizationData = new UserAuthorizationData(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource(), Collections.emptyList());
+
+        when(identityAuthorizationClient.authorize(any(String.class), any(String.class)))
+                .thenReturn(userAuthorizationData);
+
 
         var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(identityAuthorizationClient, times(1)).authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
@@ -67,7 +76,7 @@ class AuthorizationServiceTest {
         this.setCnNameInContext("not-in-allowed");
 
         when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
-                .thenReturn(new IdentityDto(any(String.class), any(String.class)));
+                .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(bearerTokenValidationService, times(1)).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
@@ -81,7 +90,7 @@ class AuthorizationServiceTest {
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
 
         when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
-                .thenReturn(new IdentityDto(any(String.class), any(String.class)));
+                .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(identityAuthorizationClient, never()).authorize(any(), any());
