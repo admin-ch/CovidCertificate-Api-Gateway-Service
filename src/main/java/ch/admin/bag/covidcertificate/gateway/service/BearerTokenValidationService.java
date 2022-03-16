@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Array;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.IDP_SOURCE_CLAIM_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
@@ -100,7 +100,7 @@ public class BearerTokenValidationService {
             String typ = claimsJws.getBody().get(TYP_CLAIM_KEY, String.class);
             var rolesArray = claimsJws.getBody().get(USER_ROLES_CLAIM_KEY, String[].class);
 
-            List<String> roles = ArrayUtils.isEmpty(rolesArray) ? Collections.emptyList() : Arrays.asList(rolesArray);
+            List<String> roles = Objects.isNull(rolesArray) || ArrayUtils.isEmpty(rolesArray) ? Collections.emptyList() : Arrays.asList(rolesArray);
 
             log.debug("Found Claims in JWT {}, {}, {}, {}",
                     kv(SCOPE_CLAIM_KEY, scope),
