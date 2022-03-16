@@ -10,19 +10,18 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -48,17 +47,22 @@ public class AuthorizationClient {
     @Value("${cc-management-service.authorization.api.v1-path}")
     private String authorizationApiV1Path;
 
-    private Map<String, String> roleMapping=new HashMap<>();
-    private FunctionsDefinitionDto functionsDefinitionDto;
-
     @PostConstruct
     private void init() {
-         this.fetchAndSaveAuthorizationData();
+        this.fetchAndSaveAuthorizationData();
     }
 
     public boolean isAuthorized(List<String> rawRoles, String function) {
-        Set<String> grantedFunctions = this.getCurrent(rawRoles);
-        return grantedFunctions.contains(function);
+        // OTP/LTOTP pre-migration Authorization-Concept:
+        // If the list is empty, it is deduced that the
+        // roles have not been encoded in the OTP/LTOTP,
+        // so all authorizations are granted.
+        if (CollectionUtils.isEmpty(rawRoles)) {
+            return true;
+        } else {
+            Set<String> grantedFunctions = this.getCurrent(rawRoles);
+            return grantedFunctions.contains(function);
+        }
     }
 
     /**
@@ -72,7 +76,7 @@ public class AuthorizationClient {
         Set<String> grantedFunctions = Collections.emptySet();
         // map the raw roles to the configured roles
         final Set<String> roles = rawRoles.stream()
-                .map(role -> roleMapping.get(role))
+                .map(role -> fetchRoleMap().get(role))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         if (roles.isEmpty()) {
@@ -80,7 +84,7 @@ public class AuthorizationClient {
         } else {
             // keep authorizations which are currently valid
             List<FunctionsDefinitionDto.Function> functionsByPointInTime =
-                    filterByPointInTime(LocalDateTime.now(), this.functionsDefinitionDto.getFunctions());
+                    filterByPointInTime(LocalDateTime.now(), fetchDefinitions().getFunctions());
             // identify the functions granted to this time by given roles
             grantedFunctions = functionsByPointInTime.stream()
                     .filter(function -> isGranted(roles, function))
@@ -141,54 +145,41 @@ public class AuthorizationClient {
     public FunctionsDefinitionDto fetchDefinitions() {
         final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + definitionsResourcePath + servicePathVariable).toUriString();
 
-        FunctionsDefinitionDto response = defaultWebClient
+        return defaultWebClient
                 .get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(FunctionsDefinitionDto.class)
                 .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
                 .block();
-
-        return response;
     }
 
     @Cacheable(AUTHORIZATION_ROLEMAP_CACHE_NAME)
-    public List<RoleDataDto> fetchRoleMap() {
+    public SortedMap<String, String> fetchRoleMap() {
         final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + roleMappingResourcePath).toUriString();
 
-        RoleDataDto[] response = defaultWebClient.get()
+        RoleDataDto[] roleMap = defaultWebClient.get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(RoleDataDto[].class)
                 .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
                 .block();
 
-        return Arrays.asList(response);
-    }
-
-    private void saveDefinitions(FunctionsDefinitionDto functionsDefinitionDto) {
-        this.functionsDefinitionDto = functionsDefinitionDto;
-    }
-
-    private void saveRoleMap(List<RoleDataDto> roleMap) {
-        roleMapping = new TreeMap<>();
+        TreeMap<String, String> roleMapping = new TreeMap<>();
+        assert roleMap != null;
         for (RoleDataDto roleDataDto : roleMap) {
-            roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
+            roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
         }
+        return roleMapping;
     }
 
     @Scheduled(cron = "${cc-management-service.authorization.data-sync.cron}")
     @CacheEvict(value = {AUTHORIZATION_DEFINITIONS_CACHE_NAME, AUTHORIZATION_ROLEMAP_CACHE_NAME}, allEntries = true)
     public void fetchAndSaveAuthorizationData() {
-
         try {
-            FunctionsDefinitionDto functionsDefinitionDto = this.fetchDefinitions();
-            List<RoleDataDto> roleMap = this.fetchRoleMap();
-
             // TODO: What to do when no data is fetched (empty on purpose), when valid data are cached and fetch+1 return empty data
-
-            this.saveDefinitions(functionsDefinitionDto);
-            this.saveRoleMap(roleMap);
+            this.fetchDefinitions();
+            this.fetchRoleMap();
         } catch (IllegalStateException exception) {
             log.error(exception.getMessage());
         }
