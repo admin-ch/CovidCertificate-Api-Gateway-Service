@@ -31,15 +31,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthorizationClient {
 
-    private static final String AUTHORIZATION_DEFINITIONS_CACHE_NAME = "AUTHORIZATION_DEFINITIONS_CACHE_NAME";
     private static final String AUTHORIZATION_ROLEMAP_CACHE_NAME = "AUTHORIZATION_ROLEMAP_CACHE_NAME";
+    private static final String DEFINITION_RESOURCE_PATH = "definition/";
+    private static final String SERVICE_PATH_VARIABLE = "api-gateway";
+
+    private static final String AUTHORIZATION_DEFINITIONS_CACHE_NAME = "AUTHORIZATION_DEFINITIONS_CACHE_NAME";
+    private static final String ROLE_MAPPING_RESOURCE_PATH = "role-mapping";
 
     private final WebClient defaultWebClient;
-
-    private final String definitionsResourcePath = "/definition/";
-    private final String servicePathVariable = "api-gateway";
-
-    private final String roleMappingResourcePath = "/role-mapping";
 
     @Value("${cc-management-service.uri}")
     private String managementServiceURL;
@@ -76,7 +75,7 @@ public class AuthorizationClient {
         Set<String> grantedFunctions = Collections.emptySet();
         // map the raw roles to the configured roles
         final Set<String> roles = rawRoles.stream()
-                .map(role -> fetchRoleMap().get(role))
+                .map(role -> requireRoleMap().get(role))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         if (roles.isEmpty()) {
@@ -84,7 +83,7 @@ public class AuthorizationClient {
         } else {
             // keep authorizations which are currently valid
             List<FunctionsDefinitionDto.Function> functionsByPointInTime =
-                    filterByPointInTime(LocalDateTime.now(), fetchDefinitions().getFunctions());
+                    filterByPointInTime(LocalDateTime.now(), requireDefinitionsFunctions());
             // identify the functions granted to this time by given roles
             grantedFunctions = functionsByPointInTime.stream()
                     .filter(function -> isGranted(roles, function))
@@ -142,22 +141,23 @@ public class AuthorizationClient {
 
 
     @Cacheable(AUTHORIZATION_DEFINITIONS_CACHE_NAME)
-    public FunctionsDefinitionDto fetchDefinitions() {
-        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + definitionsResourcePath + servicePathVariable).toUriString();
-
-        return defaultWebClient
+    public List<FunctionsDefinitionDto.Function> requireDefinitionsFunctions() {
+        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + DEFINITION_RESOURCE_PATH + SERVICE_PATH_VARIABLE).toUriString();
+        FunctionsDefinitionDto response = defaultWebClient
                 .get()
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(FunctionsDefinitionDto.class)
                 .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
                 .block();
+
+        return response.getFunctions();
     }
 
     @Cacheable(AUTHORIZATION_ROLEMAP_CACHE_NAME)
-    public SortedMap<String, String> fetchRoleMap() {
-        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + roleMappingResourcePath).toUriString();
-
+    public SortedMap<String, String> requireRoleMap() {
+        log.info("Fetch Role-Map from management-service.");
+        final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + ROLE_MAPPING_RESOURCE_PATH).toUriString();
         RoleDataDto[] roleMap = defaultWebClient.get()
                 .uri(uri)
                 .retrieve()
@@ -176,12 +176,6 @@ public class AuthorizationClient {
     @Scheduled(cron = "${cc-management-service.authorization.data-sync.cron}")
     @CacheEvict(value = {AUTHORIZATION_DEFINITIONS_CACHE_NAME, AUTHORIZATION_ROLEMAP_CACHE_NAME}, allEntries = true)
     public void fetchAndSaveAuthorizationData() {
-        try {
-            // TODO: What to do when no data is fetched (empty on purpose), when valid data are cached and fetch+1 return empty data
-            this.fetchDefinitions();
-            this.fetchRoleMap();
-        } catch (IllegalStateException exception) {
-            log.error(exception.getMessage());
-        }
+        log.info("Reset of cache 'AUTHORIZATION_DEFINITIONS_CACHE_NAME' and 'AUTHORIZATION_ROLEMAP_CACHE_NAME'.");
     }
 }

@@ -100,7 +100,7 @@ public class BearerTokenValidationService {
             String typ = claimsJws.getBody().get(TYP_CLAIM_KEY, String.class);
             var rolesArray = claimsJws.getBody().get(USER_ROLES_CLAIM_KEY, String[].class);
 
-            List<String> roles = Objects.isNull(rolesArray) || ArrayUtils.isEmpty(rolesArray) ? Collections.emptyList() : Arrays.asList(rolesArray);
+            List<String> roles = ArrayUtils.isEmpty(rolesArray) ? Collections.emptyList() : Arrays.asList(rolesArray);
 
             log.debug("Found Claims in JWT {}, {}, {}, {}",
                     kv(SCOPE_CLAIM_KEY, scope),

@@ -59,7 +59,6 @@ spring:
     basename: mail-messages,validation-messages
     encoding: UTF-8
     fallback-to-system-locale: false
-
   servlet:
     multipart:
       max-file-size: 10MB
