@@ -1,6 +1,5 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
-import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.domain.OtpRevocation;
 import ch.admin.bag.covidcertificate.gateway.util.CustomTokenProviderUtil;
 import com.flextrade.jfixture.JFixture;
@@ -59,7 +58,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        service.validate(token, ipAddress);
+        service.validateOtpAndGetAuthData(token, ipAddress);
     }
 
     @Test
@@ -77,7 +76,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(token, ipAddress));
     }
 
     @Test
@@ -94,11 +93,11 @@ class BearerTokenValidationServiceTest {
 
         String tokenNoExtId = customTokenProviderUtil.createToken("", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoExtId, ipAddress));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(tokenNoExtId, ipAddress));
 
         String tokenNoIdpSource = customTokenProviderUtil.createToken("test", "");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenNoIdpSource, ipAddress));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(tokenNoIdpSource, ipAddress));
     }
 
     @Test
@@ -115,7 +114,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(token, ipAddress));
     }
 
     @Test
@@ -132,7 +131,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createTokenNotSigned("test", "test");
 
-        assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
+        assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(token, ipAddress));
     }
 
     @Test
@@ -148,13 +147,13 @@ class BearerTokenValidationServiceTest {
         String token = customTokenProviderUtil.createToken("test", "test");
 
         final String tokenTruncatedEnd = token.substring(0, token.length() - 1);
-        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedEnd, ipAddress));
+        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(tokenTruncatedEnd, ipAddress));
         var restError = exception.getError();
         assertEquals(INVALID_OTP_LENGTH_MESSAGE, restError.getErrorMessage());
         assertEquals(INVALID_OTP_LENGTH_CODE, restError.getErrorCode());
 
         final String tokenTruncatedStart = token.substring(1);
-        exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(tokenTruncatedStart, ipAddress));
+        exception = assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(tokenTruncatedStart, ipAddress));
         restError = exception.getError();
         assertEquals(INVALID_OTP_LENGTH_MESSAGE, restError.getErrorMessage());
         assertEquals(INVALID_OTP_LENGTH_CODE, restError.getErrorCode());
@@ -172,7 +171,7 @@ class BearerTokenValidationServiceTest {
 
         String token = customTokenProviderUtil.createToken("test", "test", revokedJti);
 
-        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validate(token, ipAddress));
+        InvalidBearerTokenException exception = assertThrows(InvalidBearerTokenException.class, () -> service.validateOtpAndGetAuthData(token, ipAddress));
         assertEquals(INVALID_BEARER, exception.getError());
     }
 }

@@ -1,6 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.domain.TestType;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
@@ -154,7 +155,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.vaccineCreateDto);
             postRequest(URL, this.vaccineCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -172,7 +173,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -263,7 +264,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.vaccineCreateDto, status().isOk());
 
@@ -316,11 +317,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.vaccineCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(VaccinationCertificateCreateDto.class), eq(null));
         }
 
@@ -360,7 +361,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.vaccineTouristCreateDto);
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -378,7 +379,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -469,7 +470,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.vaccineTouristCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isOk());
 
@@ -521,11 +522,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.vaccineTouristCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(VaccinationTouristCertificateCreateDto.class), eq(null));
         }
 
@@ -565,7 +566,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.testCreateDto);
             postRequest(URL, this.testCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -583,7 +584,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -692,7 +693,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.testCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.testCreateDto, status().isOk());
 
@@ -762,11 +763,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.testCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null));
         }
 
@@ -806,7 +807,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.recoveryCreateDto);
             postRequest(URL, this.recoveryCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -824,7 +825,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -907,7 +908,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.recoveryCreateDto, status().isOk());
 
@@ -948,11 +949,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.recoveryCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryCertificateCreateDto.class), eq(null));
         }
 
@@ -992,7 +993,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.recoveryRatCertificateCreateDto);
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -1010,7 +1011,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -1093,7 +1094,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.recoveryRatCertificateCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isOk());
 
@@ -1133,11 +1134,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.recoveryRatCertificateCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(RecoveryRatCertificateCreateDto.class), eq(null));
             verify(kpiDataService, never()).saveKpiData(any(), eq(KPI_TYPE_RECOVERY), any(), anyString(), anyString(), anyString());
         }
@@ -1178,7 +1179,7 @@ class CovidCertificateGenerationControllerTest {
         void callsAuthorizationServiceWithGivenPayload() throws Exception {
             var payload = mapper.writeValueAsString(this.antibodyCreateDto);
             postRequest(URL, this.antibodyCreateDto, status().isOk());
-            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any());
+            verify(authorizationService, times(1)).validateAndGetId(equalsSerialized(payload), any(), any());
         }
 
         @Test
@@ -1196,7 +1197,7 @@ class CovidCertificateGenerationControllerTest {
                             }))
                     .andExpect(status().isOk());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress));
+            verify(authorizationService, times(1)).validateAndGetId(any(), eq(remoteAddress), any());
         }
 
         @Test
@@ -1279,7 +1280,7 @@ class CovidCertificateGenerationControllerTest {
         void savesInAppKpiWithUserId_whenAppCodeIsSet() throws Exception {
             ReflectionTestUtils.setField(this.antibodyCreateDto, "appCode", fixture.create(String.class));
             var userExtId = fixture.create(String.class);
-            when(authorizationService.validateAndGetId(any(), any())).thenReturn(userExtId);
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenReturn(userExtId);
 
             postRequest(URL, this.antibodyCreateDto, status().isOk());
 
@@ -1319,11 +1320,11 @@ class CovidCertificateGenerationControllerTest {
 
         @Test
         void returns403_withAuthorizationError() throws Exception {
-            when(authorizationService.validateAndGetId(any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
+            when(authorizationService.validateAndGetId(any(), any(), any())).thenThrow(new InvalidBearerTokenException(INVALID_BEARER));
 
             postRequest(URL, this.antibodyCreateDto, status().isForbidden());
 
-            verify(authorizationService, times(1)).validateAndGetId(any(), any());
+            verify(authorizationService, times(1)).validateAndGetId(any(), any(), any());
             verify(generationService, never()).createCovidCertificate(any(AntibodyCertificateCreateDto.class), eq(null));
         }
 

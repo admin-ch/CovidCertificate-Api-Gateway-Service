@@ -59,7 +59,6 @@ spring:
     basename: mail-messages,validation-messages
     encoding: UTF-8
     fallback-to-system-locale: false
-
   servlet:
     multipart:
       max-file-size: 10MB
@@ -96,3 +95,6 @@ cc-management-service:
   covidcertificate:
     api:
       v1-path: "api/v1/covidcertificate/"
+  authorization:
+    api:
+      v1-path: "api/v1/authorization/"

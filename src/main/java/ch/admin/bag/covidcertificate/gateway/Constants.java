@@ -7,12 +7,9 @@ import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Constants {
-    public static final String KPI_UUID_KEY = "uuid";
     public static final String KPI_TIMESTAMP_KEY = "ts";
     public static final String KPI_TYPE_KEY = "type";
-    public static final String KPI_COUNTRY = "country";
     public static final String KPI_DETAILS_KEY = "details";
-    public static final String KPI_FRAUD = "fraud";
     public static final String KPI_CERT_KEY = "cert";
     public static final String KPI_IN_APP_DELIVERY_CODE_KEY = "code";
     public static final String KPI_IN_APP_DELIVERY_UVCI_KEY = "uvci";
@@ -35,6 +32,10 @@ public class Constants {
     public static final String SEC_KPI_IDP_SOURCE = "idp";
     public static final String SEC_KPI_OTP_JWT_ID = "jwtId";
     public static final String SEC_KPI_OTP_TYPE = "otpType";
+
+    public static final String UUID_CLAIM_KEY = "uuid";
+    public static final String IDP_SOURCE_CLAIM_KEY = "idpsource";
+    public static final String CLIENT_NAME_KEY = "clientName";
 
     public static final String ISO_3166_1_ALPHA_2_CODE_SWITZERLAND = "CH";
 }

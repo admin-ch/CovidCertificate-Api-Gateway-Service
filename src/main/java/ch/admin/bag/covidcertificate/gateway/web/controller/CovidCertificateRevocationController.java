@@ -1,6 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateRevocationService;
@@ -87,7 +88,7 @@ public class CovidCertificateRevocationController {
     )
     public ResponseEntity<HttpStatus> create(@RequestBody RevocationDto revocationDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Revoke for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(revocationDto, request.getRemoteAddr(), Function.REVOKE_CERTIFICATE);
 
         revocationService.createRevocation(revocationDto, userExtId);
 
@@ -124,7 +125,7 @@ public class CovidCertificateRevocationController {
     )
     public CheckRevocationListResponseDto checkMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Check-Mass-Revocation for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr(), Function.REVOKE_CERTIFICATE_MASS);
 
         return revocationService.checkMassRevocation(revocationListDto, userExtId);
     }
@@ -155,7 +156,7 @@ public class CovidCertificateRevocationController {
     )
     public RevocationListResponseDto createMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Mass-Revocation for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr(), Function.REVOKE_CERTIFICATE_MASS);
 
         return revocationService.massRevocation(revocationListDto, userExtId);
     }

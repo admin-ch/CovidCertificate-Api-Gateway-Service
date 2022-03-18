@@ -30,7 +30,7 @@ class DefaultIdentityAuthorizationClientITTest {
     @Test
     void authorize_invalid() {
         Exception exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize("test", "test"));
+                () -> client.fetchUserAndGetAuthData("test", "test"));
 
         String expectedMessage = "Invalid identity user";
         String actualMessage = exception.getMessage();
@@ -40,7 +40,7 @@ class DefaultIdentityAuthorizationClientITTest {
 
     @Test
     void authorize_valid() {
-        client.authorize("REPLACE", "REPLACE");
+        client.fetchUserAndGetAuthData("REPLACE", "REPLACE");
 
         assertTrue(true);
     }
