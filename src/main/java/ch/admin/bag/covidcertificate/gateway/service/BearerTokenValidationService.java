@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.IDP_SOURCE_CLAIM_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
@@ -91,7 +90,6 @@ public class BearerTokenValidationService {
         }
 
         try {
-
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
 
             String userExtId = claimsJws.getBody().get(USER_EXT_ID_CLAIM_KEY, String.class);

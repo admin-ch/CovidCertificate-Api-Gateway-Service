@@ -1,7 +1,9 @@
 package ch.admin.bag.covidcertificate.gateway.features.authorization;
 
-import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.FunctionsDefinitionDto;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.RoleDataDto;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.dto.ServiceData;
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import com.nimbusds.oauth2.sdk.util.MapUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,13 +12,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -65,33 +67,48 @@ public class AuthorizationClient {
     }
 
     /**
-     * Returns all permitted functions by given roles at given service.
-     * This permission is bound to time and may change during time.
+     * Returns all permitted functions for a given roles set at current instant time.
      *
      * @param rawRoles the current roles of the user (either from eIAM or from Claim)
      * @return list of permitted functions
      */
-    private Set<String> getCurrent(List<String> rawRoles) {
-        Set<String> grantedFunctions = Collections.emptySet();
-        // map the raw roles to the configured roles
-        final Set<String> roles = rawRoles.stream()
-                .map(role -> requireRoleMap().get(role))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        if (roles.isEmpty()) {
-            log.info("no supported roles in '{}'", rawRoles);
-        } else {
-            // keep authorizations which are currently valid
-            List<FunctionsDefinitionDto.Function> functionsByPointInTime =
-                    filterByPointInTime(LocalDateTime.now(), requireDefinitionsFunctions());
-            // identify the functions granted to this time by given roles
-            grantedFunctions = functionsByPointInTime.stream()
-                    .filter(function -> isGranted(roles, function))
-                    .map(FunctionsDefinitionDto.Function::getIdentifier)
-                    .collect(Collectors.toSet());
+    public Set<String> getCurrent(List<String> rawRoles) {
+
+        ServiceData serviceData = requireFunctionsDefinitions();
+        if (serviceData == null || serviceData.getFunctions().isEmpty()) {
+            log.info("Functions definitions are null or empty, no function is granted.");
+            return Collections.emptySet();
         }
 
-        log.info("grants: " + grantedFunctions);
+        SortedMap<String, String> roleMap = requireRoleMap();
+        if (MapUtils.isEmpty(roleMap)) {
+            log.info("RoleMap is null or empty, no function is granted.");
+            return Collections.emptySet();
+        }
+
+        // Map user roles names to the claim names
+        final Set<String> roles = rawRoles.stream()
+                .map(roleMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        if (CollectionUtils.isEmpty(roles)) {
+            log.info("No supported roles found in RoleMap for '{}'", rawRoles);
+            return Collections.emptySet();
+        }
+
+        // Filter functions which are available at current intstant time
+        var functions = serviceData.getFunctions();
+        List<ServiceData.Function> functionsByPointInTime = filterByPointInTime(LocalDateTime.now(), functions.values());
+
+        // Filter functions which are available for mapped roles set
+        Set<String> grantedFunctions = functionsByPointInTime.stream()
+                .filter(function -> isGranted(roles, function))
+                .map(ServiceData.Function::getIdentifier)
+                .collect(Collectors.toSet());
+
+        log.info("Role set {} has granted functions: {}", roles, grantedFunctions);
+
         return grantedFunctions;
     }
 
@@ -110,48 +127,44 @@ public class AuthorizationClient {
      * @param function the function to check
      * @return <code>true</code> only if both mandatory and one-of are valid
      */
-    private boolean isGranted(Set<String> roles, FunctionsDefinitionDto.Function function) {
-        String mandatory = function.getMandatory();
-        boolean mandatoryValid = mandatory == null || roles.contains(mandatory);
+    private boolean isGranted(Set<String> roles, ServiceData.Function function) {
+        boolean allAdditionalValid = true;
+        if (CollectionUtils.isNotEmpty(function.getAdditional())) {
+            // check additional functions which are currently valid
+            List<ServiceData.Function> activeAdditionalFunctions =
+                    filterByPointInTime(LocalDateTime.now(), function.getAdditional());
+
+            allAdditionalValid = activeAdditionalFunctions.stream().allMatch(func -> isGranted(roles, func));
+        }
         List<String> oneOf = function.getOneOf();
-        boolean oneOfValid = oneOf != null && !oneOf.isEmpty() && oneOf.stream().anyMatch(roles::contains);
-        return (mandatoryValid && oneOfValid);
+        if (CollectionUtils.isEmpty(oneOf)) {
+            return allAdditionalValid;
+        }
+        boolean oneOfValid = oneOf.stream().anyMatch(roles::contains);
+        return (allAdditionalValid && oneOfValid);
     }
 
-    private List<FunctionsDefinitionDto.Function> filterByPointInTime(LocalDateTime pointInTime, List<FunctionsDefinitionDto.Function> functions) {
-        List<FunctionsDefinitionDto.Function> result = Collections.emptyList();
+    private List<ServiceData.Function> filterByPointInTime(LocalDateTime pointInTime, Collection<ServiceData.Function> functions) {
+        List<ServiceData.Function> result = Collections.emptyList();
         if (functions != null && pointInTime != null) {
             result = functions.stream()
                     .parallel()
-                    .filter(function -> isBetween(pointInTime, function))
+                    .filter(function -> function.isBetween(pointInTime))
                     .collect(Collectors.toList());
         }
         return result;
     }
 
-    private boolean isBetween(LocalDateTime pointInTime, FunctionsDefinitionDto.Function function) {
-        boolean between = false;
-        if (function != null) {
-            boolean fromSmallerEquals = (function.getFrom() == null || function.getFrom().isBefore(pointInTime) || function.getFrom().isEqual(pointInTime));
-            boolean untilLargerEquals = (function.getUntil() == null || function.getUntil().isAfter(pointInTime) || function.getUntil().isEqual(pointInTime));
-            between = fromSmallerEquals && untilLargerEquals;
-        }
-        return between;
-    }
-
-
     @Cacheable(AUTHORIZATION_DEFINITIONS_CACHE_NAME)
-    public List<FunctionsDefinitionDto.Function> requireDefinitionsFunctions() {
+    public ServiceData requireFunctionsDefinitions() {
         final var uri = UriComponentsBuilder.fromHttpUrl(managementServiceURL + authorizationApiV1Path + DEFINITION_RESOURCE_PATH + SERVICE_PATH_VARIABLE).toUriString();
-        FunctionsDefinitionDto response = defaultWebClient
+        return defaultWebClient
                 .get()
                 .uri(uri)
                 .retrieve()
-                .bodyToMono(FunctionsDefinitionDto.class)
+                .bodyToMono(ServiceData.class)
                 .switchIfEmpty(Mono.error(new IllegalStateException("Response Body is null for request " + uri)))
                 .block();
-
-        return response.getFunctions();
     }
 
     @Cacheable(AUTHORIZATION_ROLEMAP_CACHE_NAME)
@@ -169,6 +182,7 @@ public class AuthorizationClient {
         assert roleMap != null;
         for (RoleDataDto roleDataDto : roleMap) {
             roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
+            roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
         }
         return roleMapping;
     }

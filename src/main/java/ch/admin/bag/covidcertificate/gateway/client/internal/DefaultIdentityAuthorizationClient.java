@@ -11,15 +11,12 @@ import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,7 +81,7 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
                 .map(Role::getName)                                                             // Stream<Role> -> Stream<String>
                 .collect(Collectors.toList());                                                  // Stream<Role> -> List<String>
 
-         return new UserAuthorizationData(uuid, idpSource, roles);
+        return new UserAuthorizationData(uuid, idpSource, roles);
     }
 
     private QueryUsersResponse queryUser(String uuid, String idpSource) {
@@ -116,8 +113,9 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         try {
             return response.getReturns().stream().anyMatch(
                     user -> user.getProfiles().stream().anyMatch(
-                            profile -> profile.getState().equals(ProfileState.ACTIVE) &&
-                                    profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
+                            profile -> ProfileState.ACTIVE.equals(profile.getState())
+                                    && profile.isDefaultProfile()
+                                    && profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
         } catch (Exception e) {
             log.error("Error when checking eIAM user role exists.", e);
             throw e;

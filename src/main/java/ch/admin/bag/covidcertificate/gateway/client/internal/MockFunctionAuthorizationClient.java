@@ -23,8 +23,9 @@ public class MockFunctionAuthorizationClient implements FunctionAuthorizationCli
 
     @Override
     public void validateUserAuthorization(UserAuthorizationData userAuthorizationData, Function function) {
-        if (!authorizationClient.isAuthorized(userAuthorizationData.getRoles(), function.getIdentifier())) {
-            throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
-        }
+
+        if (authorizationClient.isAuthorized(userAuthorizationData.getRoles(), function.getIdentifier())) return;
+
+        throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
     }
 }

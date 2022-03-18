@@ -51,7 +51,7 @@ public class AuthorizationService {
 
         functionAuthorizationClient.validateUserAuthorization(userAuthorizationData, function);
 
-        return userAuthorizationData.getUuid();
+        return userAuthorizationData.getUserId();
     }
 
     private boolean isIdentifiedWithOTP(String otp) {
