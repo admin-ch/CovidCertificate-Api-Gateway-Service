@@ -3,10 +3,8 @@ package ch.admin.bag.covidcertificate.gateway.client.internal;
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMConfig;
-import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Authorization;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Profile;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.ProfileState;
-import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.QueryUsersResponse;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Role;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
@@ -34,8 +32,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @org.springframework.context.annotation.Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 @RequiredArgsConstructor
 public class DefaultIdentityAuthorizationClient implements IdentityAuthorizationClient {
-    private static final String ROLE_CREATOR = "9500.GGG-Covidcertificate.CertificateCreator";
-    private static final String ROLE_SUPERUSER = "9500.GGG-Covidcertificate.SuperUserCC";
 
     private final EIAMClient eiamClient;
 
@@ -106,22 +102,4 @@ public class DefaultIdentityAuthorizationClient implements IdentityAuthorization
         }
     }
 
-
-    protected boolean hasUserRoleSuperUserOrCreator(QueryUsersResponse response) {
-        try {
-            return response.getReturns().stream().anyMatch(
-                    user -> user.getProfiles().stream().anyMatch(
-                            profile -> ProfileState.ACTIVE.equals(profile.getState())
-                                    && profile.isDefaultProfile()
-                                    && profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
-        } catch (Exception e) {
-            log.error("Error when checking eIAM user role exists.", e);
-            throw e;
-        }
-    }
-
-    private boolean isRoleSuperUserOrCreator(Authorization authorization) {
-        return authorization.getRole().getExtId().equals(ROLE_CREATOR) ||
-                authorization.getRole().getExtId().equals(ROLE_SUPERUSER);
-    }
 }
