@@ -38,19 +38,22 @@ public class AuthorizationService {
 
         UserAuthorizationData userAuthorizationData;
 
-        if (isIdentifiedWithOTP(dtoWithAuthorization.getOtp())) {
+        String otp = dtoWithAuthorization.getOtp();
+        if (isIdentifiedWithOTP(otp)) {
             log.trace("Checking access via 'otp'.");
-            userAuthorizationData = bearerTokenValidationService.validate(dtoWithAuthorization.getOtp(), ipAddress);
-        } else if (isIdentifiedWithIdentity(dtoWithAuthorization.getIdentity())) {
-            log.trace("Checking access via 'identity'.");
-            userAuthorizationData = identityAuthorizationClient.authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
+            userAuthorizationData = bearerTokenValidationService.validateOtpAndGetAuthData(otp, ipAddress);
         } else {
-            log.error("No OTP nor Identity is present in the request.");
-            throw new CreateCertificateException(INVALID_IDENTITY_USER);
+            IdentityDto identity = dtoWithAuthorization.getIdentity();
+            if (isIdentifiedWithIdentity(identity)) {
+                log.trace("Checking access via 'identity'.");
+                userAuthorizationData = identityAuthorizationClient.fetchUserAndGetAuthData(identity.getUuid(), identity.getIdpSource());
+            } else {
+                log.error("No OTP nor Identity is present in the request.");
+                throw new CreateCertificateException(INVALID_IDENTITY_USER);
+            }
         }
 
         functionAuthorizationClient.validateUserAuthorization(userAuthorizationData, function);
-
         return userAuthorizationData.getUserId();
     }
 

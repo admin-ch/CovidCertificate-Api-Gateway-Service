@@ -76,7 +76,7 @@ public class BearerTokenValidationService {
 
     }
 
-    public UserAuthorizationData validate(String token, String ipAddress) throws InvalidBearerTokenException {
+    public UserAuthorizationData validateOtpAndGetAuthData(String token, String ipAddress) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
         if (token == null) {

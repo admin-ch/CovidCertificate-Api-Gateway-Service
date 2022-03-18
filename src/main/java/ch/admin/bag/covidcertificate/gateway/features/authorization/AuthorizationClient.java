@@ -61,7 +61,7 @@ public class AuthorizationClient {
         if (CollectionUtils.isEmpty(rawRoles)) {
             return true;
         } else {
-            Set<String> grantedFunctions = this.getCurrent(rawRoles);
+            Set<String> grantedFunctions = this.getCurrentGrantedFunctions(rawRoles);
             return grantedFunctions.contains(function);
         }
     }
@@ -72,7 +72,7 @@ public class AuthorizationClient {
      * @param rawRoles the current roles of the user (either from eIAM or from Claim)
      * @return list of permitted functions
      */
-    public Set<String> getCurrent(List<String> rawRoles) {
+    public Set<String> getCurrentGrantedFunctions(List<String> rawRoles) {
 
         ServiceData serviceData = requireFunctionsDefinitions();
         if (serviceData == null || serviceData.getFunctions().isEmpty()) {
@@ -97,7 +97,7 @@ public class AuthorizationClient {
             return Collections.emptySet();
         }
 
-        // Filter functions which are available at current intstant time
+        // Filter functions which are available at current instant time
         var functions = serviceData.getFunctions();
         List<ServiceData.Function> functionsByPointInTime = filterByPointInTime(LocalDateTime.now(), functions.values());
 
@@ -134,6 +134,7 @@ public class AuthorizationClient {
             List<ServiceData.Function> activeAdditionalFunctions =
                     filterByPointInTime(LocalDateTime.now(), function.getAdditional());
 
+            //TODO: fix infinite recursion
             allAdditionalValid = activeAdditionalFunctions.stream().allMatch(func -> isGranted(roles, func));
         }
         List<String> oneOf = function.getOneOf();

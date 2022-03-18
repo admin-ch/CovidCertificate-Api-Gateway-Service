@@ -20,7 +20,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -61,12 +60,12 @@ class AuthorizationServiceTest {
         this.dtoWithAuthorization = this.getDtoWithAuthorization(false, true);
         UserAuthorizationData userAuthorizationData = new UserAuthorizationData(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource(), Collections.emptyList());
 
-        when(identityAuthorizationClient.authorize(any(String.class), any(String.class)))
+        when(identityAuthorizationClient.fetchUserAndGetAuthData(any(String.class), any(String.class)))
                 .thenReturn(userAuthorizationData);
 
 
         var uuid = assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
-        verify(identityAuthorizationClient, times(1)).authorize(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
+        verify(identityAuthorizationClient, times(1)).fetchUserAndGetAuthData(dtoWithAuthorization.getIdentity().getUuid(), dtoWithAuthorization.getIdentity().getIdpSource());
         assertEquals(dtoWithAuthorization.getIdentity().getUuid(), uuid);
     }
 
@@ -75,11 +74,11 @@ class AuthorizationServiceTest {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("not-in-allowed");
 
-        when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
+        when(bearerTokenValidationService.validateOtpAndGetAuthData(any(String.class), any(String.class)))
                 .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
-        verify(bearerTokenValidationService, times(1)).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
+        verify(bearerTokenValidationService, times(1)).validateOtpAndGetAuthData(this.dtoWithAuthorization.getOtp(), ipAddress);
     }
 
     @Test
@@ -89,12 +88,12 @@ class AuthorizationServiceTest {
 
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
 
-        when(bearerTokenValidationService.validate(any(String.class), any(String.class)))
+        when(bearerTokenValidationService.validateOtpAndGetAuthData(any(String.class), any(String.class)))
                 .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
-        verify(identityAuthorizationClient, never()).authorize(any(), any());
-        verify(bearerTokenValidationService, never()).validate(this.dtoWithAuthorization.getOtp(), ipAddress);
+        verify(identityAuthorizationClient, never()).fetchUserAndGetAuthData(any(), any());
+        verify(bearerTokenValidationService, never()).validateOtpAndGetAuthData(this.dtoWithAuthorization.getOtp(), ipAddress);
     }
 
     private void setCnNameInContext(String cnValue) {

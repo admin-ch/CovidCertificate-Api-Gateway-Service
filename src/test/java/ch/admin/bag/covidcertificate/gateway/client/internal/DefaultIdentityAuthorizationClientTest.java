@@ -42,7 +42,7 @@ class DefaultIdentityAuthorizationClientTest {
         when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(getQueryUsersResponse("9500.GGG-Covidcertificate.CertificateCreator"));
         // when
-        client.authorize(uuid, ipdSource);
+        client.fetchUserAndGetAuthData(uuid, ipdSource);
         // then
         verify(eiamClient).queryUser(any(String.class), any(String.class), any(String.class));
     }
@@ -53,7 +53,7 @@ class DefaultIdentityAuthorizationClientTest {
         when(eiamClient.queryUser(any(String.class), any(String.class), any(String.class)))
                 .thenReturn(getQueryUsersResponse("9500.GGG-Covidcertificate.SuperUserCC"));
         // when
-        client.authorize(uuid, ipdSource);
+        client.fetchUserAndGetAuthData(uuid, ipdSource);
         // then
         verify(eiamClient).queryUser(any(String.class), any(String.class), any(String.class));
     }
@@ -65,7 +65,7 @@ class DefaultIdentityAuthorizationClientTest {
                 .thenReturn(new QueryUsersResponse());
         // when then
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize(uuid, ipdSource));
+                () -> client.fetchUserAndGetAuthData(uuid, ipdSource));
         assertEquals(INVALID_IDENTITY_USER, exception.getError());
     }
 
@@ -76,7 +76,7 @@ class DefaultIdentityAuthorizationClientTest {
                 .thenReturn(getQueryUsersResponse(jFixture.create(String.class)));
         // when then
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize(uuid, ipdSource));
+                () -> client.fetchUserAndGetAuthData(uuid, ipdSource));
         assertEquals(INVALID_IDENTITY_USER_ROLE, exception.getError());
     }
 
@@ -88,14 +88,14 @@ class DefaultIdentityAuthorizationClientTest {
                 .thenThrow(runtimeException);
         // when then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> client.authorize(uuid, ipdSource));
+                () -> client.fetchUserAndGetAuthData(uuid, ipdSource));
         assertEquals(runtimeException, exception);
     }
 
     @Test
     void throwsExceptionOnAuthorize__ifUuidIsEmptyString() {
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize("", ipdSource));
+                () -> client.fetchUserAndGetAuthData("", ipdSource));
         assertEquals(INVALID_IDENTITY_USER, exception.getError());
         verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
     }
@@ -103,7 +103,7 @@ class DefaultIdentityAuthorizationClientTest {
     @Test
     void throwsExceptionOnAuthorize__ifIdpSourceIsEmptyString() {
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize(uuid, ""));
+                () -> client.fetchUserAndGetAuthData(uuid, ""));
         assertEquals(INVALID_IDENTITY_USER, exception.getError());
         verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
     }
@@ -111,7 +111,7 @@ class DefaultIdentityAuthorizationClientTest {
     @Test
     void throwsExceptionOnAuthorize__ifIdpSourceAndUuidAreEmptyString() {
         CreateCertificateException exception = assertThrows(CreateCertificateException.class,
-                () -> client.authorize("", ""));
+                () -> client.fetchUserAndGetAuthData("", ""));
         assertEquals(INVALID_IDENTITY_USER, exception.getError());
         verify(eiamClient, never()).queryUser(anyString(), anyString(), anyString());
     }

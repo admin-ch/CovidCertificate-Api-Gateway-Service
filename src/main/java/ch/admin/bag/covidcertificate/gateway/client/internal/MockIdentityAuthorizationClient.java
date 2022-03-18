@@ -41,7 +41,7 @@ public class MockIdentityAuthorizationClient implements IdentityAuthorizationCli
     private static final String ROLE_SUPERUSER = "9500.GGG-Covidcertificate.SuperUserCC";
 
     @Override
-    public UserAuthorizationData authorize(String uuid, String idpSource) {
+    public UserAuthorizationData fetchUserAndGetAuthData(String uuid, String idpSource) {
         log.info("Call the mock identity authorization");
 
         if (!StringUtils.hasText(uuid) || !StringUtils.hasText(idpSource)) {
