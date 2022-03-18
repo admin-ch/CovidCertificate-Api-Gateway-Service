@@ -18,7 +18,7 @@ cc-management-service:
   uri: "https://cc-management-service.abn.app.cfap02.atlantica.admin.ch/"
   authorization:
     data-sync:
-      cron: "0 0 */1 * * ?" ## Every hour
+      cron: "0 0 * * * *" ## Every hour
   monitor:
     prometheus:
       user: "prometheus"

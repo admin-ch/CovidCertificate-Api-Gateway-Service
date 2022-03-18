@@ -23,10 +23,10 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDEN
 @Slf4j
 @Profile(ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 public class MockIdentityAuthorizationClient extends AbstractIdentityAuthorizationClient {
-    public static final String TEST_PROFILE_AUTHORIZED_FIRST_ACTIVE_ROLE_XML = "test_profile_authorized_first_active_role.xml";
+    public static final String EIAM_MOCK_XML = "test_profile_uuid_hans.xml";
 
     protected User queryUser(String uuid, String idpSource) {
-        String fileName = TEST_PROFILE_AUTHORIZED_FIRST_ACTIVE_ROLE_XML;
+        String fileName = EIAM_MOCK_XML;
         try (InputStream inputStream = new ClassPathResource(fileName).getInputStream()) {
             JAXBContext context = JAXBContext.newInstance(QueryUsersResponse.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
