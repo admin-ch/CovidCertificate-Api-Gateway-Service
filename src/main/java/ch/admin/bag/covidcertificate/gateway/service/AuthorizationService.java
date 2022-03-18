@@ -1,7 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
-import ch.admin.bag.covidcertificate.gateway.client.FunctionAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
+import ch.admin.bag.covidcertificate.gateway.client.internal.FunctionAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;

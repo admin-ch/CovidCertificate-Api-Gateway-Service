@@ -1,7 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
-import ch.admin.bag.covidcertificate.gateway.client.FunctionAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
+import ch.admin.bag.covidcertificate.gateway.client.internal.FunctionAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
@@ -14,13 +14,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,7 +36,7 @@ class AuthorizationServiceTest {
 
     DtoWithAuthorization dtoWithAuthorization;
     AuthorizationService authorizationService;
-    List<String> allowedCommonNames = Arrays.asList("test-cn");
+    List<String> allowedCommonNames = List.of("test-cn");
     String ipAddress;
 
     @BeforeEach
@@ -53,7 +51,7 @@ class AuthorizationServiceTest {
     }
 
     @Test
-    void verifiesCommonName__ifInAllowedList() throws InvalidBearerTokenException {
+    void verifiesCommonName__ifInAllowedList() {
         ReflectionTestUtils.setField(authorizationService, "allowedCommonNamesForIdentity", allowedCommonNames);
         this.setCnNameInContext("test-cn");
 

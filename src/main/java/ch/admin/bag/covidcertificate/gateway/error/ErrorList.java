@@ -124,6 +124,12 @@ public class ErrorList {
     public static final String INVALID_OTP_LENGTH_JSON = ERROR_CODE_KEY + INVALID_OTP_LENGTH_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_OTP_LENGTH_MESSAGE + "}";
 
+    public static final RestError EIAM_CALL_ERROR = new RestError(
+        497,
+            "Error when calling eIAM AdminService queryUsers.",
+            HttpStatus.INTERNAL_SERVER_ERROR
+    );
+
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
             + ERROR_MESSAGE_KEY + "Duplicate UVCI.}";
