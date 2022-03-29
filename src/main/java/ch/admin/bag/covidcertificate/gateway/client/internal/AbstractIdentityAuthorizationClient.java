@@ -23,7 +23,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @Slf4j
 public abstract class AbstractIdentityAuthorizationClient implements IdentityAuthorizationClient {
 
-    protected abstract User queryUser(String uuid, String idpSource);
+    protected abstract User searchUser(String uuid, String idpSource);
 
     @Override
     public UserAuthorizationData fetchUserAndGetAuthData(String uuid, String idpSource) {
@@ -36,7 +36,7 @@ public abstract class AbstractIdentityAuthorizationClient implements IdentityAut
             log.trace("User info is valid");
         }
 
-        User user = queryUser(uuid, idpSource);
+        User user = searchUser(uuid, idpSource);
 
         Predicate<Profile> isActiveProfilePredicate = profile -> ProfileState.ACTIVE == profile.getState();
         Predicate<Profile> isDefaultProfilePredicate = Profile::isDefaultProfile;

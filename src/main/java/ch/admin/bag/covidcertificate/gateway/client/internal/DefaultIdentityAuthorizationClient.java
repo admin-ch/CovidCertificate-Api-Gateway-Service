@@ -2,20 +2,17 @@ package ch.admin.bag.covidcertificate.gateway.client.internal;
 
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMConfig;
+import ch.admin.bag.covidcertificate.gateway.client.eiam.QueryType;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
-import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Optional;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.CLIENT_NAME_KEY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.IDP_SOURCE_CLAIM_KEY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.UUID_CLAIM_KEY;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.EIAM_CALL_ERROR;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Service
@@ -24,43 +21,64 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthorizationClient {
 
+    private static final String LOG_KEY_UUID = "uuid";
+    private static final String LOG_KEY_IDPSOURCE = "idpSource";
+    private static final String LOG_KEY_QUERY_TYPE = "queryType";
+    private static final String LOG_KEY_CLIENTNAME = "clientName";
+
     private final EIAMClient eiamClient;
 
-    protected User queryUser(String uuid, String idpSource) {
-        try {
-            log.info("Calling eIAM AdminService queryUsers. {} {} {}",
-                    kv(UUID_CLAIM_KEY, uuid),
-                    kv(IDP_SOURCE_CLAIM_KEY, idpSource),
-                    kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
+    protected User searchUser(String uuid, String idpSource) {
+        log.info("Search user with {} {} {}",
+                kv(LOG_KEY_UUID, uuid),
+                kv(LOG_KEY_IDPSOURCE, idpSource),
+                kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
 
-            Optional<User> eiamUser = eiamClient.queryUser(uuid, idpSource, EIAMConfig.CLIENT_NAME)
-                    .getReturns()
-                    .stream()
-                    .findFirst();
+        QueryType queryType = QueryType.BY_USER_EXT_ID;
 
-            if (eiamUser.isEmpty()) {
-                log.info("User does not exist in eIAM. {} {} {}",
-                        kv(UUID_CLAIM_KEY, uuid),
-                        kv(IDP_SOURCE_CLAIM_KEY, idpSource),
-                        kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
-                throw new CreateCertificateException(INVALID_IDENTITY_USER);
-            }
+        // First, the user is searched considering UUID as userExtID which is the main case...
+        log.info("Calling eIAM by userExtId");
+        List<User> eiamUsers = requestUsers(uuid, queryType);
 
-            log.info("User has been found in eIAM. {} {} {}",
-                    kv(UUID_CLAIM_KEY, uuid),
-                    kv(IDP_SOURCE_CLAIM_KEY, idpSource),
-                    kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
-
-            return eiamUser.get();
-
-
-        } catch (Exception e) {
-            log.error("Error when calling eIAM AdminService queryUsers. {} {} {}",
-                    kv(UUID_CLAIM_KEY, uuid),
-                    kv(IDP_SOURCE_CLAIM_KEY, idpSource),
-                    kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME), e);
-            throw new CreateCertificateException(EIAM_CALL_ERROR);
+        // ...if the previous search does not return a response
+        // a new search is performed considering the given credential as of CH-LOGIN type
+        // since it's possible to provide a CH-Login credential (idpSource:E-ID CH-LOGIN)...
+        if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_CH_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            log.info("...no result returned, calling eIAM by CH-LOGIN");
+            queryType = QueryType.BY_USER_CH_LOGIN_SUBJECT;
+            eiamUsers = requestUsers(uuid, queryType);
         }
+
+        // ...if the previous search does also not return a response
+        // a new search is performed considering the given credential as of HIN-LOGIN type
+        // since it's possible to provide a HIN-LOGIN credential (idpSource:HIN).
+        else if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_HIN_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            log.info("...no result returned, calling eIAM by HIN-LOGIN");
+            queryType = QueryType.BY_USER_HIN_LOGIN_SUBJECT;
+            eiamUsers = requestUsers(uuid, queryType);
+        }
+
+        Optional<User> optionalUser = eiamUsers.stream().findFirst();
+
+        if (optionalUser.isEmpty()) {
+            log.info("User could not been found in eIAM. {} {} {}",
+                    kv(LOG_KEY_UUID, uuid),
+                    kv(LOG_KEY_IDPSOURCE, idpSource),
+                    kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
+
+            throw new IllegalArgumentException("User does not exist in eIAM.");
+        }
+
+        log.info("User has been found in eIAM. {} {} {} {}",
+                kv(LOG_KEY_UUID, uuid),
+                kv(LOG_KEY_IDPSOURCE, idpSource),
+                kv(LOG_KEY_QUERY_TYPE, queryType),
+                kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
+
+        return optionalUser.get();
     }
 
+    private List<User> requestUsers(String uuid, QueryType type) {
+        return eiamClient.requestUsers(uuid, type).getReturns();
+    }
 }

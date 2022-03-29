@@ -25,7 +25,7 @@ import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDEN
 public class MockIdentityAuthorizationClient extends AbstractIdentityAuthorizationClient {
     public static final String EIAM_MOCK_XML = "test_profile_uuid_hans.xml";
 
-    protected User queryUser(String uuid, String idpSource) {
+    protected User searchUser(String uuid, String idpSource) {
         String fileName = EIAM_MOCK_XML;
         try (InputStream inputStream = new ClassPathResource(fileName).getInputStream()) {
             JAXBContext context = JAXBContext.newInstance(QueryUsersResponse.class);
