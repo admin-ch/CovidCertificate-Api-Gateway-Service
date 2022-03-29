@@ -40,29 +40,28 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
         log.info("Calling eIAM by userExtId");
         List<User> eiamUsers = requestUsers(uuid, idpSource, queryType);
 
-        // ...if the previous search does not return a response
-        // a new search is performed considering the given credential as of CH-LOGIN type
-        // since it's possible to provide a CH-Login credential (idpSource:E-ID CH-LOGIN)...
         if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_CH_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            // ...if the previous search does not return a response
+            // a new search is performed considering the given credential as of CH-LOGIN type
+            // since it's possible to provide a CH-Login credential (idpSource:E-ID CH-LOGIN)...
             log.info("...no result returned, calling eIAM by CH-LOGIN");
             queryType = QueryType.BY_USER_CH_LOGIN_SUBJECT;
             eiamUsers = requestUsers(uuid, idpSource, queryType);
         }
-
-        // ...if the previous search does also not return a response
-        // a new search is performed considering the given credential as of HIN-LOGIN type
-        // since it's possible to provide a HIN-LOGIN credential (idpSource:HIN).
         else if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_HIN_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            // ...if the previous search does also not return a response
+            // a new search is performed considering the given credential as of HIN-LOGIN type
+            // since it's possible to provide a HIN-LOGIN credential (idpSource:HIN).
             log.info("...no result returned, calling eIAM by HIN-LOGIN");
             queryType = QueryType.BY_USER_HIN_LOGIN_SUBJECT;
             eiamUsers = requestUsers(uuid, idpSource, queryType);
         }
 
-        // ...if the previous search does also not return a response
-        // a new search is performed considering the given credential as of legacy SubjectAndIssuer type
-        // since it's possible to provide a legacy classical SubjectAndIssuer credential (case: NAS).
-        else if (CollectionUtils.isEmpty(eiamUsers)) {
-            log.info("...no result returned, calling eIAM by SUBJECT&ISSUER");
+         if (CollectionUtils.isEmpty(eiamUsers)) {
+             // ...if the previous search does also not return a response
+             // a new search is performed considering the given credential as of legacy SubjectAndIssuer type
+             // since it's possible to provide a legacy classical SubjectAndIssuer credential (case: NAS).
+             log.info("...no result returned, calling eIAM by SUBJECT&ISSUER");
             queryType = QueryType.BY_SUBJECT_AND_ISSUER;
             eiamUsers = requestUsers(uuid, idpSource, queryType);
         }
