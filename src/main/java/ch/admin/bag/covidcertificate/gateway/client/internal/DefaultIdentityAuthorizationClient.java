@@ -38,7 +38,7 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
 
         // First, the user is searched considering UUID as userExtID which is the main case...
         log.info("Calling eIAM by userExtId");
-        List<User> eiamUsers = requestUsers(uuid, queryType);
+        List<User> eiamUsers = requestUsers(uuid, idpSource, queryType);
 
         // ...if the previous search does not return a response
         // a new search is performed considering the given credential as of CH-LOGIN type
@@ -46,7 +46,7 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
         if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_CH_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
             log.info("...no result returned, calling eIAM by CH-LOGIN");
             queryType = QueryType.BY_USER_CH_LOGIN_SUBJECT;
-            eiamUsers = requestUsers(uuid, queryType);
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
         }
 
         // ...if the previous search does also not return a response
@@ -55,7 +55,16 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
         else if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_HIN_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
             log.info("...no result returned, calling eIAM by HIN-LOGIN");
             queryType = QueryType.BY_USER_HIN_LOGIN_SUBJECT;
-            eiamUsers = requestUsers(uuid, queryType);
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
+        }
+
+        // ...if the previous search does also not return a response
+        // a new search is performed considering the given credential as of legacy SubjectAndIssuer type
+        // since it's possible to provide a legacy classical SubjectAndIssuer credential (case: NAS).
+        else if (CollectionUtils.isEmpty(eiamUsers)) {
+            log.info("...no result returned, calling eIAM by SUBJECT&ISSUER");
+            queryType = QueryType.BY_SUBJECT_AND_ISSUER;
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
         }
 
         Optional<User> optionalUser = eiamUsers.stream().findFirst();
@@ -78,7 +87,7 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
         return optionalUser.get();
     }
 
-    private List<User> requestUsers(String uuid, QueryType type) {
-        return eiamClient.requestUsers(uuid, type).getReturns();
+    private List<User> requestUsers(String uuid, String idpSource, QueryType type) {
+        return eiamClient.requestUsers(uuid, idpSource, type).getReturns();
     }
 }

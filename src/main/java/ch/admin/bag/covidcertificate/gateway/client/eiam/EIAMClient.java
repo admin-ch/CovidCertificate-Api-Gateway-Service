@@ -11,6 +11,7 @@ import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.QueryUsersRespons
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.SamlFederation;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.UserQuery;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.UserState;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 import java.text.MessageFormat;
@@ -21,8 +22,8 @@ public class EIAMClient extends WebServiceGatewaySupport {
     private static final String QUERYTYPE_CANT_BE_NULL = "Query type can't be null!";
     private static final String QUERYTYPE_NOT_SUPPORTED_ERROR_MESSAGE = "QueryType {1} is not (yet) supported!";
 
-    public QueryUsersResponse requestUsers(String uuid, QueryType queryType) {
-        UserQuery userQuery = createUserQuery(uuid, queryType, EIAMConfig.CLIENT_NAME, DetailLevel.HIGH);
+    public QueryUsersResponse requestUsers(String uuid, String idpSource, QueryType queryType) {
+        UserQuery userQuery = createUserQuery(uuid, idpSource, queryType);
         var requestPayload = new QueryUsers();
         requestPayload.setQuery(userQuery);
         return (QueryUsersResponse) getWebServiceTemplate()
@@ -40,31 +41,43 @@ public class EIAMClient extends WebServiceGatewaySupport {
                 .marshalSendAndReceive(request);
     }
 
-    private UserQuery createUserQuery(String uuid, QueryType queryType, String clientName, DetailLevel detailLevel) {
-        User user = createUser(uuid, queryType);
-        DetailLevels detailLevels = createDetailLevels(detailLevel);
+    private UserQuery createUserQuery(String uuid, String idpSource, QueryType queryType) {
+        User user = createUser(uuid, idpSource, queryType);
+        DetailLevels detailLevels = createDetailLevels();
 
         var userQuery = new UserQuery();
-        userQuery.setClientName(clientName);
+        userQuery.setClientName(EIAMConfig.CLIENT_NAME);
         userQuery.setDetailLevels(detailLevels);
         userQuery.setUser(user);
         return userQuery;
     }
 
-    private User createUser(String uuid, QueryType queryType) {
+    private User createUser(String uuid, String idpSource, QueryType queryType) {
 
         if (queryType == null) throw new NullPointerException(QUERYTYPE_CANT_BE_NULL);
 
+        User user;
+
         switch (queryType) {
             case BY_USER_EXT_ID:
-                return createUserWithExtId(uuid);
+                user = createUserWithExtId(uuid);
+                break;
             case BY_USER_CH_LOGIN_SUBJECT:
-                return createUserWithCHLogin(uuid);
+                user = createUserWithCHLogin(uuid);
+                break;
             case BY_USER_HIN_LOGIN_SUBJECT:
-                return createUserWithHINLogin(uuid);
+                user = createUserWithHINLogin(uuid);
+                break;
+            case BY_SUBJECT_AND_ISSUER:
+                user = createUserWithSubjectAndIssuer(uuid, idpSource);
+                break;
             default:
                 throw new UnsupportedOperationException(MessageFormat.format(QUERYTYPE_NOT_SUPPORTED_ERROR_MESSAGE, queryType.name()));
         }
+
+        user.setState(UserState.ACTIVE);
+
+        return user;
     }
 
     private User createUserWithExtId(String userExtId) {
@@ -85,18 +98,29 @@ public class EIAMClient extends WebServiceGatewaySupport {
         return user;
     }
 
+    private User createUserWithSubjectAndIssuer(String uuid, String idpsource) {
+        var user = new User();
+
+        var samlFederation = new SamlFederation();
+        samlFederation.setSubjectNameId(uuid);
+        samlFederation.setIssuerNameId(idpsource);
+
+        user.getSamlFederations().add(samlFederation);
+        return user;
+    }
+
     private SamlFederation createSamlFederation(String subjectNameId) {
         var samlFederation = new SamlFederation();
         samlFederation.setSubjectNameId(subjectNameId);
         return samlFederation;
     }
 
-    private DetailLevels createDetailLevels(DetailLevel detailLevel) {
+    private DetailLevels createDetailLevels() {
         var detailLevels = new DetailLevels();
-        detailLevels.setUserDetailLevel(detailLevel);
-        detailLevels.setProfileDetailLevel(detailLevel);
-        detailLevels.setAuthorizationDetailLevel(detailLevel);
-        detailLevels.setDefaultDetailLevel(detailLevel);
+        detailLevels.setUserDetailLevel(DetailLevel.HIGH);
+        detailLevels.setProfileDetailLevel(DetailLevel.HIGH);
+        detailLevels.setAuthorizationDetailLevel(DetailLevel.HIGH);
+        detailLevels.setDefaultDetailLevel(DetailLevel.HIGH);
         return detailLevels;
     }
 }
