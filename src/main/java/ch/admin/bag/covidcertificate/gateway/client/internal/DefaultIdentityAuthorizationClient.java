@@ -4,6 +4,7 @@ import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMConfig;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.QueryType;
 import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
+import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Service
@@ -73,7 +75,8 @@ public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthoriz
                     kv(LOG_KEY_IDPSOURCE, idpSource),
                     kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
 
-            throw new IllegalArgumentException("User does not exist in eIAM.");
+            log.error("User does not exist in eIAM.");
+            throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
 
         log.info("User has been found in eIAM. {} {} {} {}",
