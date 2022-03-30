@@ -28,6 +28,7 @@ public class OtpRevocationService {
     @Scheduled(fixedRateString = "${cc-api-gateway-service.cache-duration}")
     @CacheEvict(value = OTP_CACHE_NAME, allEntries = true)
     public void clearCache() {
+        log.info("Cleaning cache of otps list.");
     }
 
 }
