@@ -11,7 +11,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -96,9 +95,7 @@ public class BearerTokenValidationService {
             String idpSource = claimsJws.getBody().get(IDP_SOURCE_CLAIM_KEY, String.class);
             String scope = claimsJws.getBody().get(SCOPE_CLAIM_KEY, String.class);
             String typ = claimsJws.getBody().get(TYP_CLAIM_KEY, String.class);
-            var rolesArray = claimsJws.getBody().get(USER_ROLES_CLAIM_KEY, String[].class);
-
-            List<String> roles = ArrayUtils.isEmpty(rolesArray) ? Collections.emptyList() : Arrays.asList(rolesArray);
+            var roles = ObjectUtils.defaultIfNull(claimsJws.getBody().get(USER_ROLES_CLAIM_KEY, List.class), Collections.emptyList());
 
             log.debug("Found Claims in JWT {}, {}, {}, {}",
                     kv(SCOPE_CLAIM_KEY, scope),

@@ -8,6 +8,9 @@ import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
@@ -23,8 +26,11 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @Slf4j
 public abstract class AbstractIdentityAuthorizationClient implements IdentityAuthorizationClient {
 
-    protected abstract User queryUser(String uuid, String idpSource);
+    private static final String USER_AUTHORIZATION_DATA_CACHE = "USER_AUTHORIZATION_DATA_CACHE";
 
+    protected abstract User searchUser(String uuid, String idpSource);
+
+    @Cacheable(USER_AUTHORIZATION_DATA_CACHE)
     @Override
     public UserAuthorizationData fetchUserAndGetAuthData(String uuid, String idpSource) {
         if (!StringUtils.hasText(uuid) || !StringUtils.hasText(idpSource)) {
@@ -36,7 +42,7 @@ public abstract class AbstractIdentityAuthorizationClient implements IdentityAut
             log.trace("User info is valid");
         }
 
-        User user = queryUser(uuid, idpSource);
+        User user = searchUser(uuid, idpSource);
 
         Predicate<Profile> isActiveProfilePredicate = profile -> ProfileState.ACTIVE == profile.getState();
         Predicate<Profile> isDefaultProfilePredicate = Profile::isDefaultProfile;
@@ -52,5 +58,11 @@ public abstract class AbstractIdentityAuthorizationClient implements IdentityAut
 
         log.trace("Authorization checked successfully.");
         return new UserAuthorizationData(uuid, idpSource, roles);
+    }
+
+    @Scheduled(fixedRateString = "${cc-api-gateway-service.cache-duration}")
+    @CacheEvict(value = USER_AUTHORIZATION_DATA_CACHE, allEntries = true)
+    public void cleanUserAuthorizationDataCache() {
+        log.info("Cleaning cache of user autorization data.");
     }
 }

@@ -2,6 +2,7 @@ package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.internal.FunctionAuthorizationClient;
+import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -73,7 +75,7 @@ class AuthorizationServiceTest {
         this.setCnNameInContext("not-in-allowed");
 
         when(bearerTokenValidationService.validateOtpAndGetAuthData(any(String.class), any(String.class)))
-                .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
+                .thenReturn(new UserAuthorizationData("dsd", "sdsd", Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(dtoWithAuthorization, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(bearerTokenValidationService, times(1)).validateOtpAndGetAuthData(this.dtoWithAuthorization.getOtp(), ipAddress);
@@ -87,7 +89,7 @@ class AuthorizationServiceTest {
         var otherDtoWithAuth = this.getDtoWithAuthorization(true, false);
 
         when(bearerTokenValidationService.validateOtpAndGetAuthData(any(String.class), any(String.class)))
-                .thenReturn(new UserAuthorizationData(any(String.class), any(String.class), Collections.emptyList()));
+                .thenReturn(new UserAuthorizationData("dsdsd", "dsd", Collections.emptyList()));
 
         assertDoesNotThrow(() -> authorizationService.validateAndGetId(otherDtoWithAuth, ipAddress, Function.CREATE_VACCINE_CERTIFICATE));
         verify(identityAuthorizationClient, never()).fetchUserAndGetAuthData(any(), any());

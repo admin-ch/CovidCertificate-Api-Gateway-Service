@@ -40,7 +40,7 @@ public class AuthorizationService {
 
         String otp = dtoWithAuthorization.getOtp();
         if (isIdentifiedWithOTP(otp)) {
-            log.trace("Checking access via 'otp'.");
+            log.trace("Checking access via 'otp'/'ltotp'.");
             userAuthorizationData = bearerTokenValidationService.validateOtpAndGetAuthData(otp, ipAddress);
         } else {
             IdentityDto identity = dtoWithAuthorization.getIdentity();
@@ -51,6 +51,11 @@ public class AuthorizationService {
                 log.error("No OTP nor Identity is present in the request.");
                 throw new CreateCertificateException(INVALID_IDENTITY_USER);
             }
+        }
+
+        if (!userAuthorizationData.isValid()) {
+            log.error("UserAuthorizationData is not valid");
+            throw new CreateCertificateException(INVALID_IDENTITY_USER);
         }
 
         functionAuthorizationClient.validateUserAuthorization(userAuthorizationData, function);
