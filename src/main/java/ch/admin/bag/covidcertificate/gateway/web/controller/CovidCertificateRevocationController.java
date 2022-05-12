@@ -6,7 +6,6 @@ import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateRevocationService;
 import ch.admin.bag.covidcertificate.gateway.service.InvalidBearerTokenException;
-import ch.admin.bag.covidcertificate.gateway.service.dto.CheckRevocationListResponseDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevocationListResponseDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationDto;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RevocationListDto;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +56,6 @@ public class CovidCertificateRevocationController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('bag-cc-certificatecreator')")
     @Operation(operationId = "revokeCertificate",
             summary = "Revokes the certificate for the given UVCI.",
             description = "Revokes a Covid certificate with a given UVCI. Performs an integrity check for each request based on headers and body.",
@@ -95,43 +92,7 @@ public class CovidCertificateRevocationController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    /*
-    // TODO VACCINECER-2086: Enable Mass-revocation
-    // TODO: make sure PreAuthorize fits new authorization
-
-    @PostMapping("/mass-revocation-check")
-    @PreAuthorize("hasRole('bag-cc-superuser')")
-    @Operation(operationId = "certificateMassRevocationCheck",
-            summary = "Checks if the given UVCIs are valid for mass revocation.",
-            description = "Analyzes a list of UVCIs if they can be revoked on a mass revocation. Performs checks if the UVCI is well formatted, known and not yet revoked.",
-            parameters = {
-                    @Parameter(in = ParameterIn.HEADER, name = IntegrityFilter.HEADER_HASH_NAME,
-                            required = true, description = "Base64 encoded hash of the canonicalized body, generated with the `SHA256withRSA` algorithm " +
-                            "signed with the private key of the certificate issued by \"SwissGov Regular CA 01\". " +
-                            "See [documentation](https://github.com/admin-ch/CovidCertificate-Apidoc#content-signature) on Github.",
-                            schema = @Schema(type = "string", format = "Base64")
-                    )
-            }
-    )
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CheckRevocationListResponseDto.class)))
-    @ApiResponse(responseCode = "400",
-            content = @Content(
-                    schema = @Schema(implementation = RestError.class),
-                    mediaType = "application/json",
-                    examples = {
-                            @ExampleObject(name = "INVALID_SIZE_OF_UVCI_LIST", value = INVALID_SIZE_OF_UVCI_LIST)
-                    }
-            )
-    )
-    public CheckRevocationListResponseDto checkMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
-        log.info("Call of Check-Mass-Revocation for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr(), Function.REVOKE_CERTIFICATE_MASS);
-
-        return revocationService.checkMassRevocation(revocationListDto, userExtId);
-    }
-
     @PostMapping("/mass-revocation")
-    @PreAuthorize("hasRole('bag-cc-superuser')")
     @Operation(operationId = "certificateMassRevocationCheck",
             summary = "Executes a mass-revocation of the given UVCIs.",
             description = "Revokes all revokable UVCIs of list of UVCIs. Performs checks if the UVCI is well formatted, known and not yet revoked.",
@@ -156,10 +117,9 @@ public class CovidCertificateRevocationController {
     )
     public RevocationListResponseDto createMassRevocation(@RequestBody RevocationListDto revocationListDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Mass-Revocation for covid certificate");
-        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr(), Function.REVOKE_CERTIFICATE_MASS);
+        String userExtId = authorizationService.validateAndGetId(revocationListDto, request.getRemoteAddr(), Function.BULK_REVOKE_CERTIFICATES);
 
-        return revocationService.massRevocation(revocationListDto, userExtId);
+        return revocationService.createMassRevocation(revocationListDto, userExtId);
     }
 
-    */
 }
