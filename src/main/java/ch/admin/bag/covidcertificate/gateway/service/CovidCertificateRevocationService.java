@@ -52,31 +52,7 @@ public class CovidCertificateRevocationService {
         }
     }
 
-    public CheckRevocationListResponseDto checkMassRevocation(RevocationListDto revocationListDto, String userExtId) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/revocation/uvcilist/check");
-
-        revocationListDto.setSystemSource(systemSourceService.getRelevantSystemSource(revocationListDto.getSystemSource()));
-        revocationListDto.setUserExtId(userExtId);
-        String uri = builder.toUriString();
-
-        log.debug("Call the CovidCertificateRevocationService with {}", kv("url", uri));
-        try {
-            CheckRevocationListResponseDto response = defaultWebClient.post()
-                    .uri(uri)
-                    .body(Mono.just(revocationListDto), revocationListDto.getClass())
-                    .retrieve()
-                    .bodyToMono(CheckRevocationListResponseDto.class)
-                    .block();
-
-            log.trace("CovidCertificateGenerationService Response: {}", response);
-            return response;
-        } catch (WebClientResponseException e) {
-            RestError errorResponse = WebClientUtils.handleWebClientResponseError(e);
-            throw new RevokeCertificateException(errorResponse);
-        }
-    }
-
-    public RevocationListResponseDto massRevocation(RevocationListDto revocationListDto, String userExtId) {
+    public RevocationListResponseDto createMassRevocation(RevocationListDto revocationListDto, String userExtId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + "api/v1/revocation/uvcilist");
 
         revocationListDto.setSystemSource(systemSourceService.getRelevantSystemSource(revocationListDto.getSystemSource()));

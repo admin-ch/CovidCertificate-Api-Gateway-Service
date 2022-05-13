@@ -9,7 +9,7 @@ public enum Function {
     CREATE_RECOVERY_RAT_CERTIFICATE,
     CREATE_EXCEPTIONAL_CERTIFICATE,
     REVOKE_CERTIFICATE,
-    REVOKE_CERTIFICATE_MASS;
+    BULK_REVOKE_CERTIFICATES;
 
     public String getIdentifier() {
         return this.name().toLowerCase().replace("_", "-");
