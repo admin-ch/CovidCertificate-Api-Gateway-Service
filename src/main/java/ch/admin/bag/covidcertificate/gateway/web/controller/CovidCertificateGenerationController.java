@@ -2,6 +2,7 @@ package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.domain.TestType;
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
@@ -36,22 +37,14 @@ import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.ISO_3166_1_ALPHA_2_CODE_SWITZERLAND;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CANTON;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_COUNTRY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_DETAILS_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_CODE_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_IN_APP_DELIVERY_UVCI_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_SYSTEM_API;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TIMESTAMP_KEY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_ANTIBODY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_IN_APP_DELIVERY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_KEY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_RECOVERY_RAT;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_TEST;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_VACCINATION;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TYPE_VACCINATION_TOURIST;
-import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_UUID_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.LOG_FORMAT;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.DUPLICATE_DELIVERY_METHOD;
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_ADDRESS;
@@ -159,17 +152,11 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody VaccinationCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for vaccination certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_VACCINE_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION, userExtId, createDto, covidCertificate.getUvci(),
-                createDto.getVaccinationInfo().get(0).getMedicinalProductCode(),
-                createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
-        if (createDto.getVaccinationInfo().get(0).getNumberOfDoses() == 1 &&
-                createDto.getVaccinationInfo().get(0).getTotalNumberOfDoses() == 1) {
-            log.info("fraud: {}", kv("risk", "1/1"));
-        }
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationInfo().get(0).getCountryOfVaccination());
         return covidCertificate;
     }
 
@@ -212,17 +199,11 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody VaccinationTouristCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for WHO vaccination-tourist certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_VACCINE_TOURIST_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_VACCINATION_TOURIST, userExtId, createDto, covidCertificate.getUvci(),
-                createDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode(),
-                createDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination());
-        if (createDto.getVaccinationTouristInfo().get(0).getNumberOfDoses() == 1 &&
-                createDto.getVaccinationTouristInfo().get(0).getTotalNumberOfDoses() == 1) {
-            log.info("fraud: {}", kv("risk", "1/1"));
-        }
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), createDto.getVaccinationTouristInfo().get(0).getMedicinalProductCode(), createDto.getVaccinationTouristInfo().get(0).getCountryOfVaccination());
         return covidCertificate;
     }
 
@@ -266,11 +247,14 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody TestCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for test certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_TEST_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logTestCertificateGenerationKpi(createDto, userExtId, covidCertificate.getUvci());
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+
+        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
+        String typeCodeDetailString = testType.map(TestType::getKpiValue).orElse(null);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), typeCodeDetailString, createDto.getTestInfo().get(0).getMemberStateOfTest());
         return covidCertificate;
     }
 
@@ -311,12 +295,11 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody RecoveryCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_RECOVERY_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_RECOVERY, userExtId, createDto, covidCertificate.getUvci(),
-                null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), null, createDto.getRecoveryInfo().get(0).getCountryOfTest());
         return covidCertificate;
     }
 
@@ -356,11 +339,12 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody RecoveryRatCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery-rat certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_RECOVERY_RAT_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logRecoveryRatCertificateGenerationKpi(createDto, userExtId, covidCertificate.getUvci());
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), getDetails(testType), ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
@@ -400,12 +384,11 @@ public class CovidCertificateGenerationController {
     )
     public CovidCertificateCreateResponseDto create(@RequestBody AntibodyCertificateCreateDto createDto, HttpServletRequest request) throws InvalidBearerTokenException {
         log.info("Call of Create for recovery certificate");
-        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr());
+        String userExtId = authorizationService.validateAndGetId(createDto, request.getRemoteAddr(), Function.CREATE_ANTIBODY_CERTIFICATE);
         createDto.validate();
 
-        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto);
-        logKpi(KPI_TYPE_ANTIBODY, userExtId, createDto, covidCertificate.getUvci(),
-                DETAILS_ANTIBODY, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
+        CovidCertificateCreateResponseDto covidCertificate = generationService.createCovidCertificate(createDto, userExtId);
+        logDeliveryKpi(userExtId, createDto, covidCertificate.getUvci(), DETAILS_ANTIBODY, ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
         return covidCertificate;
     }
 
@@ -427,59 +410,25 @@ public class CovidCertificateGenerationController {
         return typeCodeDetailString;
     }
 
-    public void logTestCertificateGenerationKpi(TestCertificateCreateDto createDto, String userExtId, String uvci) {
-        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
-        logKpi(KPI_TYPE_TEST, userExtId, createDto, uvci,
-                getDetails(testType),
-                createDto.getTestInfo().get(0).getMemberStateOfTest());
-    }
-
-    public void logRecoveryRatCertificateGenerationKpi(RecoveryRatCertificateCreateDto createDto, String userExtId, String uvci) {
-        var testType = TestType.findByTypeCode(createDto.getTestInfo().get(0).getTypeCode());
-        logKpi(KPI_TYPE_RECOVERY_RAT, userExtId, createDto, uvci,
-                getDetails(testType),
-                ISO_3166_1_ALPHA_2_CODE_SWITZERLAND);
-    }
-
-    private void logKpi(String type, String userExtId, CertificateCreateDto createDto,
-                        String uvci, String details, String country) {
+    private void logDeliveryKpi(String userExtId, CertificateCreateDto createDto, String uvci, String details, String country) {
         LocalDateTime timestamp = LocalDateTime.now();
-        kpiDataService.saveKpiData(timestamp, type, userExtId, uvci, details, country);
+
         var timestampKVPair = kv(KPI_TIMESTAMP_KEY, timestamp.format(LOG_FORMAT));
         var systemKVPair = kv(KPI_CREATE_CERTIFICATE_TYPE, KPI_SYSTEM_API);
-        var typeKVPair = kv(KPI_TYPE_KEY, type);
-        var detailsKVPair = kv(KPI_DETAILS_KEY, details);
-        var kpiCountryKVPair = kv(KPI_COUNTRY, country);
-        var uuidKVPair = kv(KPI_UUID_KEY, userExtId);
         var inAppDeliveryCode = createDto.getAppCode();
 
         if (createDto.getAddress() != null && createDto.getAddress().getCantonCodeSender() != null) {
+            var printDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_CANTON);
             var cantonKVPair = kv(KPI_CANTON, createDto.getAddress().getCantonCodeSender());
-            if (details == null) {
-                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
-            } else {
-                log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair, cantonKVPair, kpiCountryKVPair);
-            }
+            log.info("kpi: {} {} {} {}", timestampKVPair, systemKVPair, printDeliveryTypeKVPair, cantonKVPair);
             kpiDataService.saveKpiData(timestamp, KPI_CANTON, createDto.getAddress().getCantonCodeSender(), uvci, details, country);
-        } else if (StringUtils.hasText(inAppDeliveryCode)) {
+        } else if (StringUtils.hasText(createDto.getAppCode())) {
             var inAppDeliveryTypeKVPair = kv(KPI_TYPE_KEY, KPI_TYPE_IN_APP_DELIVERY);
             var inAppDeliveryCodeKVPair = kv(KPI_IN_APP_DELIVERY_CODE_KEY, inAppDeliveryCode);
             var inAppDeliveryUvciPair = kv(KPI_IN_APP_DELIVERY_UVCI_KEY, uvci);
-            if (details == null) {
-                log.info("kpi: {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair,
-                        uuidKVPair, kpiCountryKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
-            } else {
-                log.info("kpi: {} {} {} {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair,
-                        detailsKVPair, uuidKVPair, kpiCountryKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
-            }
-            kpiDataService.saveKpiData(timestamp, KPI_TYPE_IN_APP_DELIVERY, userExtId, uvci,
-                    details, country, inAppDeliveryCode);
-        } else {
-            if (details == null) {
-                log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, uuidKVPair, kpiCountryKVPair);
-            } else {
-                log.info("kpi: {} {} {} {} {} {}", timestampKVPair, systemKVPair, typeKVPair, detailsKVPair, uuidKVPair, kpiCountryKVPair);
-            }
+
+            log.info("kpi: {} {} {} {} {}", timestampKVPair, systemKVPair, inAppDeliveryTypeKVPair, inAppDeliveryCodeKVPair, inAppDeliveryUvciPair);
+            kpiDataService.saveKpiData(timestamp, KPI_TYPE_IN_APP_DELIVERY, userExtId, uvci, details, country, inAppDeliveryCode);
         }
     }
 }

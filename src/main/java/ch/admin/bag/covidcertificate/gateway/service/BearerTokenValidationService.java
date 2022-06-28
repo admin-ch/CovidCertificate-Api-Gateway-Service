@@ -1,10 +1,17 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
-import io.jsonwebtoken.*;
+import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -16,9 +23,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.*;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.*;
+import static ch.admin.bag.covidcertificate.gateway.Constants.IDP_SOURCE_CLAIM_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CREATE_CERTIFICATE_TYPE;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_SYSTEM_API;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TIMESTAMP_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.LOG_FORMAT;
+import static ch.admin.bag.covidcertificate.gateway.Constants.SEC_KPI_EXT_ID;
+import static ch.admin.bag.covidcertificate.gateway.Constants.SEC_KPI_IDP_SOURCE;
+import static ch.admin.bag.covidcertificate.gateway.Constants.SEC_KPI_IP_ADDRESS;
+import static ch.admin.bag.covidcertificate.gateway.Constants.SEC_KPI_OTP_JWT_ID;
+import static ch.admin.bag.covidcertificate.gateway.Constants.SEC_KPI_OTP_TYPE;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_BEARER;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_OTP_LENGTH;
+import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.MISSING_BEARER;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Component
@@ -29,7 +49,7 @@ public class BearerTokenValidationService {
     private static final String COVID_CERT_CREATION = "covidcertcreation";
     private static final String SCOPE_CLAIM_KEY = "scope";
     private static final String USER_EXT_ID_CLAIM_KEY = "userExtId";
-    private static final String IDP_SOURCE_CLAIM_KEY = "idpsource";
+    private static final String USER_ROLES_CLAIM_KEY = "userroles";
     private static final String TYP_CLAIM_KEY = "typ";
     private static final String AUTH_MACHINE_JWT = "authmachine+jwt";
     private static final String OTP_CLAIM_KEY = "otp";
@@ -55,7 +75,7 @@ public class BearerTokenValidationService {
 
     }
 
-    public String validate(String token, String ipAddress) throws InvalidBearerTokenException {
+    public UserAuthorizationData validateOtpAndGetAuthData(String token, String ipAddress) throws InvalidBearerTokenException {
         log.trace("validate token {}", token);
 
         if (token == null) {
@@ -69,19 +89,23 @@ public class BearerTokenValidationService {
         }
 
         try {
-
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
 
             String userExtId = claimsJws.getBody().get(USER_EXT_ID_CLAIM_KEY, String.class);
             String idpSource = claimsJws.getBody().get(IDP_SOURCE_CLAIM_KEY, String.class);
             String scope = claimsJws.getBody().get(SCOPE_CLAIM_KEY, String.class);
             String typ = claimsJws.getBody().get(TYP_CLAIM_KEY, String.class);
+            var roles = ObjectUtils.defaultIfNull(claimsJws.getBody().get(USER_ROLES_CLAIM_KEY, List.class), Collections.emptyList());
 
-            log.debug("Found Claims in JWT scope {}, userExtId {}, idpSource {}", scope, userExtId, idpSource);
+            log.debug("Found Claims in JWT {}, {}, {}, {}",
+                    kv(SCOPE_CLAIM_KEY, scope),
+                    kv(USER_EXT_ID_CLAIM_KEY, userExtId),
+                    kv(IDP_SOURCE_CLAIM_KEY, idpSource),
+                    kv(USER_ROLES_CLAIM_KEY, roles));
 
             String jti = claimsJws.getBody().getId();
             if (isRevoked(jti)) {
-                log.warn("Call with revoked otp with jti {}", jti);
+                log.warn("Call with revoked otp with {}", kv("jti", jti));
                 throw new InvalidBearerTokenException(INVALID_BEARER);
             }
 
@@ -92,7 +116,7 @@ public class BearerTokenValidationService {
 
             logSecKPI(ipAddress, claimsJws, userExtId, idpSource, jti);
 
-            return userExtId;
+            return new UserAuthorizationData(userExtId, idpSource, roles);
 
         } catch (ExpiredJwtException e) {
             log.warn("Token expired", e);

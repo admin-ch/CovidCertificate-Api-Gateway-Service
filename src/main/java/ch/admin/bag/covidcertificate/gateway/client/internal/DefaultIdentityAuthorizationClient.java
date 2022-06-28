@@ -1,91 +1,95 @@
 package ch.admin.bag.covidcertificate.gateway.client.internal;
 
-import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMClient;
 import ch.admin.bag.covidcertificate.gateway.client.eiam.EIAMConfig;
-import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.Authorization;
-import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.ProfileState;
-import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.QueryUsersResponse;
+import ch.admin.bag.covidcertificate.gateway.client.eiam.QueryType;
+import ch.admin.bag.covidcertificate.gateway.eiam.adminservice.User;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.web.config.ProfileRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER;
-import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER_ROLE;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Service
 @Slf4j
-@Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
+@org.springframework.context.annotation.Profile("!" + ProfileRegistry.IDENTITY_AUTHORIZATION_MOCK)
 @RequiredArgsConstructor
-public class DefaultIdentityAuthorizationClient implements IdentityAuthorizationClient {
-    private static final String ROLE_CREATOR = "9500.GGG-Covidcertificate.CertificateCreator";
-    private static final String ROLE_SUPERUSER = "9500.GGG-Covidcertificate.SuperUserCC";
+public class DefaultIdentityAuthorizationClient extends AbstractIdentityAuthorizationClient {
+
+    private static final String LOG_KEY_UUID = "uuid";
+    private static final String LOG_KEY_IDPSOURCE = "idpSource";
+    private static final String LOG_KEY_QUERY_TYPE = "queryType";
+    private static final String LOG_KEY_CLIENTNAME = "clientName";
 
     private final EIAMClient eiamClient;
 
-    @Override
-    public void authorize(String uuid, String idpSource) {
-        if (!StringUtils.hasText(uuid) || !StringUtils.hasText(idpSource)) {
-            log.info("User not valid {} {}", kv("uuid", uuid), kv("idpSource", idpSource));
+    protected User searchUser(String uuid, String idpSource) {
+        log.info("Search user with {} {} {}",
+                kv(LOG_KEY_UUID, uuid),
+                kv(LOG_KEY_IDPSOURCE, idpSource),
+                kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
+
+        QueryType queryType = QueryType.BY_USER_EXT_ID;
+
+        // First, the user is searched considering UUID as userExtID which is the main case...
+        log.info("Calling eIAM by userExtId");
+        List<User> eiamUsers = requestUsers(uuid, idpSource, queryType);
+
+        if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_CH_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            // ...if the previous search does not return a response
+            // a new search is performed considering the given credential as of CH-LOGIN type
+            // since it's possible to provide a CH-Login credential (idpSource:E-ID CH-LOGIN)...
+            log.info("...no result returned, calling eIAM by CH-LOGIN");
+            queryType = QueryType.BY_USER_CH_LOGIN_SUBJECT;
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
+        } else if (CollectionUtils.isEmpty(eiamUsers) && QueryType.BY_USER_HIN_LOGIN_SUBJECT.getIdpSource().equals(idpSource)) {
+            // ...if the previous search does also not return a response
+            // a new search is performed considering the given credential as of HIN-LOGIN type
+            // since it's possible to provide a HIN-LOGIN credential (idpSource:HIN).
+            log.info("...no result returned, calling eIAM by HIN-LOGIN");
+            queryType = QueryType.BY_USER_HIN_LOGIN_SUBJECT;
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
+        }
+
+        if (CollectionUtils.isEmpty(eiamUsers)) {
+            // ...if the previous search does also not return a response
+            // a new search is performed considering the given credential as of legacy SubjectAndIssuer type
+            // since it's possible to provide a legacy classical SubjectAndIssuer credential (case: NAS).
+            log.info("...no result returned, calling eIAM by SUBJECT&ISSUER");
+            queryType = QueryType.BY_SUBJECT_AND_ISSUER;
+            eiamUsers = requestUsers(uuid, idpSource, queryType);
+        }
+
+        Optional<User> optionalUser = eiamUsers.stream().findFirst();
+
+        if (optionalUser.isEmpty()) {
+            log.info("User could not been found in eIAM. {} {} {}",
+                    kv(LOG_KEY_UUID, uuid),
+                    kv(LOG_KEY_IDPSOURCE, idpSource),
+                    kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
+
+            log.error("User does not exist in eIAM.");
             throw new CreateCertificateException(INVALID_IDENTITY_USER);
-        } else {
-            log.trace("User info is valid");
         }
 
-        QueryUsersResponse queryUsersResponse = queryUser(uuid, idpSource);
-        if (checkUserExists(queryUsersResponse)) {
-            log.info("User does not exist in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
-            throw new CreateCertificateException(INVALID_IDENTITY_USER);
-        } else {
-            log.trace("User exists");
-        }
-        if (!hasUserRoleSuperUserOrCreator(queryUsersResponse)) {
-            log.info("User does not have required role in eIAM. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
-            throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
-        } else {
-            log.trace("User has right roles");
-        }
-        log.trace("Authorization checked successfully.");
+        log.info("User has been found in eIAM. {} {} {} {}",
+                kv(LOG_KEY_UUID, uuid),
+                kv(LOG_KEY_IDPSOURCE, idpSource),
+                kv(LOG_KEY_QUERY_TYPE, queryType),
+                kv(LOG_KEY_CLIENTNAME, EIAMConfig.CLIENT_NAME));
+
+        return optionalUser.get();
     }
 
-    private QueryUsersResponse queryUser(String uuid, String idpSource) {
-        try {
-            log.info("Calling eIAM AdminService queryUsers. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME));
-            return eiamClient.queryUser(uuid, idpSource, EIAMConfig.CLIENT_NAME);
-        } catch (Exception e) {
-            log.error("Error when calling eIAM AdminService queryUsers. {} {} {}", kv("uuid", uuid), kv("idpSource", idpSource), kv("clientName", EIAMConfig.CLIENT_NAME), e);
-            throw e;
-        }
-    }
-
-    private boolean checkUserExists(QueryUsersResponse response) {
-        try {
-            return (response.getReturns() == null || response.getReturns().isEmpty());
-        } catch (Exception e) {
-            log.error("Error when checking eIAM user exists.", e);
-            throw e;
-        }
-    }
-
-    protected boolean hasUserRoleSuperUserOrCreator(QueryUsersResponse response) {
-        try {
-            return response.getReturns().stream().anyMatch(
-                    user -> user.getProfiles().stream().anyMatch(
-                            profile -> profile.getState().equals(ProfileState.ACTIVE) &&
-                                    profile.getAuthorizations().stream().anyMatch(this::isRoleSuperUserOrCreator)));
-        } catch (Exception e) {
-            log.error("Error when checking eIAM user role exists.", e);
-            throw e;
-        }
-    }
-
-    private boolean isRoleSuperUserOrCreator(Authorization authorization) {
-        return authorization.getRole().getExtId().equals(ROLE_CREATOR) ||
-                authorization.getRole().getExtId().equals(ROLE_SUPERUSER);
+    private List<User> requestUsers(String uuid, String idpSource, QueryType type) {
+        return eiamClient.requestUsers(uuid, idpSource, type).getReturns();
     }
 }

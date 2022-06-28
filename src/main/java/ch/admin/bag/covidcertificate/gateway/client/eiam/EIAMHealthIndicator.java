@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ch.admin.bag.covidcertificate.gateway.Constants.CLIENT_NAME_KEY;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Component("eIAMAdminService")
@@ -24,15 +25,15 @@ public class EIAMHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        log.info("Calling eIAM AdminService queryClients. {}", kv("clientName", EIAMConfig.CLIENT_NAME));
+        log.info("Calling eIAM AdminService queryClients. {}", kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
         try {
             QueryClientsResponse response = eiamClient.queryClient(EIAMConfig.CLIENT_NAME);
             var clients = response.getReturns();
             if (clients == null || clients.isEmpty()) {
-                log.info("Client does not exist in eIAM. {}", kv("clientName", EIAMConfig.CLIENT_NAME));
+                log.info("Client does not exist in eIAM. {}", kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
                 return Health.down().build();
             } else if (clients.get(0).getName().equals(EIAMConfig.CLIENT_NAME)) {
-                log.info("Client does exist in eIAM. {}", kv("clientName", EIAMConfig.CLIENT_NAME));
+                log.info("Client does exist in eIAM. {}", kv(CLIENT_NAME_KEY, EIAMConfig.CLIENT_NAME));
                 return Health.up().build();
             }
             return Health.down().build();

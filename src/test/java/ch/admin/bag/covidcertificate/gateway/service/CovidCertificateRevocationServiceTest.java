@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 
 class CovidCertificateRevocationServiceTest {
 
@@ -27,17 +29,20 @@ class CovidCertificateRevocationServiceTest {
     static final ObjectMapper objectMapper = new ObjectMapper();
     static MockWebServer mockManagementService;
 
+    private static SystemSourceService systemSourceService;
+
     private CovidCertificateRevocationService revocationService;
 
     @BeforeAll
     static void setUp() throws IOException {
+        systemSourceService = mock(SystemSourceService.class);
         mockManagementService = new MockWebServer();
         mockManagementService.start();
     }
 
     @BeforeEach
     void initialize() {
-        this.revocationService = new CovidCertificateRevocationService(WebClient.create());
+        this.revocationService = new CovidCertificateRevocationService(WebClient.create(), systemSourceService);
         ReflectionTestUtils.setField(this.revocationService, "serviceUri",
                 String.format("http://localhost:%s/", mockManagementService.getPort()));
     }
@@ -50,7 +55,7 @@ class CovidCertificateRevocationServiceTest {
                 .addHeader("Content-Type", "application/json"));
 
         var createDto = fixture.create(RevocationDto.class);
-        assertDoesNotThrow(() -> revocationService.createRevocation(createDto));
+        assertDoesNotThrow(() -> revocationService.createRevocation(createDto, any(String.class)));
     }
 
     @Test
@@ -62,7 +67,7 @@ class CovidCertificateRevocationServiceTest {
                 .addHeader("Content-Type", "application/json"));
 
         var createDto = fixture.create(RevocationDto.class);
-        assertThrows(RevokeCertificateException.class, () -> revocationService.createRevocation(createDto));
+        assertThrows(RevokeCertificateException.class, () -> revocationService.createRevocation(createDto, any(String.class)));
     }
 
     @Test
@@ -74,7 +79,7 @@ class CovidCertificateRevocationServiceTest {
                 .addHeader("Content-Type", "application/json"));
 
         var createDto = fixture.create(RevocationDto.class);
-        assertThrows(RevokeCertificateException.class, () -> revocationService.createRevocation(createDto));
+        assertThrows(RevokeCertificateException.class, () -> revocationService.createRevocation(createDto, any(String.class)));
     }
 
     @AfterAll

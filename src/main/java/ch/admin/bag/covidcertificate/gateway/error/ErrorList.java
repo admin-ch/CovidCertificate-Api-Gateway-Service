@@ -77,6 +77,10 @@ public class ErrorList {
     public static final String MISSING_RECOVERY_RAT_INFO_JSON = ERROR_CODE_KEY + MISSING_RECOVERY_RAT_INFO_CODE + ","
             + ERROR_MESSAGE_KEY + MISSING_RECOVERY_RAT_INFO_MESSAGE + "}";
 
+    private static final int INVALID_SIZE_OF_UVCI_LIST_CODE = 472;
+    public static final String INVALID_SIZE_OF_UVCI_LIST = ERROR_CODE_KEY + INVALID_SIZE_OF_UVCI_LIST_CODE + ","
+            + ERROR_MESSAGE_KEY + "Size of uvci list is not valid. Max 100 uvcis allowed.}";
+
     // Authorization
     private static final int INVALID_SIGNATURE_CODE = 490;
     private static final String INVALID_SIGNATURE_MESSAGE = "Integrity check failed, the body hash does not match the hash in the header";
@@ -119,6 +123,12 @@ public class ErrorList {
     public static final RestError INVALID_OTP_LENGTH = new RestError(INVALID_OTP_LENGTH_CODE, INVALID_OTP_LENGTH_MESSAGE, HttpStatus.FORBIDDEN);
     public static final String INVALID_OTP_LENGTH_JSON = ERROR_CODE_KEY + INVALID_OTP_LENGTH_CODE + ","
             + ERROR_MESSAGE_KEY + INVALID_OTP_LENGTH_MESSAGE + "}";
+
+    public static final RestError EIAM_CALL_ERROR = new RestError(
+        497,
+            "Error when calling eIAM AdminService queryUsers.",
+            HttpStatus.INTERNAL_SERVER_ERROR
+    );
 
     // Conflict
     public static final String DUPLICATE_UVCI = ERROR_CODE_KEY + 480 + ","
