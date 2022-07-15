@@ -60,7 +60,7 @@ public class CovidCertificateGenerationService {
 
     private CovidCertificateCreateResponseDto createCovidCertificate(CertificateCreateDto createDto, String resourcePath, String userExtId) {
         final var uri = UriComponentsBuilder.fromHttpUrl(serviceURL + covidcertificateApiV1Path + resourcePath).toUriString();
-        log.debug("Call the CovidCertificateGenerationService with url {}", kv("url", uri));
+        log.debug("Call the CovidCertificateGenerationService with {}", kv("url", uri));
 
         createDto.setSystemSource(systemSourceService.getRelevantSystemSource(createDto.getSystemSource()));
         createDto.setUserExtId(userExtId);

@@ -45,7 +45,7 @@ public class ValueSetsService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + RAPID_TESTS_PATH);
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             List<RapidTestDto> response = defaultWebClient
                     .get()
@@ -68,7 +68,7 @@ public class ValueSetsService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + ISSUABLE_RAPID_TESTS_PATH);
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             List<IssuableRapidTestDto> response = defaultWebClient
                     .get()
@@ -91,7 +91,7 @@ public class ValueSetsService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + VACCINES_PATH);
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             List<VaccineDto> response = defaultWebClient
                     .get()
@@ -119,7 +119,7 @@ public class ValueSetsService {
         }
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             List<IssuableVaccineDto> response = defaultWebClient
                     .get()
@@ -142,7 +142,7 @@ public class ValueSetsService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + COUNTRY_CODE_PATH);
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             CountryCodesDto response = defaultWebClient
                     .get()
@@ -166,7 +166,7 @@ public class ValueSetsService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUri + COUNTRY_CODE_PATH + "/" + language);
 
         String uri = builder.toUriString();
-        log.debug("Call the ValueSetsService with url {}", kv("url", uri));
+        log.debug("Call the ValueSetsService with {}", kv("url", uri));
         try {
             List<CountryCodeDto> response = defaultWebClient
                     .get()

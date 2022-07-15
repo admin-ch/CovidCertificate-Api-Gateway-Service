@@ -29,6 +29,9 @@ cc-api-gateway-service:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
   cache-duration: 3600000
 
+  truststore:
+    password: ${vcap.services.cc_trust_store.credentials.password}
+
 eiam-admin-service:
   url: ${vcap.services.cc-eiam-admin-service.credentials.url}
   keystore: ${vcap.services.cc-eiam-admin-service.credentials.keystore}
