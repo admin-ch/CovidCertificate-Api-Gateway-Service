@@ -27,7 +27,7 @@ public class EIAMConfig {
     private String keystore;
     @Value("${eiam-admin-service.keystore-password}")
     private String keystorePassword;
-    @Value("${eiam-admin-service.truststore-password}")
+    @Value("${cc-api-gateway-service.truststore.password}")
     private String truststorePassword;
 
     @Bean
