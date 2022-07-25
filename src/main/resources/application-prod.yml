@@ -29,11 +29,14 @@ cc-api-gateway-service:
     publicKey: ${vcap.services.cc_jwt_public_key.credentials.publicKey}
   cache-duration: 3600000
 
+  # password for the provided truststore in truststore.jks
+  truststore:
+    password: ${vcap.services.cc_trust_store.credentials.password}
+
 eiam-admin-service:
   url: ${vcap.services.cc-eiam-admin-service.credentials.url}
   keystore: ${vcap.services.cc-eiam-admin-service.credentials.keystore}
   keystore-password: ${vcap.services.cc-eiam-admin-service.credentials.keystore-password}
-  truststore-password: ${vcap.services.cc-eiam-admin-service.credentials.truststore-password}
 
 allowed-common-names-for-identity: ${vcap.services.cc-api-gateway-service-allowed-cn-identity.credentials.cn}
 allowed-common-names-for-system-source: ${vcap.services.cc-api-gateway-service-allowed-cn-system-source.credentials.cn}
