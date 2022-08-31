@@ -34,9 +34,9 @@ import java.util.Map;
 @Slf4j
 public class SignatureTestController {
 
-    private static final String PRIVATE_CERT_PATH = "/home/dev/private-cert.pem";
+//    private static final String PRIVATE_CERT_PATH = "/home/dev/private-cert.pem";
 //    private static final String PRIVATE_CERT_PATH = "/home/dev/worktools/certificates/ZH-spital-A-t.bit.admin.ch.key";
-//    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/ZH-spital-A-t.bit.admin.ch.key";
+    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/ZH-spital-A-t.bit.admin.ch.key";
 //    private static final String PRIVATE_CERT_PATH = "/home/dev/development/postman/a0115-irfBIT-PROD.key";
 
     /**
