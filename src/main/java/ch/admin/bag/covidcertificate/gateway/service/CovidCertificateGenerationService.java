@@ -2,20 +2,23 @@ package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
-import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.*;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.AntibodyCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.CovidCertificateCreateResponseDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.RecoveryRatCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.TestCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationCertificateCreateDto;
+import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.VaccinationTouristCertificateCreateDto;
 import ch.admin.bag.covidcertificate.gateway.service.util.WebClientUtils;
-import ch.admin.bag.covidcertificate.gateway.web.config.CustomHeaderAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 

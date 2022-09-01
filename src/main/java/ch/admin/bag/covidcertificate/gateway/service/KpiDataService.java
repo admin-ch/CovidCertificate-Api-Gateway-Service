@@ -18,9 +18,6 @@ public class KpiDataService {
     public void saveKpiData(LocalDateTime timestamp, String type, String value) {
         saveKpiData(timestamp, type, value, null, null, null, false, null);
     }
-    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, boolean fraud) {
-        saveKpiData(timestamp, type, value, uvci, null, null, fraud, null);
-    }
 
     public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country) {
         saveKpiData(timestamp, type, value, uvci, details, country, false, null);
