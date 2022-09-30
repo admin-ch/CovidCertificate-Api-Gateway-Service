@@ -1,6 +1,5 @@
 package ch.admin.bag.covidcertificate.gateway.web.config;
 
-import ch.admin.bag.covidcertificate.gateway.web.config.CNExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

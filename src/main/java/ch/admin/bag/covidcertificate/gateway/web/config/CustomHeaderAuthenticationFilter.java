@@ -16,7 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static ch.admin.bag.covidcertificate.gateway.Constants.*;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_CERT_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_COMMON_NAME_TYPE;
+import static ch.admin.bag.covidcertificate.gateway.Constants.KPI_TIMESTAMP_KEY;
+import static ch.admin.bag.covidcertificate.gateway.Constants.LOG_FORMAT;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j

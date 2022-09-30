@@ -178,10 +178,11 @@ public class AuthorizationClient {
                 .block();
 
         TreeMap<String, String> roleMapping = new TreeMap<>();
-        assert roleMap != null;
-        for (RoleDataDto roleDataDto : roleMap) {
-            roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
-            roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
+        if(roleMap != null) {
+            for (RoleDataDto roleDataDto : roleMap) {
+                roleMapping.put(roleDataDto.getClaim(), roleDataDto.getIntern());
+                roleMapping.put(roleDataDto.getEiam(), roleDataDto.getIntern());
+            }
         }
         return roleMapping;
     }

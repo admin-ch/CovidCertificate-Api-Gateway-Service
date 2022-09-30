@@ -38,9 +38,13 @@ public class ResponseStatusExceptionHandler {
         RestError error;
         try {
             var rootException = (InvalidFormatException) ex.getCause();
-            assert rootException != null;
-            var errorMessage = "Unable to parse " + rootException.getValue() + " to " + rootException.getTargetType();
-            log.warn("HttpMessage with invalid format received: ", rootException);
+            String errorMessage;
+            if(rootException != null) {
+                errorMessage = "Unable to parse " + rootException.getValue() + " to " + rootException.getTargetType();
+                log.warn("HttpMessage with invalid format received: ", rootException);
+            } else {
+                errorMessage = "Root exception is null, so it is not possible to give further details. ";
+            }
             error = new RestError(HttpStatus.BAD_REQUEST.value(), errorMessage, HttpStatus.BAD_REQUEST);
         } catch (ClassCastException | AssertionError processingException) {
             log.warn("HttpMessage is not readable: ", ex);

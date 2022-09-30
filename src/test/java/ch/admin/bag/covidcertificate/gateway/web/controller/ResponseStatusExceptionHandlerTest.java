@@ -7,22 +7,21 @@ import ch.admin.bag.covidcertificate.gateway.service.dto.ReadValueSetsException;
 import ch.admin.bag.covidcertificate.gateway.service.dto.RevokeCertificateException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.flextrade.jfixture.JFixture;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ResponseStatusExceptionHandlerTest {
-    private final JFixture fixture = new JFixture();
 
-    private TestResponseStatusExceptionHandlerWrapper testExceptionHanlder = new TestResponseStatusExceptionHandlerWrapper();
+    private TestResponseStatusExceptionHandlerWrapper testExceptionHandler = new TestResponseStatusExceptionHandlerWrapper();
 
     @Test
     void createCertificateConflictReturnsRestError__withCreateCertificateException() {
@@ -30,7 +29,7 @@ class ResponseStatusExceptionHandlerTest {
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
 
-        var responseEntity = this.testExceptionHanlder.createCertificateConflict(exception);
+        var responseEntity = this.testExceptionHandler.createCertificateConflict(exception);
         assertEquals(restError.getErrorCode(), Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         assertEquals(restError.getErrorMessage(), Objects.requireNonNull(responseEntity.getBody()).getErrorMessage());
         assertEquals(restError.getHttpStatus(), Objects.requireNonNull(responseEntity.getStatusCode()));
@@ -42,7 +41,7 @@ class ResponseStatusExceptionHandlerTest {
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
 
-        var responseEntity = this.testExceptionHanlder.createCertificateConflict(exception);
+        var responseEntity = this.testExceptionHandler.createCertificateConflict(exception);
         assertEquals(restError.getErrorCode(), Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         assertEquals(restError.getErrorMessage(), Objects.requireNonNull(responseEntity.getBody()).getErrorMessage());
         assertEquals(restError.getHttpStatus(), Objects.requireNonNull(responseEntity.getStatusCode()));
@@ -54,7 +53,7 @@ class ResponseStatusExceptionHandlerTest {
         var restError = new RestError(492, "test", HttpStatus.FORBIDDEN);
         when(exception.getError()).thenReturn(restError);
 
-        var responseEntity = this.testExceptionHanlder.invalidBearer(exception);
+        var responseEntity = this.testExceptionHandler.invalidBearer(exception);
         assertEquals(restError.getErrorCode(), Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         assertEquals(restError.getErrorMessage(), Objects.requireNonNull(responseEntity.getBody()).getErrorMessage());
         assertEquals(restError.getHttpStatus(), Objects.requireNonNull(responseEntity.getStatusCode()));
@@ -67,7 +66,7 @@ class ResponseStatusExceptionHandlerTest {
         var causedByException = new InvalidFormatException(mock(JsonParser.class), "", testValue, String.class);
         when(exception.getCause()).thenReturn(causedByException);
 
-        var responseEntity = this.testExceptionHanlder.notReadableRequestPayload(exception);
+        var responseEntity = this.testExceptionHandler.notReadableRequestPayload(exception);
         assertEquals(400, Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         var expectedErrorMessage = "Unable to parse " + testValue + " to " + String.class;
         assertEquals(expectedErrorMessage, responseEntity.getBody().getErrorMessage());
@@ -75,10 +74,10 @@ class ResponseStatusExceptionHandlerTest {
 
     @Test
     void notReadableHandlerReturnsUnreadableMessage__ifNotInvalidFormatException() {
-        var exception = mock(HttpMessageNotReadableException.class);
-        when(exception.getCause()).thenReturn(new RuntimeException());
+        var exception = new HttpMessageNotReadableException(
+                "Mock of HttpMessageNotReadableException", new Exception("Mocked root cause"), (HttpInputMessage)null);
 
-        var responseEntity = this.testExceptionHanlder.notReadableRequestPayload(exception);
+        var responseEntity = this.testExceptionHandler.notReadableRequestPayload(exception);
         assertEquals(400, Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         var expectedErrorMessage = "Http message not readable";
         assertEquals(expectedErrorMessage, responseEntity.getBody().getErrorMessage());
@@ -90,18 +89,16 @@ class ResponseStatusExceptionHandlerTest {
         var restError = new RestError(400, "test", HttpStatus.BAD_REQUEST);
         when(exception.getError()).thenReturn(restError);
 
-        var responseEntity = this.testExceptionHanlder.readValueSetsException(exception);
+        var responseEntity = this.testExceptionHandler.readValueSetsException(exception);
         assertEquals(restError.getErrorCode(), Objects.requireNonNull(responseEntity.getBody()).getErrorCode());
         assertEquals(restError.getErrorMessage(), Objects.requireNonNull(responseEntity.getBody()).getErrorMessage());
         assertEquals(restError.getHttpStatus(), Objects.requireNonNull(responseEntity.getStatusCode()));
-
-
     }
 
     @Test
     void returns500__onAnyException() {
-        var exception = mock(Exception.class);
-        var responseEntity = this.testExceptionHanlder.handleException(exception);
+        var exception = new Exception("Mocked exception", new Exception("Mocked root cause"));
+        var responseEntity = this.testExceptionHandler.handleException(exception);
         assertEquals(responseEntity.getStatusCode(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
