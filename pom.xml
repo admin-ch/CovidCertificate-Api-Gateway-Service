@@ -15,7 +15,7 @@
     <description>CC-API-Gateway-Service</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
 
         <cc-backend-logging.version>1.0.4</cc-backend-logging.version>
         <com.squareup.okhttp3.version>4.10.0</com.squareup.okhttp3.version>
@@ -24,7 +24,7 @@
         <jfixture-mockito.version>2.7.2</jfixture-mockito.version>
         <jjwt.version>0.11.5</jjwt.version>
         <logstash.version>7.2</logstash.version>
-        <maven.jaxb2-plugin.version>0.15.1</maven.jaxb2-plugin.version>
+        <maven-jaxb2-plugin.version>0.15.1</maven-jaxb2-plugin.version>
         <org.mokito.version>4.8.0</org.mokito.version>
         <net.therore.logback.version>1.0.0</net.therore.logback.version>
         <org.glassfish.jaxb-runtime.version>2.3.6</org.glassfish.jaxb-runtime.version>
@@ -253,7 +253,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>${maven.jaxb2-plugin.version}</version>
+                <version>${maven-jaxb2-plugin.version}</version>
                 <executions>
                     <execution>
                         <configuration>
