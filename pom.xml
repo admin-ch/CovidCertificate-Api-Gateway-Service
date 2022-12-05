@@ -10,7 +10,7 @@
     </parent>
     <groupId>ch.admin.bag.covidcertificate</groupId>
     <artifactId>cc-api-gateway-service</artifactId>
-    <version>4.9.0</version>
+    <version>4.9.1</version>
     <name>cc-api-gateway-service</name>
     <description>CC-API-Gateway-Service</description>
 
@@ -20,7 +20,7 @@
         <cc-backend-logging.version>1.0.4</cc-backend-logging.version>
         <com.squareup.okhttp3.version>4.10.0</com.squareup.okhttp3.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <janino.version>3.1.8</janino.version>
+        <janino.version>3.1.9</janino.version>
         <jfixture-mockito.version>2.7.2</jfixture-mockito.version>
         <jjwt.version>0.11.5</jjwt.version>
         <logstash.version>7.2</logstash.version>
@@ -28,9 +28,9 @@
         <org.mokito.version>4.8.0</org.mokito.version>
         <net.therore.logback.version>1.0.0</net.therore.logback.version>
         <org.glassfish.jaxb-runtime.version>2.3.6</org.glassfish.jaxb-runtime.version>
-        <spring-cloud-starter-sleuth.version>3.1.4</spring-cloud-starter-sleuth.version>
-        <springdoc.version>1.6.11</springdoc.version>
-        <java-cfenv-boot.version>2.4.0</java-cfenv-boot.version>
+        <spring-cloud-starter-sleuth.version>3.1.5</spring-cloud-starter-sleuth.version>
+        <springdoc.version>1.6.13</springdoc.version>
+        <java-cfenv-boot.version>2.4.1</java-cfenv-boot.version>
              
         <log4j2.version>2.18.0</log4j2.version>
 
