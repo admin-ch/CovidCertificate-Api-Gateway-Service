@@ -1,7 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CcApiGatewayServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local,authorization,mock-identity-authorization" />
-    <module name="cc-api-gateway-service" />
+    <option name="ALTERNATIVE_JRE_PATH" value="17" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <module name="CovidCertificate-Api-Gateway-Service" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ch.admin.bag.covidcertificate.gateway.CcApiGatewayServiceApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
