@@ -1,5 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,9 +14,11 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "kpi")
 public class KpiData {
     @Id
@@ -29,16 +33,4 @@ public class KpiData {
     boolean fraud;
     @Column(name = "in_app_delivery_code")
     String inAppDeliveryCode;
-
-    public KpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country,
-                   boolean fraud, String inAppDeliveryCode) {
-        this.timestamp = timestamp;
-        this.type = type;
-        this.value = value;
-        this.uvci = uvci;
-        this.details = details;
-        this.country = country;
-        this.fraud = fraud;
-        this.inAppDeliveryCode = inAppDeliveryCode;
-    }
 }
