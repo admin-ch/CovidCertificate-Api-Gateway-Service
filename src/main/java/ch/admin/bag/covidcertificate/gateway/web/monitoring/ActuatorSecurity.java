@@ -1,4 +1,4 @@
-package ch.admin.bag.covidcertificate.gateway.web.config;
+package ch.admin.bag.covidcertificate.gateway.web.monitoring;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthEndpoint;
