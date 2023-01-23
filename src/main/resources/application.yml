@@ -90,7 +90,7 @@ cc-api-gateway-service:
   allowed-origin: "*"
   monitor:
     prometheus:
-      user: "prometheus"
+      secure: true
 
 cc-management-service:
   covidcertificate:
