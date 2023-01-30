@@ -68,7 +68,7 @@ public class AuthorizationClient {
      * Returns all permitted functions for a given roles set at current instant time.
      *
      * @param rawRoles the current roles of the user (either from eIAM or from Claim)
-     * @return list of permitted functions
+     * @return set of permitted functions
      */
     public Set<String> getCurrentGrantedFunctions(List<String> rawRoles) {
 
@@ -149,7 +149,7 @@ public class AuthorizationClient {
             result = functions.stream()
                     .parallel()
                     .filter(function -> function.isBetween(pointInTime))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return result;
     }

@@ -7,11 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.CLIENT_NAME_KEY;
 import static net.logstash.logback.argument.StructuredArguments.kv;
@@ -41,12 +37,5 @@ public class EIAMHealthIndicator implements HealthIndicator {
             log.error("Error when calling eIAM AdminService queryClients.", e);
             return Health.down(e).build();
         }
-    }
-
-    private List<String> getErrorMessages(Exception e, String errorMessage) {
-        final List<String> messages = new ArrayList<>();
-        messages.add(errorMessage);
-        messages.add(NestedExceptionUtils.getMostSpecificCause(e).getMessage());
-        return messages;
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static ch.admin.bag.covidcertificate.gateway.Constants.IDP_SOURCE_CLAIM_KEY;
 import static ch.admin.bag.covidcertificate.gateway.Constants.UUID_CLAIM_KEY;
@@ -53,8 +52,7 @@ public abstract class AbstractIdentityAuthorizationClient implements IdentityAut
                 .map(Profile::getRoles)
                 .flatMap(Collection::stream)
                 .map(Role::getExtId)
-                .distinct()
-                .collect(Collectors.toList());
+                .distinct().toList();
 
         log.trace("Authorization checked successfully.");
         return new UserAuthorizationData(uuid, idpSource, roles);

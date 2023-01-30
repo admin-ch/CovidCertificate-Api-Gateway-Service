@@ -23,14 +23,18 @@ public class KpiDataService {
         saveKpiData(timestamp, type, value, uvci, details, country, false, null);
     }
 
-    public void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci,
-                            String details, String country, String inAppDeliveryCode) {
-        saveKpiData(timestamp, type, value, uvci, details, country, false, inAppDeliveryCode);
-    }
-
     private void saveKpiData(LocalDateTime timestamp, String type, String value, String uvci, String details, String country,
                              boolean fraud, String inAppDeliveryCode) {
-        KpiData kpiData = new KpiData(timestamp, type, value, uvci, details, country, fraud, inAppDeliveryCode);
+        KpiData kpiData = KpiData.builder()
+                .timestamp(timestamp)
+                .type(type)
+                .value(value)
+                .uvci(uvci)
+                .details(details)
+                .country(country)
+                .fraud(fraud)
+                .inAppDeliveryCode(inAppDeliveryCode)
+                .build();
         logRepository.save(kpiData);
     }
 }
