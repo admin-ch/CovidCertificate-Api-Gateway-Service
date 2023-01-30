@@ -1,7 +1,7 @@
 package ch.admin.bag.covidcertificate.gateway.web.controller;
 
 import ch.admin.bag.covidcertificate.gateway.error.RestError;
-import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.Function;
 import ch.admin.bag.covidcertificate.gateway.filters.IntegrityFilter;
 import ch.admin.bag.covidcertificate.gateway.service.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.CovidCertificateGenerationService;
