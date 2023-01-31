@@ -132,6 +132,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ch.admin.bag.covidcertificate</groupId>
+            <artifactId>cc-backend-authorization</artifactId>
+            <version>${cc-backend-authorization.version}</version>
+        </dependency>
 
         <!-- monitoring Dependencies -->
         <dependency>
@@ -158,11 +163,6 @@
             <groupId>ch.admin.bag.covidcertificate</groupId>
             <artifactId>cc-backend-logging</artifactId>
             <version>${cc-backend-logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.admin.bag.covidcertificate</groupId>
-            <artifactId>cc-backend-authorization</artifactId>
-            <version>${cc-backend-authorization.version}</version>
         </dependency>
 
         <dependency>
