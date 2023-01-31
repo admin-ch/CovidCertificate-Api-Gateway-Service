@@ -16,9 +16,6 @@ spring:
 
 cc-management-service:
   uri: "https://cc-management-service.dev.app.cfap02.atlantica.admin.ch/"
-  authorization:
-    data-sync:
-      cron: "0 0/30 * * * *" ## Every half-hour
   monitor:
     prometheus:
       user: "prometheus"

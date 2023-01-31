@@ -96,6 +96,3 @@ cc-management-service:
   covidcertificate:
     api:
       v1-path: "api/v1/covidcertificate/"
-  authorization:
-    api:
-      v1-path: "api/v1/authorization/"
