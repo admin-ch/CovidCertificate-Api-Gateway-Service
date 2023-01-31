@@ -24,6 +24,7 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
     private String password;
 
     @Override
+    @SuppressWarnings(value="java:S4502")
     protected void configure(HttpSecurity http) throws Exception {
         http.requestMatcher(org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest.toAnyEndpoint()).
                 authorizeRequests().
