@@ -1,8 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.features.authorization.FunctionAuthorization;
 import ch.admin.bag.covidcertificate.gateway.features.authorization.Function;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.FunctionAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
 import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
@@ -19,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;

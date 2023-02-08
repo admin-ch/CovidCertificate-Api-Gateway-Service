@@ -17,9 +17,6 @@ spring:
 
 cc-management-service:
   uri: http://localhost:8120/
-  authorization:
-    data-sync:
-      cron: "0 * * * * *" ## Every minute
   monitor:
     prometheus:
       user: "prometheus"
