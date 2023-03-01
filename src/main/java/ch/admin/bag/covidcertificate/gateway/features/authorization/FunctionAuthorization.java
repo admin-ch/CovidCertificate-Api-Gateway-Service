@@ -1,25 +1,29 @@
-package ch.admin.bag.covidcertificate.gateway.client.internal;
+package ch.admin.bag.covidcertificate.gateway.features.authorization;
 
-import ch.admin.bag.covidcertificate.gateway.features.authorization.AuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
+import ch.admin.bag.covidcertificate.authorization.AuthorizationService;
 import ch.admin.bag.covidcertificate.gateway.service.dto.CreateCertificateException;
 import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static ch.admin.bag.covidcertificate.gateway.error.ErrorList.INVALID_IDENTITY_USER_ROLE;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FunctionAuthorizationClient {
+public class FunctionAuthorization {
 
-    private final AuthorizationClient authorizationClient;
+    private final AuthorizationService authorizationService;
 
     public void validateUserAuthorization(UserAuthorizationData userAuthorizationData, Function function) {
 
-        if (authorizationClient.isAuthorized(userAuthorizationData.getRoles(), function.getIdentifier())) return;
+        Set<String> grantedFunctions = authorizationService.getCurrent(
+                AuthorizationService.SERVICE_API_GATEWAY, userAuthorizationData.getRoles());
+
+        if (grantedFunctions.contains(function.getIdentifier())) return;
 
         throw new CreateCertificateException(INVALID_IDENTITY_USER_ROLE);
     }

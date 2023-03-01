@@ -1,4 +1,4 @@
-package ch.admin.bag.covidcertificate.gateway.features.authorization.model;
+package ch.admin.bag.covidcertificate.gateway.features.authorization;
 
 public enum Function {
     CREATE_VACCINE_CERTIFICATE,

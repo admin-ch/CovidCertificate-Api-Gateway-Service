@@ -1,9 +1,8 @@
 package ch.admin.bag.covidcertificate.gateway.service;
 
 import ch.admin.bag.covidcertificate.gateway.client.IdentityAuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.client.internal.FunctionAuthorizationClient;
-import ch.admin.bag.covidcertificate.gateway.error.RestError;
-import ch.admin.bag.covidcertificate.gateway.features.authorization.model.Function;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.Function;
+import ch.admin.bag.covidcertificate.gateway.features.authorization.FunctionAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.DtoWithAuthorization;
 import ch.admin.bag.covidcertificate.gateway.service.dto.incoming.IdentityDto;
 import ch.admin.bag.covidcertificate.gateway.service.model.UserAuthorizationData;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -34,7 +32,7 @@ class AuthorizationServiceTest {
 
     BearerTokenValidationService bearerTokenValidationService;
     IdentityAuthorizationClient identityAuthorizationClient;
-    FunctionAuthorizationClient functionAuthorizationClient;
+    FunctionAuthorization functionAuthorization;
 
     DtoWithAuthorization dtoWithAuthorization;
     AuthorizationService authorizationService;
@@ -45,10 +43,10 @@ class AuthorizationServiceTest {
     void initialize() {
         this.bearerTokenValidationService = mock(BearerTokenValidationService.class);
         this.identityAuthorizationClient = mock(IdentityAuthorizationClient.class);
-        this.functionAuthorizationClient = mock(FunctionAuthorizationClient.class);
+        this.functionAuthorization = mock(FunctionAuthorization.class);
         this.dtoWithAuthorization = this.getDtoWithAuthorization(false, false);
 
-        this.authorizationService = new AuthorizationService(bearerTokenValidationService, identityAuthorizationClient, functionAuthorizationClient);
+        this.authorizationService = new AuthorizationService(bearerTokenValidationService, identityAuthorizationClient, functionAuthorization);
         this.ipAddress = fixure.create(String.class);
     }
 
